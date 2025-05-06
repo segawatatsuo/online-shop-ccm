@@ -1,0 +1,108 @@
+@charset "utf-8";
+
+.main {
+    max-width: 1200px;
+    margin-top: 60px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 60px;
+    margin-bottom: 60px;
+}
+
+.container table.cart td {
+    vertical-align: middle;
+}
+
+.tb-scrooll{
+    max-width: 100%; 
+    overflow: auto;/*スマホの時にはscrollに切り替わる*/
+}
+
+.container table.shop_table td {
+    border-bottom: 2px solid #f1f1f1;
+    padding: 6px 12px;
+    vertical-align: middle;
+    font-weight: bold;
+}
+
+.container table.shop_table th {
+    border-bottom: 2px solid #f1f1f1;
+    line-height: 18px;
+    font-size: 0.9em;
+    padding: 6px 12px;
+    font-weight: bold;
+}
+
+.message {
+    background-color: #e36e3a;
+    color: #ffffff;
+    padding: 20px;
+}
+
+.product-name {
+    text-align: left;
+}
+
+.product-thumbnail {
+    max-width: 100px;
+    max-height: auto;
+}
+
+.product-thumbnai img {
+    width: 100px;
+    height: 100px;
+}
+
+.qty {
+    width: 40px;
+    height: 20px;
+}
+
+.cart-collaterals {
+    display: flex;
+    justify-content: flex-end
+}
+
+.cart-collaterals table {
+    line-height: 0.1;
+}
+
+.cart-collaterals td {
+    padding: 1em 1em;
+}
+
+.a-button {
+    border: none;
+}
+
+.modifi-button {
+    padding: 5px 5px;
+}
+
+
+@media (max-width: 800px) {
+
+    .main {
+        margin-top: 10px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-top: 10px;
+
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+
+    }
+
+    .actions{
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+
+}

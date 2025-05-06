@@ -1,0 +1,220 @@
+@charset "utf-8";
+
+.main {
+    max-width: 1200px;
+    margin-top: 60px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+        "breadcrumbs breadcrumbs"
+        "leftside rightside";
+    column-gap: 40px;
+    row-gap: 40px;
+    grid-auto-rows: minmax(200px, auto);
+    margin-top: 60px;
+    margin-bottom: 60px;
+}
+
+.container .img-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container img {
+    max-width: 300px;
+    height: auto;
+}
+
+.breadcrumbs {
+    grid-area: breadcrumbs;
+    font-size: 10px;
+}
+
+.leftside {
+    grid-area: leftside;
+}
+
+.leftside .igm-box {
+    display: flex;
+    /*align-items: center; /* 縦中央揃え */
+    justify-content: center;
+    /* 横中央揃え（必要なら） */
+    /*height: 100%; /* 親要素の高さを指定 */
+}
+
+.rightside {
+    grid-area: rightside;
+    display: flex;
+    flex-direction: column;
+
+}
+
+.rightside .title {
+    font-size: 24px;
+    margin-top: 0;
+}
+
+.rightside h2 {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.rightside h3 {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.rightside .point {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.rightside p {
+    margin-top: 20px;
+    font-size: 12px;
+    line-height: 2em;
+    margin-bottom: 40px;
+}
+
+.rightside div.text {
+    font-size: 12px;
+    line-height: 2em;
+    margin-bottom: 20px;
+}
+
+.price {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.price .tax {
+    font-size: 11px;
+    font-weight: normal;
+}
+
+.a-button {
+    margin-top: 20px;
+}
+
+.product-list {
+    display: flex;
+    flex-wrap: wrap;
+    width: 500px;
+    gap: 10px;
+    /* 画像間に余白を作る場合 */
+    margin-top: 40px;
+}
+
+.product-list .data-thumb {
+    width: 30%;
+    /* 3列で並ぶように調整 */
+}
+
+.product-list .data-thumb img {
+    width: 100%;
+    height: 100px;
+    object-fit: contain;
+    /* 画像を縮小して全体を表示 */
+}
+
+.igm-point img {
+    max-width: 100%;
+    /* コンテナいっぱいに広げる */
+    width: 500px;
+    /* 必要に応じて適宜変更 */
+    height: auto;
+    /* アスペクト比を保持 */
+}
+
+@media (max-width: 800px) {
+    .main {
+        margin-top: 10px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-top: 10px;
+
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        column-gap: 40px;
+        row-gap: 40px;
+        grid-auto-rows: minmax(200px, auto);
+        margin-top: 60px;
+        margin-bottom: 60px;
+    }
+
+    .rightside .title{
+        font-size: 18px;
+        line-height: 1.2em;
+    }
+    .rightside p {
+        margin-bottom: 10px;
+    }
+
+    .footer {
+        text-align: left;
+        padding: 5%;
+      }
+    
+      .footer .row ul li {
+        display: block;
+        margin: 10px 0px;
+        text-align: left;
+      }
+    
+      .footer .row a i {
+        margin: 0% 3%;
+      }
+
+      .igm-box img{
+        width: 100%;
+        height: auto;
+      }
+}
+
+.sub-img li.current img {
+    border: 2px solid rgb(190, 190, 190);
+    transition: border .5s;
+}
+.main-img {
+    height: auto;
+    width: 100%;
+}
+.main-img img {
+    height: auto;
+    width: 100%;
+}
+.sub-img {
+    display: flex;
+    margin-top: 10px;
+}
+.sub-img li {
+    margin-right: 2%;
+    width: calc(96% / 3);
+}
+.sub-img li:nth-child(3n) {
+    margin-right: 0;
+}
+.sub-img li img {
+    border: 2px solid transparent;
+    transition: border .5s;
+}
+.sub-img img {
+    cursor: pointer;
+    width: 100%;
+}

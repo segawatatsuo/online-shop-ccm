@@ -1,0 +1,23 @@
+@charset "utf-8";
+
+.line-up {
+    width: 930px;
+    max-width: 100%;
+    margin-top: 75px;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+}
+
+.line-up{
+    display: flex;
+    flex-direction: column;
+    row-gap: 40px;
+}
+
+.line-up img{
+    width: 100%;
+    height: auto;
+    
+}
+
