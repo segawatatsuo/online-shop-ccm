@@ -5,15 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>エアーストッキング</title>
-    <script src="{{ secure_asset('js/toggle-menu.js') }}"></script>
-    <link rel="stylesheet" href="{{ secure_asset('css/app.css') }}">
-    <link rel="stylesheet" href="{{ secure_asset('css/common.css') }}">
-    <link rel="stylesheet" href="{{ secure_asset('css/concept.css') }}">
-    <link rel="stylesheet" href="{{ secure_asset('css/menu.css') }}">
-    <link rel="stylesheet" href="{{ secure_asset('css/main.css') }}">
-    <link rel="stylesheet" href="{{ secure_asset('css/button.css') }}">
-    <link rel="stylesheet" href="{{ secure_asset('css/top.css') }}">
-    <link rel="stylesheet" href="{{ secure_asset('css/index.css') }}">
+    <script src="{{ asset('js/toggle-menu.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/common.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/concept.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/menu.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/button.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/top.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/index.css') }}">
     <script src="https://kit.fontawesome.com/f57af4dcea.js" crossorigin="anonymous"></script>
 </head>
 
@@ -21,7 +21,7 @@
 
     <header class="header">
         <div class="header-inner">
-            <a class="header-logo" href="index.html"><img src="{{ secure_asset('images/top/logo.png') }}" alt=""> </a>
+            <a class="header-logo" href="index.html"><img src="{{ asset('images/top/logo.png') }}" alt=""> </a>
 
             
 
@@ -30,9 +30,9 @@
                 <nav class="site-menu">
                     <ul>
                         <li><a href="https://www.ccmedico.com/">CCM</a></li>
-                        <li><a href="{{ secure_asset('product/airstocking') }}">エアストッキング&reg;</a></li>
-                        <li><a href="{{ secure_asset('product/gelnail') }}">3in1&reg;ジェルネイル</a></li>
-                        <li><a href="{{ secure_asset('product/wax') }}">美脚脱毛</a></li>
+                        <li><a href="{{ asset('product/airstocking') }}">エアストッキング&reg;</a></li>
+                        <li><a href="{{ asset('product/gelnail') }}">3in1&reg;ジェルネイル</a></li>
+                        <li><a href="{{ asset('product/wax') }}">美脚脱毛</a></li>
                     </ul>
                 </nav>
             </div>
@@ -45,9 +45,9 @@
 
     <main class="main">
         <div class="line-up">
-            <a href="{{ secure_asset('product/wax') }}"><img src="{{ secure_asset('images/shop-top/bikyaku.jpg') }}" alt="" class="pic"></a>
-            <a href="{{ secure_asset('product/airstocking') }}"><img src="{{ secure_asset('images/shop-top/daimond.jpg') }}" alt="" class="pic"></a>
-            <a href="{{ secure_asset('product/gelnail') }}"><img src="{{ secure_asset('images/shop-top/3in1Lineup1560-600.jpg') }}" alt="" class="pic"></a>
+            <a href="{{ asset('product/wax') }}"><img src="{{ asset('images/shop-top/bikyaku.jpg') }}" alt="" class="pic"></a>
+            <a href="{{ asset('product/airstocking') }}"><img src="{{ asset('images/shop-top/daimond.jpg') }}" alt="" class="pic"></a>
+            <a href="{{ asset('product/gelnail') }}"><img src="{{ asset('images/shop-top/3in1Lineup1560-600.jpg') }}" alt="" class="pic"></a>
         </div>
 
 
