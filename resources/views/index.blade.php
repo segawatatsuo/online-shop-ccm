@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>エアーストッキング</title>
     <script src="{{ asset('js/toggle-menu.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/common.css') }}">
     <link rel="stylesheet" href="{{ asset('css/concept.css') }}">
     <link rel="stylesheet" href="{{ asset('css/menu.css') }}">
