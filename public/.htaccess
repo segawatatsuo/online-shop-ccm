@@ -3,6 +3,12 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+    # 🔽 ここから追記（HTTPS強制ヘッダ）
+    <IfModule mod_setenvif.c>
+        SetEnvIf X-Forwarded-Proto https HTTPS=on
+    </IfModule>
+    # 🔼 ここまで追記
+
     RewriteEngine On
 
     # Handle Authorization Header
@@ -19,3 +25,4 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
