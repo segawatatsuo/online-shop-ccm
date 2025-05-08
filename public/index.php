@@ -32,8 +32,9 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 */
 
 //require __DIR__.'/../vendor/autoload.php';
-require __DIR__.'/vendor/autoload.php';
-require __DIR__ . '/../../../online-shop-ccm/vendor/autoload.php';
+//require __DIR__.'/vendor/autoload.php';
+//require __DIR__ . '/../../../online-shop-ccm/vendor/autoload.php';
+require __DIR__ . '/../../../../online-shop-ccm/vendor/autoload.php';
 /*
 |--------------------------------------------------------------------------
 | Run The Application
@@ -46,8 +47,9 @@ require __DIR__ . '/../../../online-shop-ccm/vendor/autoload.php';
 */
 
 //$app = require_once __DIR__.'/../bootstrap/app.php';
-$app = require_once __DIR__.'/bootstrap/app.php';
-$app = require_once __DIR__ . '/../../../online-shop-ccm/bootstrap/app.php';
+//$app = require_once __DIR__.'/bootstrap/app.php';
+//$app = require_once __DIR__ . '/../../../online-shop-ccm/bootstrap/app.php';
+$app = require_once __DIR__ . '/../../../../online-shop-ccm/bootstrap/app.php';
 $kernel = $app->make(Kernel::class);
 
 $response = $kernel->handle(
