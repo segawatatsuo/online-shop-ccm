@@ -84,7 +84,7 @@ class ProductJaController extends Controller
         //collect() は空のコレクションを作るLaravelの関数です。これで変数が常に存在し、Bladeでエラーになりません。
         $premiumSilk = collect();
         $diamondLegs = collect();
-        dd($category);
+        
         if ($category === 'airstocking') {
             $baseQuery = ProductJa::with('category')
                 ->whereHas('category', function ($query) use ($category) {

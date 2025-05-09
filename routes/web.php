@@ -80,7 +80,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('register', [AdminRegisterController::class, 'store'])->middleware('can:admin');
 
     // 商品画像削除
-    Route::delete('product-images/{id}', [ProductImageController::class, 'destroy'])->name('product_images.destroy');
+    Route::delete('product-images/{id}', [ProductImageJaController::class, 'destroy'])->name('product_images.destroy');
 });
 
 // ホーム画面（ログイン後のリダイレクト用）
