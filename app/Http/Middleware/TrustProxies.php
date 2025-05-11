@@ -13,7 +13,8 @@ class TrustProxies extends Middleware
      * @var array<int, string>|string|null
      */
     //protected $proxies;
-    protected $proxies = '*';
+    protected $proxies = '*'; // または リバースプロキシのIPアドレス
+ 
 
     /**
      * The headers that should be used to detect proxies.
@@ -25,6 +26,8 @@ class TrustProxies extends Middleware
         Request::HEADER_X_FORWARDED_FOR |
         Request::HEADER_X_FORWARDED_HOST |
         Request::HEADER_X_FORWARDED_PORT |
-        Request::HEADER_X_FORWARDED_PROTO ;
+        Request::HEADER_X_FORWARDED_PROTO |
+        Request::HEADER_X_FORWARDED_ALL;
+
 
 }

@@ -24,19 +24,12 @@
                 </script>
             @else
                 <h1>ショッピングカート</h1>
-                <!--
-            <div class="message">
-                “[色白肌][PS01] エアーストッキング プレミアシルク ライトナチュラル AirStocking Premier Silk 120g Light Natural”をお買い物カゴに追加しました。
-            </div>
-            -->
+
                 <div class="tb-scrooll">
                     <table class="shop_table" cellspacing="0" style="width: 100%">
                         <thead>
                             <tr>
-                                <!--
-                            <th class="product-remove"><span class="screen-reader-text"></span></th>
-                            <th class="product-thumbnail"><span class="screen-reader-text"></span></th>
-                            -->
+
                                 <th class="product-name">商品</th>
                                 <th class="product-price">金額</th>
                                 <th class="product-quantity">数量</th>
@@ -90,30 +83,7 @@
                         <h2>お買い物カゴの合計</h2>
 
                         <table cellspacing="0">
-                            <!--
-                            <tr>
-                                <td class="actions">
-                                    <button type="submit" class="modifi-button" name="update_cart"
-                                        value="お買い物カゴを更新">お買い物カゴを更新</button>
-                                    <input type="hidden" id="woocommerce-cart-nonce" name="woocommerce-cart-nonce"
-                                        value="6d84b01763" /><input type="hidden" name="_wp_http_referer" value="/cart/" />
-                                </td>
-                            </tr>
-                 
-                            <tr class="cart-subtotal">
-                                <th>小計</th>
-                                <td data-title="小計">
-                                    <span class="woocommerce-Price-amount amount">
-                                        <span class="woocommerce-Price-currencySymbol">&yen;</span>3,300</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>送料</th>
-                                <td data-title="配送">
-                                    &yen;800
-                                </td>
-                            </tr>
-                            -->
+
                             <tr class="order-total">
                                 <th>合計</th>
                                 <td data-title="合計"><strong>

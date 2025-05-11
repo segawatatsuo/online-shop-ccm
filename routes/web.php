@@ -17,6 +17,9 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\AdminRegisterController;
 
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AmazonPayTestController;
+use App\Http\Controllers\AmazonPayController;
+
 
 // ホーム → 商品一覧にリダイレクト
 //Route::get('/', fn() => redirect('/products'));
@@ -49,6 +52,11 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('add', [CartController::class, 'add'])->name('add');
     Route::post('update', [CartController::class, 'update'])->name('update');
     Route::post('remove', [CartController::class, 'remove'])->name('remove');
+
+    // Amazon Pay
+    Route::get('show', [CartController::class, 'show'])->name('show');
+    Route::post('checkout-session', [CartController::class, 'createCheckoutSession'])->name('checkout-session');
+    Route::get('complete', [CartController::class, 'review'])->name('amazonpay.review');
 });
 
 // 注文
@@ -90,3 +98,11 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 //Square
 Route::get('/pay', [PaymentController::class, 'show']);
 Route::post('/process-payment', [PaymentController::class, 'process']);
+
+
+//AmazonPayのSDKバージョン取得
+Route::get('/amazonpay/version', [AmazonPayTestController::class, 'version']);
+
+Route::get('/amazonpay/start', [AmazonPayController::class, 'redirectToAmazonPay'])->name('amazonpay.start');
+Route::get('/amazonpay/return', [AmazonPayController::class, 'handleReturn'])->name('amazonpay.return');
+

@@ -37,6 +37,7 @@ class OrderController extends Controller
 
     public function complete(OrderCustomerRequest $request)
     {
+
         $cart = session()->get('cart', []);
 
         if (empty($cart)) {

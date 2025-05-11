@@ -14,20 +14,26 @@ class OrderCustomerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'    => ['required', 'string', 'max:100'],
+            'sei'    => ['required', 'string', 'max:30'],
+            'mei'    => ['required', 'string', 'max:30'],
             'email'   => ['required', 'email'],
             'phone'   => ['nullable', 'string', 'max:20'],
-            'address' => ['required', 'string', 'max:255'],
+            'input_add01' => ['required', 'string', 'max:255'],
+            'input_add02' => ['required', 'string', 'max:255'],
+            'input_add03' => ['nullable', 'string', 'max:255'],
+
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required'    => 'お名前は必須です。',
+            'sei.required'    => '姓は必須です。',
+            'mei.required'    => '名は必須です。',
             'email.required'   => 'メールアドレスは必須です。',
             'email.email'      => '有効なメールアドレスを入力してください。',
-            'address.required' => '住所は必須です。',
+            'input_add01.required' => '住所（都道府県）は必須です。',
+            'input_add02.required' => '住所（市区町村）は必須です。',
         ];
     }
 }
