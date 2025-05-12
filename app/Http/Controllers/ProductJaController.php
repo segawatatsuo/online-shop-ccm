@@ -11,6 +11,9 @@ class ProductJaController extends Controller
     public function index()
     {
         $products = ProductJa::with('category')->get();
+        if ($products->isEmpty()) {
+            abort(404); // ← ここで落ちる可能性あり
+        }
         $user = auth()->user();
         return view('products.index', compact('products', 'user'));
     }
@@ -84,7 +87,7 @@ class ProductJaController extends Controller
         //collect() は空のコレクションを作るLaravelの関数です。これで変数が常に存在し、Bladeでエラーになりません。
         $premiumSilk = collect();
         $diamondLegs = collect();
-        
+
         if ($category === 'airstocking') {
             $baseQuery = ProductJa::with('category')
                 ->whereHas('category', function ($query) use ($category) {
