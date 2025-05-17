@@ -10,9 +10,9 @@ class ProductJa extends Model
 {
     use HasFactory;
 
-    protected $table = 'product_jas'; // ← これを忘れずに！
+    protected $table = 'product_jas'; // ← これを忘れずに！product_jas テーブルを認識させる
 
-    protected $fillable = ['category_id', 'name', 'description', 'price', 'member_price', 'stock', 'image'];
+    protected $fillable = ['category_id', 'name', 'description', 'price', 'member_price', 'stock', 'image','sort_order'];
     public function category()
     {
         //Category::classは関連するモデルである App\Models\Category クラスへの完全修飾名

@@ -18,6 +18,8 @@
     font-size: 13px;
     font-family: "Noto Sans JP", sans-serif;
     width: 200px;
+
+    cursor: pointer;
 }
 
 @media (max-width: 800px) {

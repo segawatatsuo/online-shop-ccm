@@ -36,7 +36,8 @@
   margin-right: auto;
   /*align-items: flex-start;*/
   align-items: stretch;
-  font-family: '游明朝', 'Yu Mincho', YuMincho, 'Hiragino Mincho Pro', serif;
+  /*font-family: '游明朝', 'Yu Mincho', YuMincho, 'Hiragino Mincho Pro', serif;*/
+  font-family:"ヒラギノ角ゴ Pro W3","游ゴシック", "Yu Gothic", YuGothic, "游ゴシック体",  "メイリオ", sans-serif;
 }
 
 .feature img {
@@ -67,7 +68,7 @@
 .feature-text h2 {
   font-size: 22px;
   font-weight: bold;
-  line-height: 30px;
+  line-height: 20px;
   color: #50391a;;
 }
 
@@ -82,7 +83,7 @@
 }
 */
 .feature-text p {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 28px;
   margin-top: 25px;
   line-height: 2.4;
