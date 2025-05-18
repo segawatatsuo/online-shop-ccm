@@ -15,52 +15,31 @@ class HomeController extends Controller
 {
     public function index(Content $content)
     {
-        /*
         return $content
-            ->title('CCM Dashboard')
-            ->description('Description...')
-            ->row(Dashboard::title())
+            ->title('ダッシュボード')
+            ->description('CCM 国内 管理画面')
+            ->row(function ($row) {
 
-            ->row(function (Row $row) {
+                // 情報ボックス（上部に3つ並べる）
+                $row->column(4, new InfoBox('本日の注文数', 'shopping-cart', 'green', '/admin/orders', 3));
+                $row->column(4, new InfoBox('今月の売上', 'yen', 'blue', '/admin/orders', '¥123,000'));
+                $row->column(4, new InfoBox('卸売り', 'archive', 'red', '/admin/products/low-stock', '¥60,000'));
+            })
+            ->row(function ($row) {
 
-                $row->column(4, function (Column $column) {
-                    $column->append(Dashboard::environment());
-                });
+                // 最近の注文一覧
+                $recentOrders = view('dashboard.recent-orders'); // Bladeで管理
+                $row->column(6, new Box('最近の注文', $recentOrders));
 
-                $row->column(4, function (Column $column) {
-                    $column->append(Dashboard::extensions());
-                });
+                // 人気商品
+                $popularProducts = view('dashboard.popular-products');
+                $row->column(6, new Box('人気商品', $popularProducts));
+            })
+            ->row(function ($row) {
 
-                $row->column(4, function (Column $column) {
-                    $column->append(Dashboard::dependencies());
-                });
+                // お知らせ
+                $notice = '<p>ショップ運営に関するお知らせをここに記載できます。</p>';
+                $row->column(12, new Box('お知らせ', $notice));
             });
-            */
-    return $content
-        ->title('ダッシュボード')
-        ->description('CCM 国内 管理画面')
-        ->row(function ($row) {
-
-            // 情報ボックス（上部に3つ並べる）
-            $row->column(4, new InfoBox('本日の注文数', 'shopping-cart', 'green', '/admin/orders', 3));
-            $row->column(4, new InfoBox('今月の売上', 'yen', 'blue', '/admin/orders', '¥123,000'));
-            $row->column(4, new InfoBox('在庫が少ない商品', 'warning', 'red', '/admin/products/low-stock', 5));
-        })
-        ->row(function ($row) {
-
-            // 最近の注文一覧
-            $recentOrders = view('dashboard.recent-orders'); // Bladeで管理
-            $row->column(6, new Box('最近の注文', $recentOrders));
-
-            // 人気商品
-            $popularProducts = view('dashboard.popular-products');
-            $row->column(6, new Box('人気商品', $popularProducts));
-        })
-        ->row(function ($row) {
-
-            // お知らせ
-            $notice = '<p>ショップ運営に関するお知らせをここに記載できます。</p>';
-            $row->column(12, new Box('お知らせ', $notice));
-        });
     }
 }

@@ -9,8 +9,13 @@ use Encore\Admin\Grid;
 use Encore\Admin\Form;
 use Encore\Admin\Show;
 
+use Encore\Admin\Widgets\Form as WidgetForm;
+use Encore\Admin\Form\NestedForm;
+
+
 // ↓ 追加
 use App\Admin\Actions\Grid\DuplicateAction;
+use App\Models\Category;
 
 class ProductJaController extends AdminController
 {
@@ -24,17 +29,21 @@ class ProductJaController extends AdminController
     /**
      * Make a grid builder.
      *
-     * @return Grid
+     * @return Grid　一覧
      */
     protected function grid()
     {
         $grid = new Grid(new ProductJa());
 
         $grid->column('id', 'ID')->sortable();
+
+        // リレーション経由でカテゴリ名を表示
+        $grid->column('category.brand', 'ブランド');
+
         $grid->column('product_code', __('商品コード'));
         $grid->column('price', __('価格'));
         $grid->column('classification', __('分類'));
-        $grid->column('classification_ja', __('分類 ja'));
+        $grid->column('classification_ja', __('分類名'));
         $grid->column('color', __('色'));
         $grid->column('name', '商品名');
 
@@ -45,7 +54,18 @@ class ProductJaController extends AdminController
             });
         });
 
-        $grid->model()->orderBy('sort_order', 'asc');//並びをソート順に変更
+        // ✅ ここがフィルターの設定場所
+        $grid->filter(function ($filter) {
+            $filter->like('name', '商品名');
+
+            // カテゴリ名で絞り込み（セレクトボックス）
+            $filter->equal('category_id', 'カテゴリ')->select(
+                \App\Models\Category::all()->pluck('name', 'id')
+            );
+        });
+
+
+        $grid->model()->orderBy('sort_order', 'asc'); //並びをソート順に変更
 
         return $grid;
     }
@@ -54,27 +74,28 @@ class ProductJaController extends AdminController
      * Make a show builder.
      *
      * @param mixed $id
-     * @return Show
+     * @return Show　表示
      */
     protected function detail($id)
     {
         $show = new Show(ProductJa::findOrFail($id));
 
-        $show->field('id', __('Id'));
-        $show->field('category_id', __('Category id'));
+        //$show->field('id', __('Id'));
+        //$show->field('category_id', __('カテゴリID'));
+        $show->field('category.brand', 'ブランド');
         $show->field('name', '商品名');
-        $show->field('description', __('Description'));
+        $show->field('description', __('説明文'));
         $show->field('image', __('Image'));
-        $show->field('price', __('Price'));
-        $show->field('member_price', __('Member price'));
-        $show->field('product_code', __('Product code'));
-        $show->field('classification', __('Classification'));
-        $show->field('classification_ja', __('Classification ja'));
-        $show->field('kind', __('Kind'));
-        $show->field('color', __('Color'));
-        $show->field('color_map', __('Color map'));
-        $show->field('title_header', __('Title header'));
-        $show->field('stock', __('Stock'));
+        $show->field('price', __('価格'));
+        //$show->field('member_price', __('Member price'));
+        $show->field('product_code', __('商品コード'));
+        $show->field('classification', __('分類'));
+        $show->field('classification_ja', __('分類名'));
+        $show->field('kind', __('種類'));
+        $show->field('color', __('色'));
+        //$show->field('color_map', __('Color map'));
+        $show->field('title_header', __('タイトルヘッダー'));
+        $show->field('stock', __('在庫数'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
 
@@ -84,26 +105,40 @@ class ProductJaController extends AdminController
     /**
      * Make a form builder.
      *
-     * @return Form
+     * @return Form　編集画面
      */
     protected function form()
     {
         $form = new Form(new ProductJa());
 
-        $form->number('category_id', __('Category id'));
+        //$form->number('category_id', __('カテゴリID'));
+        $form->text('category.brand', 'ブランド');
         $form->text('name', __('商品名'));
-        $form->textarea('description', __('Description'));
+        $form->textarea('description', __('説明文'));
         $form->image('image', __('Image'));
-        $form->number('price', __('Price'));
-        $form->number('member_price', __('Member price'));
-        $form->text('product_code', __('Product code'));
-        $form->text('classification', __('Classification'));
-        $form->text('classification_ja', __('Classification ja'));
-        $form->text('kind', __('Kind'));
-        $form->color('color', __('Color'));
-        $form->text('color_map', __('Color map'));
-        $form->text('title_header', __('Title header'));
-        $form->number('stock', __('Stock'));
+        $form->number('price', __('価格'));
+        //$form->number('member_price', __('Member price'));
+        $form->text('product_code', __('商品コード'));
+        $form->text('classification', __('分類'));
+        $form->text('classification_ja', __('分類名'));
+        $form->text('kind', __('種類'));
+        $form->color('color', __('色'));
+        //$form->text('color_map', __('Color map'));
+        $form->text('title_header', __('タイトルヘッダー'));
+        $form->number('stock', __('在庫数'));
+
+        // 複数画像登録（画像に制限なし）
+        $form->hasMany('images', '商品画像', function (Form\NestedForm $form) {
+
+            $form->image('image_path', '画像')->removable(); // 画像削除ボタン付き
+            $form->hidden('order')->default(0); // 並び順
+
+            $form->radio('is_main', 'メイン画像')->options([
+                1 => 'メインにする',
+                0 => 'しない',
+            ])->default(0);
+        })->useTable();
+
 
         return $form;
     }

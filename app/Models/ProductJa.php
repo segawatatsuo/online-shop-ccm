@@ -1,18 +1,20 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany; 
-use Illuminate\Database\Eloquent\Relations\HasOne; 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ProductJa extends Model
 {
     use HasFactory;
+    
+    protected $fillable = ['category_id', 'name', 'description', 'price', 'member_price', 'stock', 'image', 'sort_order'];
 
-    protected $table = 'product_jas'; // ← これを忘れずに！product_jas テーブルを認識させる
+    protected $table = 'product_jas'; // ← これを忘れずに！Laravelにproduct_jasテーブルを認識させる
 
-    protected $fillable = ['category_id', 'name', 'description', 'price', 'member_price', 'stock', 'image','sort_order'];
     public function category()
     {
         //Category::classは関連するモデルである App\Models\Category クラスへの完全修飾名
@@ -26,20 +28,18 @@ class ProductJa extends Model
     }
     public function getPriceForUser($user)
     {
-        if($user){
+        if ($user) {
             return $this->member_price ?? $this->price;
         }
-        return$this->price;
+        return $this->price;
     }
-    public function images(): HasMany 
-    { 
-        return $this->hasMany(ProductImageJa::class); 
-    } 
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImageJa::class);
+    }
     // メイン画像だけを取得するリレーション
-    public function mainImage(): HasOne 
-    { 
-        return $this->hasOne(ProductImageJa::class)->where('is_main', true); 
+    public function mainImage(): HasOne
+    {
+        return $this->hasOne(ProductImageJa::class)->where('is_main', true);
     }
-
-    
 }

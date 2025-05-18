@@ -17,7 +17,7 @@
                         <!--route()メソッドにはname() メソッドを使って定義したルートの名前,順序付き配列を渡す-->
                         <a href="{{ route('products.show', $product->id) }}" class="btn btn-primary">詳細を見る</a>
                         @if ($product->mainImage)
-                            <img src="{{ asset('storage/' . $product->mainImage->filename) }}" alt="{{ $product->name }}"
+                            <img src="{{ asset('storage/' . $product->mainImage->image_path) }}" alt="{{ $product->name }}"
                                 style="max-width:200px;">
                         @else
                             <p>画像なし</p>

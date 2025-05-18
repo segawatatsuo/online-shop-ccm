@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Models\ProductJa;
 
 class ProductJaController extends Controller
@@ -91,7 +89,7 @@ class ProductJaController extends Controller
         if ($category === 'airstocking') {
             $baseQuery = ProductJa::with('category')
                 ->whereHas('category', function ($query) use ($category) {
-                    $query->where('slug', $category);
+                    $query->where('brand', $category);
                 });
 
             $premiumSilk = (clone $baseQuery)
@@ -118,7 +116,7 @@ class ProductJaController extends Controller
         $product = ProductJa::with('category')
             ->where('id', $id)
             ->whereHas('category', function ($query) use ($category) {
-                $query->where('slug', $category);
+                $query->where('brand', $category);
             })
             ->firstOrFail();
 

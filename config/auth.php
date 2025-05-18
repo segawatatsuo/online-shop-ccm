@@ -40,6 +40,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // 管理者用ガードを追加
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
+
     ],
 
     /*
@@ -65,10 +72,11 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        // 管理者用プロバイダ
+        'admins' => [
+            'driver' => 'eloquent',
+            'model'  => Encore\Admin\Auth\Database\Administrator::class,//Laravel-admin 組み込みモデル
+        ],
     ],
 
     /*

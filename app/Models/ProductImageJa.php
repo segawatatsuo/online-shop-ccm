@@ -10,7 +10,7 @@ class ProductImageJa extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_ja_id', 'filename', 'is_main'];
+    protected $fillable = ['product_ja_id', 'image_path', 'order' ,'is_main'];
 
     public function product(): BelongsTo
     {

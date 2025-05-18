@@ -3,13 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductJaController;
+use App\Http\Controllers\ProductImageJaController;
 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ProductImageController;
-use App\Http\Controllers\ProductImageJaController;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\MypageController;
@@ -28,6 +26,10 @@ use App\Http\Controllers\AmazonPayController;
 Route::get('/', function () {
     return view('index'); // resources/views/index.blade.php
 })->name('products.index');
+
+
+Route::get('admin/login', [App\Http\Controllers\Admin\AdminLoginController::class, 'showLoginForm'])->name('admin.login');
+Route::post('admin/login', [App\Http\Controllers\Admin\AdminLoginController::class, 'login']);
 
 // 商品
 /*
@@ -80,7 +82,7 @@ Route::middleware('auth')->prefix('mypage')->name('mypage.')->group(function () 
 });
 
 // 管理者ルート（ログイン必須）
-Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {
     Route::resource('products', AdminProductController::class);
 
     // 管理者登録（ポリシー使用）
@@ -105,4 +107,6 @@ Route::get('/amazonpay/version', [AmazonPayTestController::class, 'version']);
 
 Route::get('/amazonpay/start', [AmazonPayController::class, 'redirectToAmazonPay'])->name('amazonpay.start');
 Route::get('/amazonpay/return', [AmazonPayController::class, 'handleReturn'])->name('amazonpay.return');
+
+
 

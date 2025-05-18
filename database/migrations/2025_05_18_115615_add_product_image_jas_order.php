@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddSlugToCategoriesTable extends Migration
+class AddProductImageJasOrder extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddSlugToCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->string('slug')->unique()->after('name');
+        Schema::table('product_image_jas', function (Blueprint $table) {
+            $table->integer('order')->after('image_path')->default(0);
         });
     }
 
@@ -25,8 +25,8 @@ class AddSlugToCategoriesTable extends Migration
      */
     public function down()
     {
-        Schema::table('categories', function (Blueprint $table) {
-            //
+        Schema::table('product_image_jas', function (Blueprint $table) {
+            $table->dropColumn('order');
         });
     }
 }

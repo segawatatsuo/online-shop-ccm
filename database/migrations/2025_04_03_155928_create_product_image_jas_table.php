@@ -16,7 +16,7 @@ class CreateProductImageJasTable extends Migration
         Schema::create('product_image_jas', function (Blueprint $table) {
             $table->id(); 
             $table->foreignId('product_ja_id')->constrained('product_jas')->onDelete('cascade');
-            $table->string('filename'); 
+            $table->string('image_path'); 
             $table->boolean('is_main')->default(false); // メイン画像かどうか
             $table->timestamps();
         });
