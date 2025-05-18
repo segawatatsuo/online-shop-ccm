@@ -21,7 +21,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-        
+
     ];
 
     /**
@@ -67,5 +67,8 @@ class Kernel extends HttpKernel
 
         'admin' => \App\Http\Middleware\AdminOnly::class,
 
+        'admin' => \Encore\Admin\Middleware\Authenticate::class,
+        // 独自のミドルウェアは別名で登録（例: 'admin.only'）
+        'admin.only' => \App\Http\Middleware\AdminOnly::class,
     ];
 }
