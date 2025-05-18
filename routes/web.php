@@ -109,4 +109,5 @@ Route::get('/amazonpay/start', [AmazonPayController::class, 'redirectToAmazonPay
 Route::get('/amazonpay/return', [AmazonPayController::class, 'handleReturn'])->name('amazonpay.return');
 
 
-
+// Laravel-Adminのルーティング
+Encore\Admin\Facades\Admin::routes();
