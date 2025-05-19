@@ -59,6 +59,7 @@ return [
     'route' => [
 
         'prefix' => env('ADMIN_ROUTE_PREFIX', 'admin'),
+        'prefix' => 'online-shop-ccm/admin',  // ←ここを修正
 
         'namespace' => 'App\\Admin\\Controllers',
 
