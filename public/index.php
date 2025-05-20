@@ -1,10 +1,4 @@
 <?php
-phpinfo();
-exit(); // ここでスクリプトの実行を停止します
-?>
-
-
-<?php
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
