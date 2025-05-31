@@ -1,7 +1,12 @@
 @extends('layouts.app')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/complete.css') }}">
+@endpush
+
 @section('content')
+
+<main class="main">
     <h1>ご注文ありがとうございました！</h1>
-    <p>注文番号：#{{ $order->id }}</p>
-    <a href="{{ route('products.index') }}" class="btn btn-outline-primary">トップに戻る</a>
+</main>
 @endsection

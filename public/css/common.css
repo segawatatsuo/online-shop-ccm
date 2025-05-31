@@ -1,254 +1,222 @@
 @charset "utf-8";
 
+/* ====================
+  リセットCSS
+==================== */
 *,
 ::before,
 ::after {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 ul,
 ol {
-  list-style: none;
+    list-style: none;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-  font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-  font-size: 14px;
-  line-height: 20px;
-  color: #2f3132;
-  color: #0f1111;
-  line-height: 1;
-  background-color: #ffffff;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+    font-size: 14px;
+    line-height: 1.6; /* 行間を調整 */
+    color: #2f3132;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* 画面全体の高さにfooterが追従するように */
+}
+
+main {
+    flex: 1; /* mainが残りの高さを占めるように */
 }
 
 img {
-  max-width: 100%;
+    max-width: 100%;
+    height: auto; /* 高さを自動調整 */
+    display: block; /* 不要な下余白を削除 */
 }
 
+/* ====================
+  ヘッダー
+==================== */
 .header {
-  background-color: #50391a;
-}
-
-
-.header-inner {
-  max-width: 1200px;
-  /*
-  width: 930px;
-  max-width: 90%;
-*/
-
-  height: 110px;
-  height: 60px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 40px;
-  padding-right: 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.toggle-menu-button {
-  display: none;
-}
-
-.header-logo {
-  display: block;
-  width: 170px;
-}
-
-.site-menu ul {
-  display: flex;
-}
-
-.site-menu ul li {
-  margin-left: 20px;
-  margin-right: 20px;
-  color: #ffffff;
-  font-size: 80%;
-}
-
-.site-menu ul li a {
-  color: #ffffff;
-  font-family: 'Montserrat', sans-serif;
-  /*font-weight: bold;*/
-  font-size: 110%;
-}
-
-/*footer*/
-/*
-.footer {
-  background: #000;
-  padding: 30px 0px;
-  font-family: 'Play', sans-serif;
-  text-align: center;
-  margin-top: 60px;
-}
-
-.footer .row {
-  width: 100%;
-  margin: 1% 0%;
-  padding: 0.6% 0%;
-  color: gray;
-  font-size: 0.8em;
-}
-
-.footer .row a {
-  text-decoration: none;
-  color: gray;
-  transition: 0.5s;
-}
-
-.footer .row a:hover {
-  color: #fff;
-}
-
-.footer .row ul {
-  width: 100%;
-}
-
-.footer .row ul li {
-  display: inline-block;
-  margin: 0px 30px;
-}
-
-.footer .row a i {
-  font-size: 2em;
-  margin: 0% 1%;
-}
-  */
-/*footer*/
-
-
-
-.footer {
-  background: #000;
-  padding: 30px 0px;
-  font-family: 'Play', sans-serif;
-  text-align: center;
-}
-
-.footer .row {
-  width: 100%;
-  margin: 1% 0%;
-  padding: 0.6% 0%;
-  color: gray;
-  font-size: 0.8em;
-}
-
-.footer .row a {
-  text-decoration: none;
-  color: gray;
-  transition: 0.5s;
-}
-
-.footer .row a:hover {
-  color: #fff;
-}
-
-.footer .row ul {
-  width: 100%;
-}
-
-.footer .row ul li {
-  display: inline-block;
-  margin: 0px 30px;
-}
-
-.footer .row a i {
-  font-size: 2em;
-  margin: 0% 1%;
-}
-
-
-
-
-@media (max-width: 800px) {
-  .site-menu ul {
-    display: block;
-    text-align: center;
-  }
-
-  .site-menu li {
-    margin-top: 20px;
-  }
-
-  .header {
-    position: fixed;
+    background-color: #50391a;
+    position: sticky; /* スクロールしても固定 */
     top: 0;
     left: 0;
     right: 0;
-    background-color: #50391a;
-    height: 50px;
-    z-index: 10;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  .header-inner {
-    padding-left: 20px;
-    padding-right: 20px;
-    height: 100%;
-    position: relative;
-  }
-
-  .header-logo {
-    width: 100px;
-  }
-
-  .header-site-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    color: #ffffff;
-    background-color: #736E62;
-    padding-top: 30px;
-    padding-bottom: 50px;
-    display: none;
-  }
-
-  .header-site-menu.is-show {
-    display: block;
-  }
-
-  .toggle-menu-button {
-    display: block;
-    width: 44px;
-    height: 34px;
-    background-image: url(../images/top/icon-menu.png);
-    background-size: 50%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-color: transparent;
-    border: none;
-    border-radius: 0;
-    outline: none;
-  }
-
-  .main {
-    /*padding-top: 50px;*/
-  }
-
-  .footer {
-    text-align: left;
-    padding: 5%;
-  }
-
-  .footer .row ul li {
-    display: block;
-    margin: 10px 0px;
-    text-align: left;
-  }
-
-  .footer .row a i {
-    margin: 0% 3%;
-  }
+    z-index: 100; /* 他の要素より手前に表示 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 影を追加 */
 }
+
+.header-inner {
+    max-width: 1200px;
+    height: 60px; /* 高さを固定 */
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-menu-button {
+    display: none; /* 初期状態では非表示 */
+}
+
+.header-logo {
+    display: block;
+    width: 170px;
+}
+
+.site-menu ul {
+    display: flex;
+}
+
+.site-menu ul li {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.site-menu ul li a {
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 110%;
+    white-space: nowrap; /* メニュー項目が折り返さないように */
+}
+
+/* ====================
+  フッター
+==================== */
+.footer {
+    background: #000;
+    padding: 30px 0;
+    font-family: 'Play', sans-serif;
+    text-align: center;
+    margin-top: auto; /* mainの下に配置 */
+}
+
+.footer .row {
+    width: 100%;
+    margin: 1% 0;
+    padding: 0.6% 0;
+    color: gray;
+    font-size: 0.8em;
+}
+
+.footer .row a {
+    text-decoration: none;
+    color: gray;
+    transition: 0.5s;
+}
+
+.footer .row a:hover {
+    color: #fff;
+}
+
+.footer .row ul {
+    width: 100%;
+}
+
+.footer .row ul li {
+    display: inline-block;
+    margin: 0 30px;
+}
+
+.footer .row a i {
+    font-size: 2em;
+    margin: 0 1%;
+}
+
+/* ====================
+  メディアクエリ (共通)
+==================== */
+@media (max-width: 800px) {
+    /* ヘッダー */
+    .header {
+        height: 50px;
+    }
+
+    .header-inner {
+        padding: 0 20px;
+        height: 100%;
+    }
+
+    .header-logo {
+        width: 100px;
+    }
+
+    .header-site-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: #736E62;
+        padding: 30px 0 50px;
+        display: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* ドロワーメニューにも影 */
+    }
+
+    .header-site-menu.is-show {
+        display: block;
+    }
+
+    .site-menu ul {
+        display: block;
+        text-align: center;
+    }
+
+    .site-menu li {
+        margin: 20px 0; /* 上下のマージンを調整 */
+    }
+
+    .toggle-menu-button {
+        display: block;
+        width: 44px;
+        height: 34px;
+        background-image: url(../images/top/icon-menu.png);
+        background-size: 50%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
+        outline: none;
+        cursor: pointer; /* カーソルをポインターに */
+    }
+
+    /* フッター */
+    .footer {
+        text-align: left;
+        padding: 5%;
+    }
+
+    .footer .row ul li {
+        display: block;
+        margin: 10px 0;
+        text-align: left;
+    }
+
+    .footer .row a i {
+        margin: 0 3%;
+    }
+}
+
+
+
+
+
+
+
 

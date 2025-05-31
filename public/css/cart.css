@@ -103,6 +103,39 @@
         margin-left: auto;
         margin-right: auto;
     }
+}
 
 
+.tb-scrooll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.shop_table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+}
+
+.shop_table th,
+.shop_table td {
+    padding: 10px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .shop_table {
+        font-size: 14px;
+    }
+
+    .shop_table td,
+    .shop_table th {
+        padding: 8px;
+    }
+
+    .btn {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
 }

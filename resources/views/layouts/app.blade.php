@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="{{ asset('css/menu.css') }}">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/button.css') }}">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    {{-- 各ページ専用のCSSなどをここで差し込める --}}
+    @yield('head')
+
 
     <script src="https://kit.fontawesome.com/f57af4dcea.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -25,9 +29,9 @@
     {{-- 共通ヘッダー --}}
     @include('layouts.header')
 
-    <main class="main">
+    <!--<main class="main">-->
         @yield('content')
-    </main>
+    <!--</main>-->
 
     @push('scripts')
         <script>

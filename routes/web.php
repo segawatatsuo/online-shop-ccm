@@ -42,7 +42,7 @@ Route::prefix('products')->name('products.')->group(function () {
 Route::prefix('product')->name('product.')->group(function () {
     // カテゴリ別商品一覧
     Route::get('{category}', [ProductJaController::class, 'category'])->name('category');
-    
+
     // 商品詳細（例: /product/airstocking/123）
     Route::get('{category}/{id}', [ProductJaController::class, 'show'])->name('show');
 });
@@ -63,9 +63,14 @@ Route::prefix('cart')->name('cart.')->group(function () {
 
 // 注文
 Route::prefix('order')->name('order.')->group(function () {
-    Route::get('confirm', [OrderController::class, 'confirm'])->name('confirm');
-    Route::post('complete', [OrderController::class, 'complete'])->name('complete');
+    Route::get('create', [OrderController::class, 'create'])->name('create');
+    Route::post('confirm', [OrderController::class, 'confirm'])->name('confirm');
+    Route::post('storeOrder', [OrderController::class, 'storeOrder'])->name('storeOrder');//store
+    Route::get('complete', [OrderController::class, 'complete'])->name('complete');
+    Route::post('hoge', [OrderController::class, 'hoge'])->name('hoge');
 });
+
+
 
 // 認証関連
 Auth::routes();

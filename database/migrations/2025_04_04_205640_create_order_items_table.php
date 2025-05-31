@@ -14,6 +14,7 @@ class CreateOrderItemsTable extends Migration
     public function up()
     {
         Schema::create('order_items', function (Blueprint $table) {
+            /*
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained('product_jas')->onDelete('cascade');
@@ -21,6 +22,16 @@ class CreateOrderItemsTable extends Migration
             $table->integer('price'); // 単価（注文時点）
             $table->integer('subtotal'); // 単価 x 数量
             $table->timestamps();
+            */
+    $table->id();
+    $table->unsignedBigInteger('order_id');
+    $table->unsignedBigInteger('product_id');
+    $table->string('name');
+    $table->integer('quantity');
+    $table->integer('price');
+    $table->timestamps();
+
+
         });
     }
 

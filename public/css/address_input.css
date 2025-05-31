@@ -1,0 +1,190 @@
+/* 共通レイアウト */
+form.post-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+/* 見出し */
+.main h1 {
+  font-size: 1.8rem;
+  margin: 2rem 0 1.2rem;
+  color: #333;
+}
+
+/* フォーム行全体 */
+.post-table {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+/* ラベル部分 */
+.post-table dt {
+  width: 100%;
+  max-width: 220px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+}
+
+/* 入力欄部分 */
+.post-table dd {
+  flex: 1;
+  width: 100%;
+}
+
+/* 入力欄スタイル */
+input.form-control {
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1.05rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+/* 郵便番号とボタン並列 */
+.input-half {
+  width: calc(50% - 0.5rem);
+  margin-right: 0.5rem;
+  display: inline-block;
+  min-width: 140px;
+}
+.btn-01.small {
+  padding: 0.6rem 1rem;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  display: inline-block;
+}
+
+/* お届け先チェックブロック */
+.same-address-block {
+  background-color: #eef7ff;
+  padding: 1rem;
+  border: 1px solid #007bff;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+}
+
+/* エラー表示 */
+.alert.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+/* 送信ボタン */
+.btn-order-confirm {
+  display: inline-block;
+  padding: 0.8rem 1.6rem;
+  background-color: #ffd814;
+  color: rgb(44, 0, 0);
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.btn-order-confirm:hover {
+  background-color: #9e860f;
+}
+
+/* PC用 2カラムレイアウト */
+@media screen and (min-width: 768px) {
+  .post-table {
+    flex-wrap: nowrap;
+  }
+
+  .post-table dt {
+    width: 200px;
+    margin-bottom: 0;
+  }
+
+  .post-table dd {
+    width: calc(100% - 200px);
+  }
+}
+
+/* モバイル用レスポンシブ統一設定 */
+@media screen and (max-width: 767px) {
+  /* フォーム行を縦並びに */
+  .post-table {
+    flex-direction: column;
+  }
+
+  /* ラベルと入力欄を幅100%に */
+  .post-table dt,
+  .post-table dd {
+    width: 100% !important;
+  }
+
+  /* ラベルの左揃えと余白調整 */
+  .post-table dt {
+    text-align: left;
+    margin-bottom: 0.25rem;
+    font-weight: bold;
+    padding-left: 0; /* 左端に揃える */
+  }
+
+  .post-table dd {
+    margin-bottom: 1.2rem;
+  }
+
+  /* 入力欄幅とフォントサイズ調整 */
+  input.form-control,
+  .input-half {
+    width: 100% !important;
+    min-width: unset;
+    box-sizing: border-box;
+    font-size: 1.1rem;
+    padding: 1rem;
+  }
+
+  /* 郵便番号検索ボタン */
+  .btn-01.small {
+    display: block;
+    margin-top: 0.5rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* 送信ボタンの横幅調整 */
+  .btn-order-confirm {
+    width: 100%;
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  /* h1見出しの余白調整（ヘッダーと重ならないように） */
+  /*
+  .main h1 {
+    margin-top: 3.5rem !important;
+    font-size: 1.3rem;
+  }
+    */
+}
+/*///*/
+@media screen and (max-width: 767px) {
+  .post-table {
+    flex-direction: column;
+    align-items: flex-start; /* 中央揃え解除し、左揃えに */
+  }
+  
+  .post-table dt {
+    width: 100% !important;
+    max-width: none !important;
+    text-align: left !important;
+    padding-left: 0 !important;
+  }
+}
+

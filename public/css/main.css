@@ -1,5 +1,8 @@
 @charset "utf-8";
 
+/* ====================
+  ファーストビュー
+==================== */
 .first-view {
     height: calc(100vh - 60px);
     background-image: url(../images/top/AirStocking.jpg);
@@ -16,22 +19,17 @@
     background-size: cover;
 }
 
+/* ====================
+  リード文
+==================== */
 .lead {
-    /*max-width: 1280px;*/
-    /*margin: 60px auto;*/
     background-color: #2F3132;
-    padding-top: 60px;
-    padding-bottom: 60px;
+    padding: 60px 0;
 }
+
 .lead-nail {
-    /*max-width: 1280px;*/
-    /*margin: 60px auto;*/
-    /*background-color: #2F3132;*/
-    padding-top: 60px;
-    padding-bottom: 20px;
+    padding: 60px 0 20px;
 }
-
-
 
 .lead .lead-copy {
     color: aliceblue;
@@ -43,7 +41,6 @@
 }
 
 .lead-nail .nail-copy {
-    /*color: aliceblue;*/
     color: #7e2d2d;
     max-width: 1280px;
     text-align: center;
@@ -52,270 +49,198 @@
     font-family: '游明朝', 'Yu Mincho', YuMincho, 'Hiragino Mincho Pro', serif;
 }
 
-
 .mincho {
     font-family: '游明朝', 'Yu Mincho', YuMincho, 'Hiragino Mincho Pro', serif;
 }
 
-
-
-
-/*************************/
-
-
-
-.line-up {
-    width: 930px;
-    max-width: 90%;
-    margin-top: 75px;
-    margin-left: auto;
-    margin-right: auto;
+/* ====================
+  特徴セクション (feature)
+==================== */
+.feature {
+    display: flex;
+    align-items: center;
     justify-content: center;
+    max-width: 1200px;
+    margin: 80px auto;
+    padding: 0 20px; /* 左右の余白 */
+}
+
+.feature.reverse {
+    flex-direction: row-reverse;
+}
+
+.feature-text {
+    flex: 1;
+    padding: 0 40px;
+}
+
+.feature-text h2 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.feature-text p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+.feature img {
+    flex: 1;
+    max-width: 50%; /* 画像がテキストと並んで表示されるように */
+    height: auto;
+    display: block;
+}
+
+
+/* ====================
+  動画セクション (movie)
+==================== */
+.movie-bg {
+    background-color: #f0f0f0;
+    padding: 80px 0;
+    text-align: center;
+}
+
+.movie {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.movie h2 {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.movie video {
+    width: 100%;
+    height: auto;
+    max-height: 540px; /* 適切な最大高さを設定 */
+}
+
+/* ====================
+  商品一覧 (LINE UP)
+==================== */
+.line-up {
+    max-width: 1200px; /* 全体の最大幅を広げました */
+    margin: 75px auto;
+    padding: 0 20px; /* 左右の余白 */
 }
 
 .line-up h2 {
     font-size: 36px;
     font-weight: bold;
     text-align: center;
+    margin-bottom: 40px; /* タイトルの下にも少し余白 */
 }
 
-
-.container {
+.line-up .container {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: auto auto;
-    grid-template-areas:
-        "img img img item1"
-        "item2 item3 item4 item5";
-    column-gap: 40px;
-    row-gap: 40px;
-    grid-auto-rows: minmax(200px, auto);
-    margin-top: 60px;
+    grid-template-columns: repeat(5, 1fr); /* PCでは5列 */
+    gap: 20px; /* 要素間の隙間 */
+    margin-top: 0; /* 親要素のmargin-bottomがあるのでここでは0 */
     margin-bottom: 60px;
 }
 
-.head-img {
-    grid-area: img;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    align-self: stretch;
-}
-
-.head-img img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    height: 100%;
-    align-self: stretch;
-}
-
-.item1 {
-    display: flex;
-    grid-area: item1;
-    flex-direction: column;
-    align-items: center;
+.line-up .container li {
+    border: 1px solid #ccc;
+    padding: 10px;
     text-align: center;
-    align-self: stretch;
-    height: 100%;
-    align-self: stretch;
-    /* 親の高さに合わせて伸ばす */
-}
-
-.item1 .content {
+    box-sizing: border-box;
+    background: #fff;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    align-self: stretch;
-    /* 親の高さに合わせて伸ばす */
+    justify-content: space-between;
 }
 
-.item1 .content img {
-    width: 90%;
+.line-up .container li img {
+    max-width: 100%;
     height: auto;
-    align-self: stretch;
-    /* 親の高さに合わせて伸ばす */
+    display: block;
+    margin: 0 auto 10px;
 }
 
-
-.item2,
-.item3,
-.item4,
-.item5 {
-    min-height: 150px;
-    align-items: stretch;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* .content 内の高さを統一 */
-.item2 .content,
-.item3 .content,
-.item4 .content,
-.item5 .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
-
-.item2 img,
-.item3 img,
-.item4 img,
-.item5 img {
-    width: auto;
-    height: 100%;
-    max-height: 200px;
-    object-fit: contain;
-}
-
-.item1 p,
-.item2 p,
-.item3 p,
-.item4 p,
-.item5 p {
-    margin-top: 8px;
+.line-up .container li .title {
     font-size: 14px;
-    color: #333;
+    margin-bottom: 5px;
+    flex-grow: 1;
 }
 
+.line-up .container li .price {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
 
+.line-up .container li form {
+    margin-top: auto;
+}
 
+.line-up .container li .form-control {
+    margin-bottom: 10px;
+}
 
-
+/* ====================
+  メディアクエリ (PCとスマホの共通部分)
+==================== */
 @media (max-width: 800px) {
-    .head-img {
-        grid-area: img;
-        align-self: stretch;
+    /* リード文 */
+    .lead {
+        padding: 30px 0;
     }
 
-    .container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-areas:
-            "img img"
-            "item1 item2"
-            "item3 item4"
-            "item5 item6";
-        column-gap: 20px;
-        row-gap: 20px;
+    /* 特徴セクション */
+    .feature,
+    .feature.reverse {
+        flex-direction: column; /* スマホでは縦並び */
+        margin: 40px auto;
+        padding: 0 15px;
     }
 
+    .feature-text {
+        padding: 0; /* スマホではパディングをリセット */
+        margin-bottom: 20px; /* テキストの下に余白 */
+    }
+
+    .feature-text h2 {
+        font-size: 24px;
+        margin-bottom: 15px;
+        line-height: 1.4;
+    }
+
+    .feature-text p {
+        font-size: 14px;
+    }
+
+    .feature img {
+        max-width: 80%; /* 画像の幅を調整 */
+    }
+
+    /* 動画セクション */
+    .movie {
+        padding: 0 15px;
+    }
+
+    .movie h2 {
+        font-size: 28px;
+        margin-bottom: 30px;
+    }
+
+    /* 商品一覧 (LINE UP) - スマホ用 */
     .line-up {
-        /*width: 930px;*/
-        max-width: 90%;
-        margin-top: 75px;
-        margin-left: auto;
-        margin-right: auto;
-        justify-content: center;
+        margin-top: 50px;
+        padding: 0 15px;
     }
 
     .line-up h2 {
-        font-size: 36px;
-        font-weight: bold;
-        text-align: center;
+        font-size: 28px;
+        margin-bottom: 30px;
     }
 
-    .head-img {
-        grid-area: img;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        align-self: stretch;
+    .line-up .container {
+        grid-template-columns: repeat(2, 1fr); /* スマホでは2列 */
+        gap: 15px;
     }
-
-    .head-img img {
-        width: 100%;
-        height: auto;
-        object-fit: contain;
-        height: 100%;
-        align-self: stretch;
-    }
-
-    /*
-    .item1 {
-        grid-area: item1;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        align-self: stretch;
-    }
-
-    .item1 .content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        align-self: stretch;
-    }
-    
-    .item1 .content img {
-        width: 90%;
-        height: auto;
-        align-self: stretch;
-    }
-    */
-    .item1,
-    .item2,
-    .item3,
-    .item4,
-    .item5 {
-        min-height: 150px;
-        align-items: stretch;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-
-    /* .content 内の高さを統一 */
-    .item1 .content,
-    .item2 .content,
-    .item3 .content,
-    .item4 .content,
-    .item5 .content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-    }
-
-    .item1 img,
-    .item2 img,
-    .item3 img,
-    .item4 img,
-    .item5 img {
-        width: auto;
-        height: 100%;
-        max-height: 200px;
-        object-fit: contain;
-    }
-
-    .item1 p,
-    .item1 p,
-    .item2 p,
-    .item3 p,
-    .item4 p,
-    .item5 p {
-        margin-top: 8px;
-        font-size: 14px;
-        color: #333;
-    }
-
-
-
-    .lead {
-        padding-top: 30px;
-        padding-bottom: 30px;
-    }
-
 }

@@ -1,9 +1,12 @@
 @extends('layouts.app')
 
-@section('content')
 
+@section('head')
     <link rel="stylesheet" href="{{ asset('css/cart.css') }}">
+@endsection
 
+
+@section('content')
     <main class="main">
 
         <div class="container">
@@ -95,9 +98,14 @@
 
                         </table>
 
-                        <a href="{{ route('order.confirm') }}">
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary">
+                            <div class="a-button">買い物を続ける</div>
+                        </a>
+
+                        <a href="{{ route('order.create') }}">
                             <div class="a-button">購入手続きに進む</div>
                         </a>
+
 
 
                     </div>
@@ -111,5 +119,3 @@
 
 
 @endsection
-
-

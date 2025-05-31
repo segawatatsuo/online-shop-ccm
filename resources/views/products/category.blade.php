@@ -1,70 +1,10 @@
-{{--
 @extends('layouts.app')
 
 @section('content')
-    <h2>{{ ucfirst($category) }} の商品一覧</h2>
-
-    @foreach ($groupedProducts as $classification => $products)
-        <h3>{{ $classification }}</h3>
-        <div class="product-list">
-            @foreach ($products as $product)
-                <div class="product-item">
-                    <a href="{{ route('product.show', ['category' => $category, 'id' => $product->id]) }}">
-                        <h4>{{ $product->name }}</h4>
-
-                    </a>
-                </div>
-            @endforeach
-        </div>
-    @endforeach
-@endsection
---}}
-
-{{-- 
-@extends('layouts.app')
-
-@section('content')
-    <h2>{{ ucfirst($category) }} 商品一覧</h2>
 
 
-    <section class="premium-silk">
-        <h3>Premium Silk</h3>
-        <p>こちらはエアーストッキングの中でも最高品質の Premium Silk シリーズです。</p>
-
-        <div class="product-grid">
-            @foreach ($premiumSilk as $product)
-                <div class="product-item">
-                    <a href="{{ route('product.show', ['category' => $category, 'id' => $product->id]) }}">
-                    <h4>{{ $product->name }}</h4>
-
-                    </a>
-                </div>
-            @endforeach
-        </div>
-    </section>
 
 
-    <section class="diamond-legs mt-8">
-        <h3>Diamond Legs</h3>
-        <p>脚元に輝きを与える Diamond Legs シリーズをご紹介します。</p>
-
-        <div class="product-grid">
-            @foreach ($diamondLegs as $product)
-                <div class="product-item">
-                    <a href="{{ route('product.show', ['category' => $category, 'id' => $product->id]) }}">
-                    <h4>{{ $product->name }}</h4>
-
-                    </a>
-                </div>
-            @endforeach
-        </div>
-    </section>
-@endsection
---}}
-
-@extends('layouts.app')
-
-@section('content')
     @if ($category === 'airstocking')
         <main class="main">
 
@@ -134,231 +74,46 @@
                 <h2>LINE UP</h2>
 
                 <div class="container">
+                    <ul class="product-list container">
+                        @foreach ($premiumSilk as $product)
+                            <li>
+                                <div class="content">
+                                    <a href="{{ asset('product/airstocking/' . $product->id) }}">
+                                        <img src="{{ asset('images/product/PremireSilk/' . $product->image_filename) }}"
+                                            alt="">
+                                    </a>
+                                    <p class="title">{{ $product->name }}</p>
+                                    <p class="price">¥{{ number_format($product->price) }}</p>
 
-                    <img class="head-img" src="{{ asset('images/PremireSilk/PremireSilk-Banner.png') }}" alt="PremireSilk">
-
-                    <div class="item1">
-
-                        <a href="{{ asset('product/airstocking/1') }}"><img src="{{ asset('images/PremireSilk/PS1.jpg') }}"
-                                alt=""></a>
-                        <p class="title">ライトナチュラル</p>
-                        <p class="price">\3,300</p>
-                        <!--
-                        <a href="./cart.html">
-                            <div class="a-button">カートに入れる</div>
-                        </a>
-                        -->
-                        <form method="POST" action="{{ route('cart.add') }}">
-                            @csrf
-                            <input type="hidden" name="product_id" value="1">
-                            <div class="mb-3">
-                                <label>数量：</label>
-                                <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
-                            </div>
-                    
-                            <button type="submit" class="a-button" style="border: none">カートに入れる</button>
-                        </form>
-
-                    </div>
-
-                    <li class="item2">
-                        <div class="content">
-                            <a href="{{ asset('product/airstocking/2') }}"><img
-                                    src="{{ asset('images/PremireSilk/PS2.jpg') }}" alt=""></a>
-                            <p class="title">ナチュラル</p>
-                            <p class="price">\3,300</p>
-                            <!--<a href="./cart.html">-->
-                                <!--<div class="a-button">カートに入れる</div></a>-->
-                                <form method="POST" action="{{ route('cart.add') }}">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="2">
-                                    <div class="mb-3">
-                                        <label>数量：</label>
-                                        <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
-                                    </div>
-                            
-                                    <button type="submit" class="a-button" style="border: none">カートに入れる</button>
-                                </form>
-
-
-                        </div>
-                    </li>
-
-                    <li class="item3">
-                        <div class="content">
-                            <a href="{{ asset('product/airstocking/3') }}"><img
-                                    src="{{ asset('images/PremireSilk/PS3.jpg') }}" alt=""></a>
-                            <p class="title">テラコッタ</p>
-                            <p class="price">\3,300</p>
-                            <!--<a href="./cart.html">-->
-                                <!--<div class="a-button">カートに入れる</div></a>-->
-                                <form method="POST" action="{{ route('cart.add') }}">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="3">
-                                    <div class="mb-3">
-                                        <label>数量：</label>
-                                        <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
-                                    </div>
-                            
-                                    <button type="submit" class="a-button" style="border: none">カートに入れる</button>
-                                </form>
-                        </div>
-                    </li>
-
-                    <li class="item4">
-                        <div class="content">
-                            <a href="{{ asset('product/airstocking/4') }}"><img
-                                    src="{{ asset('images/PremireSilk/PS4.jpg') }}" alt=""></a>
-                            <p class="title">ブロンズ</p>
-                            <p class="price">\3,300</p>
-                            <!--<a href="./cart.html">-->
-                                <!--<div class="a-button">カートに入れる</div></a>-->
-                                <form method="POST" action="{{ route('cart.add') }}">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="4">
-                                    <div class="mb-3">
-                                        <label>数量：</label>
-                                        <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
-                                    </div>
-                            
-                                    <button type="submit" class="a-button" style="border: none">カートに入れる</button>
-                                </form>
-                        </div>
-                    </li>
-
-                    <li class="item5">
-                        <div class="content">
-                            <a href="{{ asset('product/airstocking/5') }}"><img
-                                    src="{{ asset('images/PremireSilk/PS5.jpg') }}" alt=""></a>
-                            <p class="title">ココ</p>
-                            <p class="price">\3,300</p>
-                            <!--<a href="./cart.html">-->
-                                <!--<div class="a-button">カートに入れる</div></a>-->
-                                <form method="POST" action="{{ route('cart.add') }}">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="5">
-                                    <div class="mb-3">
-                                        <label>数量：</label>
-                                        <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
-                                    </div>
-                            
-                                    <button type="submit" class="a-button" style="border: none">カートに入れる</button>
-                                </form>
-                        </div>
-                    </li>
-
+                                    <form method="POST" action="{{ route('cart.add') }}">
+                                        @csrf
+                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                        <div class="mb-3">
+                                            <label>数量：</label>
+                                            <input type="number" name="quantity" value="1" min="1"
+                                                class="form-control" style="width:100px">
+                                        </div>
+                                        <button type="submit" class="a-button" style="border: none">カートに入れる</button>
+                                    </form>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
-
-
-
-
-                <div class="container">
-
-                    <img class="head-img" src="{{ asset('images/DiamondLegs/DiamondLegs-Banner.png') }}" alt="PremireSilk">
-                    <div class="item1">
-                        <img src="{{ asset('images/DiamondLegs/DL1.jpg') }}" alt="">
-                        <p class="title">ライトナチュラル</p>
-                        <p class="price">\4,400</p>
-                            <!--<a href="./cart.html">-->
-                                <!--<div class="a-button">カートに入れる</div></a>-->
-                                <form method="POST" action="{{ route('cart.add') }}">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="6">
-                                    <div class="mb-3">
-                                        <label>数量：</label>
-                                        <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
-                                    </div>
-                            
-                                    <button type="submit" class="a-button" style="border: none">カートに入れる</button>
-                                </form>
-                    </div>
-
-                    <li class="item2">
-                        <div class="content">
-
-                            <img src="{{ asset('images/DiamondLegs/DL2.jpg') }}" alt="">
-                            <p class="title">ナチュラル</p>
-                            <p class="price">\4,400</p>
-                            <!--<a href="./cart.html">-->
-                                <!--<div class="a-button">カートに入れる</div></a>-->
-                                <form method="POST" action="{{ route('cart.add') }}">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="7">
-                                    <div class="mb-3">
-                                        <label>数量：</label>
-                                        <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
-                                    </div>
-                            
-                                    <button type="submit" class="a-button" style="border: none">カートに入れる</button>
-                                </form>
-                        </div>
-                    </li>
-
-                    <li class="item3">
-                        <div class="content">
-                            <img src="{{ asset('images/DiamondLegs/DL3.jpg') }}" alt="">
-                            <p class="title">テラコッタ</p>
-                            <p class="price">\4,400</p>
-                            <form method="POST" action="{{ route('cart.add') }}">
-                                @csrf
-                                <input type="hidden" name="product_id" value="8">
-                                <div class="mb-3">
-                                    <label>数量：</label>
-                                    <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
-                                </div>
-                        
-                                <button type="submit" class="a-button" style="border: none">カートに入れる</button>
-                            </form>
-                        </div>
-                    </li>
-
-                    <li class="item4">
-                        <div class="content">
-                            <img src="{{ asset('images/DiamondLegs/DL4.jpg') }}" alt="">
-                            <p class="title">ブロンズ</p>
-                            <p class="price">\4,400</p>
-                            <form method="POST" action="{{ route('cart.add') }}">
-                                @csrf
-                                <input type="hidden" name="product_id" value="9">
-                                <div class="mb-3">
-                                    <label>数量：</label>
-                                    <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
-                                </div>
-                        
-                                <button type="submit" class="a-button" style="border: none">カートに入れる</button>
-                            </form>
-                        </div>
-                    </li>
-
-                    <li class="item5">
-                        <div class="content">
-                            <img src="{{ asset('images/DiamondLegs/DL5.jpg') }}" alt="">
-                            <p class="title">ココ</p>
-                            <p class="price">\4,400</p>
-                            <form method="POST" action="{{ route('cart.add') }}">
-                                @csrf
-                                <input type="hidden" name="product_id" value="10">
-                                <div class="mb-3">
-                                    <label>数量：</label>
-                                    <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
-                                </div>
-                        
-                                <button type="submit" class="a-button" style="border: none">カートに入れる</button>
-                            </form>
-                        </div>
-                    </li>
-
-                </div>
-
-
-
-
             </div>
+
+
+
+
+
+
 
         </main>
     @else
+        <main class="main">
         <h2>{{ ucfirst($category) }} 商品一覧</h2>
         {{-- gelnail や wax など他のカテゴリ --}}
         <p>このカテゴリには現在登録されている商品がありません。</p>
+        </main>
     @endif
 @endsection
