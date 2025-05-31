@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class ProductJa extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = ['category_id', 'name', 'description', 'price', 'member_price', 'stock', 'image', 'sort_order'];
 
     protected $table = 'product_jas'; // ← これを忘れずに！Laravelにproduct_jasテーブルを認識させる
@@ -40,6 +40,11 @@ class ProductJa extends Model
     // メイン画像だけを取得するリレーション
     public function mainImage(): HasOne
     {
-        return $this->hasOne(ProductImageJa::class)->where('is_main', true);
+        return $this->hasOne(ProductImageJa::class)->where('is_main', 1);
+    }
+
+    public function subImages(): HasMany
+    {
+        return $this->hasMany(ProductImageJa::class)->where('is_sub', 1);
     }
 }

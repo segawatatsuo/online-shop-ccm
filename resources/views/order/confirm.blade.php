@@ -83,7 +83,7 @@
         <a href="{{ route('cart.index') }}" class="btn btn-secondary">戻る</a>
         <form action="{{ route('order.hoge') }}" method="POST" class="d-inline">
             @csrf
-            <button type="submit" class="btn btn-primary">注文を確定する</button>
+            <button type="submit" class="btn btn-order-confirm">お支払い方法を選択</button>
         </form>
     </div>
 </div>

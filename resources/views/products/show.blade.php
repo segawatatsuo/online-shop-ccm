@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-
-<link rel="stylesheet" href="{{ asset('css/item.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/item.css') }}">
 
 
     <main class="main">
@@ -19,29 +18,37 @@
 
             <!--leftsideパート-->
             <div class="leftside">
+                {{--
                 @if ($product->mainImage)
-                <div class="igm-box main-img js-main-img">
-                    <img src="{{ asset('storage/' . $product->mainImage->filename) }}" style="max-width:400px;" alt="メイン画像">
-                </div>
+                    <div class="igm-box main-img js-main-img">
+                        <img src="{{ asset('storage/' . $product->mainImage->filename) }}" style="max-width:400px;"
+                            alt="メイン画像">
+                    </div>
                 @endif
+                --}}
 
-               
-           
+                @if ($product->mainImage)
+                    <div class="igm-box main-img js-main-img">
+                        <img src="{{ asset($product->mainImage->image_path) }}" alt="Main Image" style="max-width:400px;">
+                    </div>
+                @endif
 
 
                 <!--flex box-->
                 <!--<div class="product-list">-->
-                    <ul class="product-list sub-img js-sub-img">
-                        
-                        <li class="data-thumb current"><img src="{{ asset('/images/PremireSilk/PS1.jpg') }}" alt=""></li>
-                        <li class="data-thumb"><img src="{{ asset('/images/other/point/1.jpg') }}" alt=""></li>
-                        <li class="data-thumb"><img src="{{ asset('/images/other/point/2.jpg') }}" alt=""></li>
-                        <li class="data-thumb"><img src="{{ asset('/images/other/point/3.jpg') }}" alt=""></li>
-                        <li class="data-thumb"><img src="{{ asset('/images/other/point/4.gif') }}" alt=""></li>
-                        <li class="data-thumb"><img src="{{ asset('/images/other/point/5.gif') }}" alt=""></li>
-                        <li class="data-thumb"><img src="{{ asset('/images/other/point/6.gif') }}" alt=""></li>
-                        <li class="data-thumb"><img src="{{ asset('/images/other/point/7.jpg') }}" alt=""></li>
-                    </ul>
+                <ul class="product-list sub-img js-sub-img">
+
+                    <li class="data-thumb current">
+                        <img src="{{ asset($product->mainImage->image_path) }}" alt="">
+                    </li>
+                    <li class="data-thumb"><img src="{{ asset('/images/other/point/1.jpg') }}" alt=""></li>
+                    <li class="data-thumb"><img src="{{ asset('/images/other/point/2.jpg') }}" alt=""></li>
+                    <li class="data-thumb"><img src="{{ asset('/images/other/point/3.jpg') }}" alt=""></li>
+                    <li class="data-thumb"><img src="{{ asset('/images/other/point/4.gif') }}" alt=""></li>
+                    <li class="data-thumb"><img src="{{ asset('/images/other/point/5.gif') }}" alt=""></li>
+                    <li class="data-thumb"><img src="{{ asset('/images/other/point/6.gif') }}" alt=""></li>
+                    <li class="data-thumb"><img src="{{ asset('/images/other/point/7.jpg') }}" alt=""></li>
+                </ul>
                 <!--</div>-->
 
             </div>
@@ -52,17 +59,18 @@
             <div class="rightside">
 
                 <p class="title">
-                    <h1>{{ $product->name }}</h1>
+                <h1>{{ $product->name }}</h1>
                 </p>
 
 
 
 
                 @if ($product->mainImage)
-                <div class="igm-point">
-                    <img src="{{ asset('images/other/AirStocking_POINT123.jpg') }}" style="max-width:400px;" alt="メイン画像">
-                </div>
-            @endif
+                    <div class="igm-point">
+                        <img src="{{ asset('images/other/AirStocking_POINT123.jpg') }}" style="max-width:400px;"
+                            alt="メイン画像">
+                    </div>
+                @endif
 
                 <h2>履かないストッキング・エアーストッキング®</h2>
                 <p>
@@ -101,13 +109,15 @@
                     優れたカバー力と耐久性で、毛穴やシミ、キズあとなどをしっかりカバー。汗や水、こすれに強いウォータープルーフ&スティングカラー処方。気品あるセミマットな仕上がり。茶エキスやシルクプロテインなどトリートメント成分配合で日焼けや乾燥などのダメージからお肌を守ります。
                 </div>
 
-                
+
                 @if ($user)
-                <div class="price">¥{{ number_format($product->member_price) }}<span class="tax">(税込)</span></div><!--会員価格-->
-            @else
-            <div class="price">¥{{ number_format($product->price) }}<span class="tax">(税込)</span></div><!--ログインしてない場合価格-->
-            @endif
-                
+                    <div class="price">¥{{ number_format($product->member_price) }}<span class="tax">(税込)</span></div>
+                    <!--会員価格-->
+                @else
+                    <div class="price">¥{{ number_format($product->price) }}<span class="tax">(税込)</span></div>
+                    <!--ログインしてない場合価格-->
+                @endif
+
 
 
 
@@ -117,9 +127,10 @@
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
                     <div class="mb-3">
                         <label>数量：</label>
-                        <input type="number" name="quantity" value="1" min="1" class="form-control" style="width:100px">
+                        <input type="number" name="quantity" value="1" min="1" class="form-control"
+                            style="width:100px">
                     </div>
-            
+
                     <button type="submit" class="a-button" style="border: none">カートに入れる</button>
                 </form>
 
@@ -128,8 +139,4 @@
             </div>
         </div>
     </main>
-
-
-
-
 @endsection

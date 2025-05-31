@@ -73,14 +73,18 @@
             <div class="line-up">
                 <h2>LINE UP</h2>
 
+                <h3>PREMIUM SILK</h3>
                 <div class="container">
                     <ul class="product-list container">
                         @foreach ($premiumSilk as $product)
                             <li>
                                 <div class="content">
                                     <a href="{{ asset('product/airstocking/' . $product->id) }}">
-                                        <img src="{{ asset('images/product/PremireSilk/' . $product->image_filename) }}"
-                                            alt="">
+                                        @if ($product->mainImage)
+                                        <img src="{{ asset($product->mainImage->image_path)  }}" alt="">
+                                        @else
+                                        <img src="{{ asset('images/noimage.png') }}" alt="画像なし">
+                                        @endif
                                     </a>
                                     <p class="title">{{ $product->name }}</p>
                                     <p class="price">¥{{ number_format($product->price) }}</p>
@@ -100,6 +104,40 @@
                         @endforeach
                     </ul>
                 </div>
+
+                <h3>DIAMOND LEGS</h3>
+                <div class="container">
+                    <ul class="product-list container">
+                        @foreach ($diamondLegs as $product)
+                            <li>
+                                <div class="content">
+                                    <a href="{{ asset('product/airstocking/' . $product->id) }}">
+                                        @if ($product->mainImage)
+                                        <img src="{{ asset($product->mainImage->image_path)  }}" alt="">
+                                        @else
+                                        <img src="{{ asset('images/noimage.png') }}" alt="画像なし">
+                                        @endif
+                                    </a>
+                                    <p class="title">{{ $product->name }}</p>
+                                    <p class="price">¥{{ number_format($product->price) }}</p>
+
+                                    <form method="POST" action="{{ route('cart.add') }}">
+                                        @csrf
+                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                        <div class="mb-3">
+                                            <label>数量：</label>
+                                            <input type="number" name="quantity" value="1" min="1"
+                                                class="form-control" style="width:100px">
+                                        </div>
+                                        <button type="submit" class="a-button" style="border: none">カートに入れる</button>
+                                    </form>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+
+
             </div>
 
 
@@ -110,7 +148,8 @@
 
         </main>
     @else
-        <main class="main">
+        
+        <main class="main" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 80vh; text-align: center;">
         <h2>{{ ucfirst($category) }} 商品一覧</h2>
         {{-- gelnail や wax など他のカテゴリ --}}
         <p>このカテゴリには現在登録されている商品がありません。</p>
