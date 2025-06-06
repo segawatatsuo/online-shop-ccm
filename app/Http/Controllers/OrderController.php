@@ -154,6 +154,7 @@ class OrderController extends Controller
             return redirect()->route('order.complete')->with('success', '注文が完了しました。');
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('OrderController::hoge - Error during order save: ' . $e->getMessage(), ['exception' => $e, 'address_session' => Session::get('address'), 'cart_session' => Session::get('cart')]);
             return back()->with('error', 'エラーが発生しました: ' . $e->getMessage());
         }
     }
