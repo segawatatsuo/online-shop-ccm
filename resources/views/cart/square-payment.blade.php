@@ -120,12 +120,12 @@
     <div id="messages" style="margin-top: 20px;"></div>
 
     <script type="text/javascript">
+        window.showError = function(message) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = `<p style="color: red;">${message}</p>`;
+        };
+
         /*
-                window.showError = function(message) {
-                    const messagesDiv = document.getElementById('messages');
-                    messagesDiv.innerHTML = `<p style="color: red;">${message}</p>`;
-                };
-                */
         window.showError = function(message) {
             Swal.fire({
                 icon: 'error',
@@ -143,7 +143,7 @@
                 confirmButtonText: 'OK',
             });
         };
-
+        */
 
 
         window.showSuccess = function(message) {
