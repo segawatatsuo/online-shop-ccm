@@ -106,9 +106,9 @@
 @section('content')
     <main class="main">
         <h1>お支払いフォーム</h1>
-        <!--
-        <p>購入金額: <span id="display-amount">1000</span>円</p>
-        -->
+
+        <p><span id="display-amount"></span>円</p>
+
         <div id="payment-form"></div>
         <button id="pay-button" disabled>支払い</button>
 
