@@ -107,7 +107,7 @@
     <main class="main">
         <h1>お支払いフォーム</h1>
 
-        <p><span id="display-amount"></span>円</p>
+        <p><span id="display-amount">3300</span>円</p>
 
         <div id="payment-form"></div>
         <button id="pay-button" disabled>支払い</button>
