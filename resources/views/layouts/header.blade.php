@@ -14,7 +14,7 @@
 
                     {{-- カートが空でなければ表示 --}}
                     @if(session('cart') && count(session('cart')) > 0)
-                        <li><a href="{{ url('/cart') }}">カート ({{ count(session('cart')) }})</a></li>
+                        <li><a href="{{ url('/cart') }}"><span title="カート">🛒</span>（ {{ count(session('cart')) }} ）</a></li>
                     @endif
 
 
