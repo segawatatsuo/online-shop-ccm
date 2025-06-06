@@ -1,0 +1,36 @@
+    .product-list {
+    display: flex; /* product-list を Flex コンテナにする */
+    flex-wrap: wrap; /* 商品が複数行に並ぶようにする */
+    /* その他のスタイル（gapなど） */
+}
+
+.product-list li {
+    display: flex; /* 各 li も Flex コンテナにする */
+    flex-direction: column; /* 子要素を縦に並べる */
+}
+
+.product-list li .content {
+    display: flex; /* content を Flex コンテナにする */
+    flex-direction: column; /* 子要素を縦に並べる */
+    height: 100%; /* 親要素 (li) の高さに合わせて広がる */
+}
+
+.product-list li .content a { /* 画像を含むリンク */
+    flex-grow: 1; /* 画像部分が可能な限り高さを占める */
+    display: flex; /* 内部の画像もFlexで中央揃えなどが可能に */
+    justify-content: center; /* 画像を水平中央に */
+    align-items: center; /* 画像を垂直中央に */
+}
+
+.product-list li .content img {
+    max-width: 100%; /* 親要素からはみ出さないように */
+    height: auto; /* 元のアスペクト比を維持 */
+    /* ここで固定の高さを指定することも検討（例: height: 200px; object-fit: contain;） */
+}
+
+.product-list li .content p.title,
+.product-list li .content p.price,
+.product-list li .content form {
+    /* 必要に応じて、これらの要素に固定の高さを設定したり、余白を調整したりする */
+    margin-top: auto; /* フォームを下に揃える場合 */
+}

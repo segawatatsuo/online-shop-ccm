@@ -91,4 +91,9 @@ class CartController extends Controller
     {
         return '注文完了ページ（ここで注文をDBに保存など）';
     }
+    public function squarePayment()
+    {
+        return view('cart.square-payment');
+    }
+
 }

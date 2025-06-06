@@ -22,7 +22,7 @@ use Illuminate\Support\Str;
 
 use App\Mail\OrderConfirmed;
 use App\Mail\OrderNotification;
-
+use App\Models\DeliveryTime; // 追加
 
 class OrderController extends Controller
 {
@@ -41,8 +41,10 @@ class OrderController extends Controller
         if (empty($cart)) {
             return redirect()->route('products.index')->with('warning', 'カートが空です。');
         }
+        
+        $deliveryTimes = DeliveryTime::pluck('time'); // 配送時間帯のtimeカラムの値のみを取得
 
-        return view('order.create', compact('cart'));
+        return view('order.create', compact('cart', 'deliveryTimes'));
     }
 
     //確認
@@ -117,12 +119,14 @@ class OrderController extends Controller
             $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
 
 
-
             $order = Order::create([
                 'order_number' => $orderNumber,
                 'customer_id'  => $customer->id,
                 'delivery_id'  => $delivery->id,
                 'total_price'  => $total,
+                'delivery_time' => $address['delivery_time'],
+                'delivery_date' => $address['delivery_date'],
+                'your_request' => $address['your_request']
             ]);
 
             // 5. 商品ごとの注文保存
@@ -167,102 +171,5 @@ class OrderController extends Controller
     {
         return view('order.complete'); // ビューは resources/views/order/complete.blade.php など
     }
-    /*
-    public function complete(Order $order)
-    {
-        return view('order.complete', compact('order'));
-    }
-    */
 
-    public function storeOrder(Request $request)
-    {
-        $address = Session::get('address');
-        $cart = Session::get('cart');
-
-        if (!$address || !$cart) {
-            return redirect()->back()->with('error', 'カートまたは住所情報が見つかりません。');
-        }
-
-        DB::beginTransaction();
-
-        try {
-            // 1. 顧客情報の保存
-            $customer = Customer::create([
-                'sei'     => $address['order_sei'],
-                'mei'     => $address['order_mei'],
-                'email'    => $address['order_email'],
-                'phone'    => $address['order_phone'],
-                'zip'      => $address['order_zip'],
-                'input_add01' => $address['order_add01'],
-                'input_add02' => $address['order_add02'],
-                'input_add03' => $address['order_add03'],
-            ]);
-
-            // 2. 配送先の保存
-            if ($address['same_as_orderer'] == '1') {
-                // 注文者と同じ場合、配送先をコピー
-                $delivery = Delivery::create([
-                    'sei'     => $customer->sei,
-                    'mei'     => $customer->mei,
-                    'email'    => $customer->email,
-                    'phone'    => $customer->phone,
-                    'zip'      => $customer->zip,
-                    'input_add01' => $customer->address1,
-                    'input_add02' => $customer->address2,
-                    'input_add03' => $customer->address3,
-                ]);
-            } else {
-                // 配送先が異なる場合
-                $delivery = Delivery::create([
-                    'sei'     => $address['delivery_sei'],
-                    'mei'     => $address['delivery_mei'],
-                    'email'    => $address['delivery_email'],
-                    'phone'    => $address['delivery_phone'],
-                    'zip'      => $address['delivery_zip'],
-                    'input_add01' => $address['delivery_add01'],
-                    'input_add02' => $address['delivery_add02'],
-                    'input_add03' => $address['delivery_add03'],
-                ]);
-            }
-
-            // 3. 注文番号生成
-            $orderNumber = $this->generateOrderNumber();
-
-            // 4. 注文作成
-            $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
-
-            $order = Order::create([
-                'order_number' => $orderNumber,
-                'customer_id'  => $customer->id,
-                'delivery_id'  => $delivery->id,
-                'total_price'  => $total,
-            ]);
-
-            // 5. 商品ごとの注文保存
-            foreach ($cart as $item) {
-                OrderItem::create([
-                    'order_id'   => $order->id,
-                    'product_id' => $item['product_id'],
-                    'name'       => $item['name'],
-                    'quantity'   => $item['quantity'],
-                    'price'      => $item['price'],
-                ]);
-            }
-
-            DB::commit();
-
-            // ...（注文保存後）
-            Mail::to($customer->email)->send(new OrderConfirmed($order, $customer, $delivery));
-
-            Mail::to('shop@example.com')->send(new OrderNotification($order, $customer, $delivery));
-
-
-            Session::forget(['cart', 'address']);
-
-            return redirect()->route('order.complete')->with('success', '注文が完了しました。');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'エラーが発生しました: ' . $e->getMessage());
-        }
-    }
 }

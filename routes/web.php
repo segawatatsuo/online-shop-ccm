@@ -18,7 +18,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AmazonPayTestController;
 use App\Http\Controllers\AmazonPayController;
 
-
+use App\Http\Controllers\ContactController;
 // ホーム → 商品一覧にリダイレクト
 //Route::get('/', fn() => redirect('/products'));
 
@@ -59,6 +59,9 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('show', [CartController::class, 'show'])->name('show');
     Route::post('checkout-session', [CartController::class, 'createCheckoutSession'])->name('checkout-session');
     Route::get('complete', [CartController::class, 'review'])->name('amazonpay.review');
+
+    //お支払い方法選択
+    Route::post('square-payment', [CartController::class, 'squarePayment'])->name('square-payment');
 });
 
 // 注文
@@ -103,8 +106,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 
 //Square
-Route::get('/pay', [PaymentController::class, 'show']);
-Route::post('/process-payment', [PaymentController::class, 'process']);
+Route::post('/process-payment', [PaymentController::class, 'processPayment']);
 
 
 //AmazonPayのSDKバージョン取得
@@ -116,3 +118,20 @@ Route::get('/amazonpay/return', [AmazonPayController::class, 'handleReturn'])->n
 
 // Laravel-Adminのルーティング
 Encore\Admin\Facades\Admin::routes();
+
+// 注文処理が終わったら(cartが空になったら)以下のページにアクセスしてきたらトップページにリダイレクトさせるミドルウェア用のルート
+Route::middleware(['cart.not.empty', 'prevent.back.history'])->group(function () {
+    Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
+    Route::get('/order/confirm', [OrderController::class, 'confirm'])->name('order.confirm');
+    Route::get('/cart/square-payment', [CartController::class, 'square-payment'])->name('cart.square-payment');
+});
+
+//お問い合わせフォーム
+Route::get('/contact', [ContactController::class, 'showForm'])->name('contact.form');
+Route::post('/contact', [ContactController::class, 'submitForm'])->name('contact.submit');
+Route::get('/contact/complete', [ContactController::class, 'complete'])->name('contact.complete');
+
+
+Route::get('/thank-you', function () {
+    return view('thank-you');
+})->name('order.thank-you');

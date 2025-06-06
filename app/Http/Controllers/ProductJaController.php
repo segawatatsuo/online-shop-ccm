@@ -77,9 +77,9 @@ class ProductJaController extends Controller
             $query->where('brand', $category);
         })
         ->firstOrFail();
-        //dd($product);
 
         $user = auth()->user();
+
         return view('products.show', compact('product', 'user'));
     }
 }

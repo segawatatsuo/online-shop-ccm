@@ -37,6 +37,18 @@
         </div>
     </div>
 
+
+    {{-- 配送情報 --}}
+    <div class="card mb-4">
+        <div class="card-header">配送情報</div>
+        <div class="card-body grid-2">
+            <div><strong>配送希望日：</strong> {{ $address['delivery_date'] }} {{ $address['delivery_date'] }}</div>
+            <div><strong>配送時間：</strong> {{ $address['delivery_time'] }}</div>
+            <div><strong>ご要望他：</strong> {{ $address['your_request'] }}</div>
+        </div>
+    </div>
+
+
     {{-- 商品情報 --}}
     <div class="card mb-4">
         <div class="card-header">ご注文商品</div>
@@ -79,13 +91,25 @@
     </div>
 
     {{-- ボタン --}}
+    {{--
     <div class="text-center mt-4">
         <a href="{{ route('cart.index') }}" class="btn btn-secondary">戻る</a>
         <form action="{{ route('order.hoge') }}" method="POST" class="d-inline">
             @csrf
-            <button type="submit" class="btn btn-order-confirm">お支払い方法を選択</button>
+            <button type="submit" class="btn btn-order-confirm">お支払い</button>
         </form>
     </div>
+--}}
+    {{-- ボタン --}}
+    <div class="text-center mt-4">
+        <a href="{{ route('cart.index') }}" class="btn btn-secondary">戻る</a>
+        <form action="{{ route('cart.square-payment') }}" method="POST" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-order-confirm">お支払い</button>
+        </form>
+    </div>
+
+
 </div>
 </main>
 @endsection

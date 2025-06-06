@@ -40,6 +40,9 @@ class OrderCustomerRequest extends FormRequest
             'order_add01' => ['required', 'string', 'max:255'],
             'order_add02' => ['required', 'string', 'max:255'],
             'order_add03' => ['nullable', 'string', 'max:255'],
+            'delivery_date' => ['nullable'],
+            'delivery_time' => ['nullable'],
+            'your_request' => ['nullable'],
 
             'same_as_orderer' => ['nullable'],
 

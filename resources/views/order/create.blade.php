@@ -2,7 +2,6 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/address_input.css') }}">
-
 @endpush
 
 
@@ -51,11 +50,13 @@
                 <span class="p-country-name" style="display:none;">Japan</span>
                 <dl class="post-table flex-between">
                     <dt>姓</dt>
-                    <dd><input type="text" name="order_sei" class="form-control" placeholder="姓" value="{{ old('order_sei') }}" /></dd>
+                    <dd><input type="text" name="order_sei" class="form-control" placeholder="姓"
+                            value="{{ old('order_sei') }}" /></dd>
                 </dl>
                 <dl class="post-table flex-between">
                     <dt>名</dt>
-                    <dd><input type="text" name="order_mei" class="form-control" placeholder="名" value="{{ old('order_mei') }}" /></dd>
+                    <dd><input type="text" name="order_mei" class="form-control" placeholder="名"
+                            value="{{ old('order_mei') }}" /></dd>
                 </dl>
                 <dl class="post-table flex-between">
                     <dt>電話番号</dt>
@@ -91,6 +92,43 @@
                     <dd><input type="text" name="order_add03" class="p-extended-address form-control"
                             placeholder="マンション名など" value="{{ old('order_add03') }}" /></dd>
                 </dl>
+
+
+
+
+                <dl class="post-table flex-between">
+                    <dt>お届け希望日</dt>
+                    <dd><input type="text" name="delivery_date" class="p-extended-address form-control"
+                            placeholder="本日より3営業日以降になります(土日祝を除く)" value="{{ old('delivery_date') }}" /></dd>
+                </dl>
+
+
+                <dl class="post-table flex-between">
+                    <dt>お届け時間帯</dt>
+                    <dd>
+                        <select class="form-select" id="delivery_time" name="delivery_time">
+                            @foreach ($deliveryTimes as $time)
+                                <option value="{{ $time }}" {{ old('delivery_time') == $time ? 'selected' : '' }}>
+                                    {{ $time }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('delivery_time')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </dd>
+                </dl>
+
+
+
+                <dl class="post-table flex-between">
+                    <dt>ご要望欄</dt>
+                    <dd><input type="text" name="your_request" class="p-extended-address form-control" placeholder=""
+                            value="{{ old('your_request') }}" /></dd>
+                </dl>
+
+
+
             </div>
 
             <dl class="post-table flex-between same-address-block"
@@ -101,13 +139,14 @@
                 <dd>
                     <label style="font-size: 1.1em;">
                         <input type="hidden" name="same_as_orderer" value="0"><!-- チェックをはずすと空欄になるのでその場合は0を送る -->
-                        <input type="checkbox" id="same_as_orderer" name="same_as_orderer" value="1" {{ old('same_as_orderer', '1') == '1' ? 'checked' : '' }}><!-- チェックした場合はこっちで上書きされる -->
+                        <input type="checkbox" id="same_as_orderer" name="same_as_orderer" value="1"
+                            {{ old('same_as_orderer', '1') == '1' ? 'checked' : '' }}><!-- チェックした場合はこっちで上書きされる -->
                         はい（チェックを外すと別の住所を入力できます）
                     </label>
                 </dd>
             </dl>
 
-            
+
 
             <div id="delivery_section">
                 <h1>お届け先入力</h1>
@@ -115,12 +154,14 @@
                     <span class="p-country-name" style="display:none;">Japan</span>
                     <dl class="post-table flex-between">
                         <dt>姓</dt>
-                        <dd><input type="text" name="delivery_sei" class="form-control" placeholder="姓" value="{{ old('delivery_sei') }}" />
+                        <dd><input type="text" name="delivery_sei" class="form-control" placeholder="姓"
+                                value="{{ old('delivery_sei') }}" />
                         </dd>
                     </dl>
                     <dl class="post-table flex-between">
                         <dt>名</dt>
-                        <dd><input type="text" name="delivery_mei" class="form-control" placeholder="名" value="{{ old('delivery_mei') }}" />
+                        <dd><input type="text" name="delivery_mei" class="form-control" placeholder="名"
+                                value="{{ old('delivery_mei') }}" />
                         </dd>
                     </dl>
                     <dl class="post-table flex-between">
@@ -130,8 +171,8 @@
                     </dl>
                     <dl class="post-table flex-between">
                         <dt>メールアドレス</dt>
-                        <dd><input type="text" name="delivery_email" class="form-control" placeholder="mail@example.com"
-                                value="{{ old('delivery_email') }}" /></dd>
+                        <dd><input type="text" name="delivery_email" class="form-control"
+                                placeholder="mail@example.com" value="{{ old('delivery_email') }}" /></dd>
                     </dl>
                     <dl class="post-table flex-between">
                         <dt>郵便番号</dt>
@@ -160,7 +201,7 @@
                 </div>
             </div>
             <input type="hidden" class="p-country-name" value="Japan">
-            
+
 
             <div style="margin-top: 20px;background-color:#ffffff;">
                 <button type="submit" class="btn-order-confirm">

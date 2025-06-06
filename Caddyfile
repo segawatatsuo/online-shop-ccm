@@ -1,0 +1,11 @@
+{
+	auto_https off
+}
+
+square.test {
+	root * /home/segawa/online-shop-ccm/public
+	php_fastcgi unix//run/php/php8.2-fpm.sock
+	file_server
+
+	tls /home/segawa/online-shop-ccm/certs/square.test.pem /home/segawa/online-shop-ccm/certs/square.test-key.pem
+}

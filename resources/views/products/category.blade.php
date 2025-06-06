@@ -1,9 +1,12 @@
 @extends('layouts.app')
 
+
+@section('head')
+    <link rel="stylesheet" href="{{ asset('css/imagefit.css') }}">
+@endsection
+
+
 @section('content')
-
-
-
 
     @if ($category === 'airstocking')
         <main class="main">
@@ -85,6 +88,7 @@
                                         @else
                                         <img src="{{ asset('images/noimage.png') }}" alt="画像なし">
                                         @endif
+
                                     </a>
                                     <p class="title">{{ $product->name }}</p>
                                     <p class="price">¥{{ number_format($product->price) }}</p>

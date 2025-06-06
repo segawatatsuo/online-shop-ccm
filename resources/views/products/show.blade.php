@@ -9,23 +9,18 @@
         <div class="container">
 
             <!--breadcrumbsパート-->
+            <!--
             <div class="breadcrumbs">ホーム / エアーストッキング / 健康肌-テラコッタ / [健康肌][PS03] エアーストッキング プレミアシルク テラコッタ AirStocking
                 Premier
                 Silk
                 120g Terra-cotta
             </div>
+            -->
 
 
             <!--leftsideパート-->
             <div class="leftside">
-                {{--
-                @if ($product->mainImage)
-                    <div class="igm-box main-img js-main-img">
-                        <img src="{{ asset('storage/' . $product->mainImage->filename) }}" style="max-width:400px;"
-                            alt="メイン画像">
-                    </div>
-                @endif
-                --}}
+
 
                 @if ($product->mainImage)
                     <div class="igm-box main-img js-main-img">
@@ -55,23 +50,18 @@
 
 
             <!--rightsideパート-->
-            <!--flex縦-->
             <div class="rightside">
 
-                <p class="title">
-                <h1>{{ $product->name }}</h1>
-                </p>
-
-
-
+                <p class="title"><h1>{{ $product->name }}</h1></p>
 
                 @if ($product->mainImage)
                     <div class="igm-point">
                         <img src="{{ asset('images/other/AirStocking_POINT123.jpg') }}" style="max-width:400px;"
-                            alt="メイン画像">
+                            alt="エアーストッキングのポイント">
                     </div>
                 @endif
 
+                {{--
                 <h2>履かないストッキング・エアーストッキング®</h2>
                 <p>
                     エアーストッキング®は日本で開発されたグローバルスタンダードのスプレーファンデーションです。エアーストッキングは「VOGUE」「ELLE」「ニューヨーク
@@ -117,8 +107,10 @@
                     <div class="price">¥{{ number_format($product->price) }}<span class="tax">(税込)</span></div>
                     <!--ログインしてない場合価格-->
                 @endif
+                --}}
 
 
+                
 
 
 
@@ -135,7 +127,7 @@
                 </form>
 
 
-
+{!! $product->description !!}
             </div>
         </div>
     </main>

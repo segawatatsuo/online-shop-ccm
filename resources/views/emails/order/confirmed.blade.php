@@ -45,12 +45,29 @@
 
 ---
 
+## ■ ご注文者
+
+- お名前：{{ $customer->sei }} {{ $customer->mei }} 様  
+- 郵便番号：{{ $customer->zip }}  
+- 住所：{{ $customer->input_add01 }} {{ $customer->input_add02 }} {{ $customer->input_add03 }}  
+- 電話番号：{{ $customer->phone }}
+
+---
+
 ## ■ お届け先
 
 - お名前：{{ $delivery->sei }} {{ $delivery->mei }} 様  
 - 郵便番号：{{ $delivery->zip }}  
 - 住所：{{ $delivery->input_add01 }} {{ $delivery->input_add02 }} {{ $delivery->input_add03 }}  
 - 電話番号：{{ $delivery->phone }}
+
+---
+
+## ■ お届け先
+
+- お届け希望日：{{ $order->delivery_date }}
+- お届け時間帯：{{ $order->delivery_time }}
+- ご要望欄：{{ $order->your_request }}
 
 ---
 

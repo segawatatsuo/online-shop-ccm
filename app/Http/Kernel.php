@@ -70,5 +70,10 @@ class Kernel extends HttpKernel
         'admin' => \Encore\Admin\Middleware\Authenticate::class,
         // 独自のミドルウェアは別名で登録（例: 'admin.only'）
         'admin.only' => \App\Http\Middleware\AdminOnly::class,
+
+        //注文が最後まで行ってカートが空になったら戻るボタンで前のページ戻れないようにする
+        'cart.not.empty' => \App\Http\Middleware\EnsureCartIsNotEmpty::class,
+        'prevent.back.history' => \App\Http\Middleware\PreventBackHistory::class,
+
     ];
 }

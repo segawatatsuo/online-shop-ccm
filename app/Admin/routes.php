@@ -16,7 +16,7 @@ Route::group([
 
     $router->resource('product-jas', 'ProductJaController');
 
-        // ✅ 複製用のPOSTルートをここに追加！
+    // ✅ 複製用のPOSTルートをここに追加！
     Route::post('product/duplicate', [ProductJaController::class, 'duplicate']);
 
 });

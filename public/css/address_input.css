@@ -38,7 +38,7 @@ form.post-content {
 }
 
 /* 入力欄スタイル */
-input.form-control {
+input.form-control,select.form-select {
   width: 100%;
   padding: 0.8rem;
   font-size: 1.05rem;
@@ -141,7 +141,7 @@ input.form-control {
   }
 
   /* 入力欄幅とフォントサイズ調整 */
-  input.form-control,
+  input.form-control,select.form-select,
   .input-half {
     width: 100% !important;
     min-width: unset;

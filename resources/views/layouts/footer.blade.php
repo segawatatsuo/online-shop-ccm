@@ -9,7 +9,7 @@
 
         <div class="row">
             <ul>
-                <li><a href="{{ url('/inquiry') }}">お問い合わせ</a></li>
+                <li><a href="{{ url('/contact') }}">お問い合わせ</a></li>
                 <li><a href="{{ url('/kiyaku') }}">利用規約</a></li>
                 <li><a href="{{ url('/privacy') }}">個人情報保護について</a></li>
                 <li><a href="{{ url('/houjin') }}">CCM法人取引専用サイト</a></li>

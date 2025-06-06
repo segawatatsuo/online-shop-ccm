@@ -16,7 +16,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.4",
-        "square/square": "^40.0"
+        "square/square": "^42.2"
     },
     "require-dev": {
         "beyondcode/laravel-er-diagram-generator": "^4.0",
