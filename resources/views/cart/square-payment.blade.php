@@ -107,7 +107,8 @@
     <main class="main">
         <h1>お支払いフォーム</h1>
 
-        <p><span id="display-amount">3300</span>円</p>
+        <!--<p><span id="display-amount">3300</span>円</p>-->
+        <p>お支払い金額：<span id="display-amount">{{ number_format($totalAmount) }}</span>円</p>
 
         <div id="payment-form"></div>
         <button id="pay-button" disabled>支払い</button>
@@ -188,7 +189,8 @@
                     const result = await card.tokenize();
                     if (result.status === 'OK') {
                         console.log(`Payment token: ${result.token}`);
-                        const purchaseAmount = document.getElementById('display-amount').innerText;
+                        const purchaseAmountText = document.getElementById('display-amount').innerText;
+                        const purchaseAmount = purchaseAmountText.replace(/,/g, ''); // カンマをすべて除去
                         await window.createPayment(result.token, parseInt(purchaseAmount));
                     } else {
                         // Square SDKが返すエラー（カード入力エラーなど）

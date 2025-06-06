@@ -33,7 +33,7 @@ class OrderController extends Controller
         $this->cartService = $cartService;
     }
 
-    public function create() // 前confirm
+    public function create() 
     {
         // 🔽 セッションからカート(セッションデータのキー名が「cart」の情報を配列で取得。無ければ空の配列を返す）
         $cart = session()->get('cart', []);

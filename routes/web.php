@@ -60,7 +60,7 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('checkout-session', [CartController::class, 'createCheckoutSession'])->name('checkout-session');
     Route::get('complete', [CartController::class, 'review'])->name('amazonpay.review');
 
-    //お支払い方法選択
+    //Squareのカード入力画面
     Route::post('square-payment', [CartController::class, 'squarePayment'])->name('square-payment');
 });
 

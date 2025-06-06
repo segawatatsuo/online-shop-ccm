@@ -91,9 +91,28 @@ class CartController extends Controller
     {
         return '注文完了ページ（ここで注文をDBに保存など）';
     }
+    /*
     public function squarePayment()
     {
         return view('cart.square-payment');
     }
+    */
+    public function squarePayment(Request $request)
+    {
+        // セッションからカート情報を取得
+        $cart = $request->session()->get('cart', []);
 
+        $totalAmount = 0;
+        foreach ($cart as $item) {
+            // quantityとpriceが存在することを確認
+            if (isset($item['quantity']) && isset($item['price'])) {
+                $totalAmount += $item['quantity'] * $item['price'];
+            }
+        }
+
+        // 計算した合計金額をビューに渡す
+        return view('cart.square-payment', [
+            'totalAmount' => $totalAmount,
+        ]);
+    }
 }
