@@ -106,9 +106,9 @@
 @section('content')
     <main class="main">
         <h1>お支払いフォーム</h1>
-
+        <!--
         <p>購入金額: <span id="display-amount">1000</span>円</p>
-
+        -->
         <div id="payment-form"></div>
         <button id="pay-button" disabled>支払い</button>
 
@@ -120,12 +120,13 @@
     <div id="messages" style="margin-top: 20px;"></div>
 
     <script type="text/javascript">
+    /*
         window.showError = function(message) {
             const messagesDiv = document.getElementById('messages');
             messagesDiv.innerHTML = `<p style="color: red;">${message}</p>`;
         };
 
-        /*
+        */
         window.showError = function(message) {
             Swal.fire({
                 icon: 'error',
@@ -143,7 +144,7 @@
                 confirmButtonText: 'OK',
             });
         };
-        */
+        
 
 
         window.showSuccess = function(message) {
