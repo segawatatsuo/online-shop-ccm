@@ -1,0 +1,118 @@
+        main.main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+            padding: 2rem;
+            background-color: #f9f9f9;
+            /* 背景色（お好みで） */
+        }
+
+        main.main form {
+            width: 100%;
+            max-width: 1200px;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        main.main form div {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main.main form label {
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        main.main form input,
+        main.main form textarea {
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        main.main form input:focus,
+        main.main form textarea:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        main.main form button {
+            background-color: #007bff;
+            color: white;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        main.main form button:hover {
+            background-color: #0056b3;
+        }
+
+        #payment-form {
+            border: 1px solid #ccc;
+            padding: 1rem;
+            border-radius: 10px;
+            background: #fefefe;
+            margin-bottom: 1rem;
+        }
+
+        #pay-button {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+            display: block;
+            padding: 0.5rem;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            border: 1px solid #ffd814;
+            background-color: #ffd814;
+        }
+
+        #pay-button {
+            cursor: pointer;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #loading-overlay {
+            display: none; /* ここが重要 */
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+        }

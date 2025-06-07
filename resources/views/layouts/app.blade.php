@@ -58,6 +58,7 @@
                 });
 
                 // フラッシュメッセージ SweetAlert2 表示(商品をカートに追加しました！は非表示)
+                /*
                 @if (session('success') && session('success') !== '商品をカートに追加しました！')
                     Swal.fire({
                         icon: 'success',
@@ -67,6 +68,7 @@
                         timer: 1800
                     });
                 @endif
+                */
             });
         </script>
     @endpush

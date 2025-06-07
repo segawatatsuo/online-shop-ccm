@@ -69,7 +69,6 @@ class OrderController extends Controller
 
         try {
 
-
             // 1. 顧客情報の保存
             $customer = Customer::create([
                 'sei'     => $address['order_sei'],
@@ -141,20 +140,22 @@ class OrderController extends Controller
             }
 
             DB::commit();
-
                         // ...（注文保存後）
             Mail::to($customer->email)->send(new OrderConfirmed($order, $customer, $delivery));
 
             Mail::to('shop@example.com')->send(new OrderNotification($order, $customer, $delivery));
             
-
             Session::forget(['cart', 'address']);
-
             //GET
-            return redirect()->route('order.complete')->with('success', '注文が完了しました。');
+            //return redirect()->route('order.complete')->with('success', '注文が完了しました。');
+            return redirect()->route('order.complete');
+
         } catch (\Exception $e) {
+
             DB::rollBack();
+
             \Log::error('OrderController::hoge - Error during order save: ' . $e->getMessage(), ['exception' => $e, 'address_session' => Session::get('address'), 'cart_session' => Session::get('cart')]);
+
             return back()->with('error', 'エラーが発生しました: ' . $e->getMessage());
         }
     }
