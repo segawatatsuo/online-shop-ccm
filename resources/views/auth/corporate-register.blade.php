@@ -12,25 +12,50 @@
         document.addEventListener('DOMContentLoaded', function() {
             const toggleCheckbox = document.getElementById('same_as_orderer');
             const deliverySection = document.getElementById('delivery_section');
+            // delivery_section 内のすべての入力要素（input, select, textarea）を取得
+            const deliveryInputs = deliverySection.querySelectorAll('input, select, textarea');
 
-            toggleCheckbox.addEventListener('change', function() {
-                if (this.checked) {
+            function toggleDeliverySection() {
+                if (toggleCheckbox.checked) {
                     deliverySection.style.display = 'none';
+                    // チェックされた場合、入力フィールドを無効化 (disabled)
+                    deliveryInputs.forEach(input => {
+                        input.setAttribute('disabled', 'disabled');
+                    });
                 } else {
                     deliverySection.style.display = 'block';
+                    // チェックが外れた場合、入力フィールドを有効化
+                    deliveryInputs.forEach(input => {
+                        input.removeAttribute('disabled');
+                    });
                 }
-            });
+            }
 
-            // 初期状態
-            if (toggleCheckbox.checked) {
-                deliverySection.style.display = 'none';
+            // チェックボックスの状態が変更されたときに実行
+            toggleCheckbox.addEventListener('change', toggleDeliverySection);
+
+            // ページロード時の初期状態を設定
+            toggleDeliverySection();
+        });
+    </script>
+
+    <script>
+        document.getElementById('my-form').addEventListener('keydown', function(event) {
+            // Enterキーを押したとき
+            if (event.key === 'Enter') {
+                // フォームのsubmitを阻止（ただし textarea 内では許可）
+                if (event.target.tagName !== 'TEXTAREA') {
+                    event.preventDefault();
+                    return false;
+                }
             }
         });
     </script>
 @endpush
 
 @section('content')
-    <form method="POST" action="{{ route('register.confirm') }}" class="post-content">
+    {{-- <form method="POST" action="{{ route('register.confirm') }}" class="post-content"> --}}
+    <form method="POST" action="{{ route('corporate.register.confirm') }}" class="post-content" id="my-form">
         @csrf
 
         @if ($errors->any())
@@ -53,6 +78,15 @@
                     <dt>会社名</dt>
                     <dd><input type="text" name="order_company_name" class="form-control" placeholder="会社名"
                             value="{{ old('order_company_name') }}" /></dd>
+                </dl>
+
+
+
+
+                <dl class="post-table flex-between">
+                    <dt>部署名</dt>
+                    <dd><input type="text" name="order_department" class="form-control" placeholder="部署名"
+                            value="{{ old('order_department') }}" /></dd>
                 </dl>
 
                 <dl class="post-table flex-between">
@@ -83,6 +117,17 @@
                             value="{{ old('email') }}" /></dd>
                 </dl>
 
+                <dl class="post-table flex-between">
+                    <dt>パスワード</dt>
+                    <dd><input type="password" name="password" class="form-control" placeholder="パスワード" value="" />
+                    </dd>
+                </dl>
+
+                <dl class="post-table flex-between">
+                    <dt>パスワード確認</dt>
+                    <dd><input type="password" name="password_confirmation" class="form-control" placeholder="パスワード確認"
+                            value="" /></dd>
+                </dl>
                 <dl class="post-table flex-between">
                     <dt>郵便番号</dt>
                     <dd>
@@ -141,6 +186,13 @@
                     </dl>
 
                     <dl class="post-table flex-between">
+                        <dt>部署名</dt>
+                        <dd><input type="text" name="delivery_department" class="form-control" placeholder="部署名"
+                                value="{{ old('delivery_department') }}" /></dd>
+                    </dl>
+
+
+                    <dl class="post-table flex-between">
                         <dt>ご担当者姓</dt>
                         <dd><input type="text" name="delivery_sei" class="form-control" placeholder="姓"
                                 value="{{ old('delivery_sei') }}" />
@@ -157,11 +209,13 @@
                         <dd><input type="text" name="delivery_phone" class="form-control" placeholder="090-999-0000"
                                 value="{{ old('delivery_phone') }}" /></dd>
                     </dl>
+                    {{--
                     <dl class="post-table flex-between">
                         <dt>メールアドレス</dt>
                         <dd><input type="text" name="delivery_email" class="form-control"
                                 placeholder="mail@example.com" value="{{ old('delivery_email') }}" /></dd>
                     </dl>
+                    --}}
                     <dl class="post-table flex-between">
                         <dt>郵便番号</dt>
                         <dd>

@@ -79,8 +79,8 @@
 
                 <dl class="post-table flex-between">
                     <dt>メールアドレス</dt>
-                    <dd><input type="text" name="email" class="form-control" placeholder="example@mail.com"
-                            value="{{ old('email') }}" /></dd>
+                    <dd><input type="text" name="order_email" class="form-control" placeholder="example@mail.com"
+                            value="{{ old('order_email') }}" /></dd>
                 </dl>
 
                 <dl class="post-table flex-between">

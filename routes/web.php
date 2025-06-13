@@ -5,48 +5,44 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\ProductJaController;
 use App\Http\Controllers\ProductImageJaController;
-
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
-
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\MypageController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\AdminRegisterController;
-
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AmazonPayTestController;
 use App\Http\Controllers\AmazonPayController;
-
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Auth\CustomRegisterController; // ここは残します
+use App\Http\Controllers\Auth\CorporateRegisterController;
+use PhpParser\Node\Stmt\Return_;
+use App\Http\Controllers\Auth\VerificationController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
+use Illuminate\Support\Facades\Session;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+
 // ホーム → 商品一覧にリダイレクト
 //Route::get('/', fn() => redirect('/products'));
 
-// ✅ トップページに index.blade.php を表示
+// トップページに index.blade.php を表示
 Route::get('/', function () {
     return view('index'); // resources/views/index.blade.php
 })->name('products.index');
 
-
 Route::get('admin/login', [App\Http\Controllers\Admin\AdminLoginController::class, 'showLoginForm'])->name('admin.login');
 Route::post('admin/login', [App\Http\Controllers\Admin\AdminLoginController::class, 'login']);
 
-// 商品
-/*
-Route::prefix('products')->name('products.')->group(function () {
-    Route::get('/', [ProductJaController::class, 'index'])->name('index');
-    Route::get('{id}', [ProductJaController::class, 'show'])->name('show');
-});
-*/
 // 商品（カテゴリ別一覧と詳細）
 Route::prefix('product')->name('product.')->group(function () {
     // カテゴリ別商品一覧
     Route::get('{category}', [ProductJaController::class, 'category'])->name('category');
-
     // 商品詳細（例: /product/airstocking/123）
     Route::get('{category}/{id}', [ProductJaController::class, 'show'])->name('show');
 });
-
 
 // カート
 Route::prefix('cart')->name('cart.')->group(function () {
@@ -54,12 +50,10 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('add', [CartController::class, 'add'])->name('add');
     Route::post('update', [CartController::class, 'update'])->name('update');
     Route::post('remove', [CartController::class, 'remove'])->name('remove');
-
     // Amazon Pay
     Route::get('show', [CartController::class, 'show'])->name('show');
     Route::post('checkout-session', [CartController::class, 'createCheckoutSession'])->name('checkout-session');
     Route::get('complete', [CartController::class, 'review'])->name('amazonpay.review');
-
     //Squareのカード入力画面
     Route::post('square-payment', [CartController::class, 'squarePayment'])->name('square-payment');
 });
@@ -68,23 +62,52 @@ Route::prefix('cart')->name('cart.')->group(function () {
 Route::prefix('order')->name('order.')->group(function () {
     Route::get('create', [OrderController::class, 'create'])->name('create');
     Route::post('confirm', [OrderController::class, 'confirm'])->name('confirm');
-    Route::post('storeOrder', [OrderController::class, 'storeOrder'])->name('storeOrder');//store
+    Route::post('storeOrder', [OrderController::class, 'storeOrder'])->name('storeOrder'); //store
     Route::get('complete', [OrderController::class, 'complete'])->name('complete');
     Route::post('hoge', [OrderController::class, 'hoge'])->name('hoge');
 });
 
+// ★★★ カスタムメール認証ルートを Auth::routes() より前に定義 ★★★
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
 
+// 法人ユーザー向けのメール確認ルート
+Route::get('/corporate/email/verify/{id}/{hash}', [VerificationController::class, '__invoke'])
+    ->name('corporate.verification.verify'); // 'signed' ミドルウェアも削除
+
+// 個人ユーザー向けのメール確認ルート
+Route::get('/email/verify/{id}/{hash}', [VerificationController::class, '__invoke'])
+    ->name('verification.verify'); // 'signed' ミドルウェアも削除
+
+
+Route::post('/email/resend', [VerificationController::class, 'resend'])
+    ->middleware(['auth', 'throttle:6,1'])->name('verification.resend');
 
 // 認証関連
-Auth::routes();
+// CustomRegisterControllerによるカスタム登録フローを優先するため、
+// Auth::routes() で生成されるデフォルトの /register を無効にし、
+// 他の認証機能（ログイン、パスワードリセット）のみを有効にします。
+// ★★★ verify => false に変更してカスタム認証ルートを使用 ★★★
+Auth::routes(['register' => false, 'verify' => false]);
+
+Route::get('/register', [CustomRegisterController::class, 'showForm'])->name('register');
+Route::post('/register/confirm', [CustomRegisterController::class, 'confirm'])->name('register.confirm');
+Route::post('/register/store', [CustomRegisterController::class, 'store'])->name('register.store');
+
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
 
-// 顧客マイページ（認証必須）
-Route::middleware('auth')->prefix('mypage')->name('mypage.')->group(function () {
+// カスタム(法人取引会員)登録ルート
+// routes/web.php
+Route::get('/corporate/register', [CorporateRegisterController::class, 'showForm'])->name('corporate.register');
+Route::post('/corporate/register/confirm', [CorporateRegisterController::class, 'confirm'])->name('corporate.register.confirm');
+Route::post('/corporate/register', [CorporateRegisterController::class, 'store'])->name('corporate.register.store');
+
+// 顧客マイページ（認証必須、メール認証済み必須）
+Route::middleware(['auth', 'verified'])->prefix('mypage')->name('mypage.')->group(function () {
     Route::get('/', [MypageController::class, 'index'])->name('index');
     Route::get('edit', [MypageController::class, 'edit'])->name('edit');
     Route::post('update', [MypageController::class, 'update'])->name('update');
-
     Route::get('password', [MypageController::class, 'editPassword'])->name('password.edit');
     Route::post('password', [MypageController::class, 'updatePassword'])->name('password.update');
 });
@@ -92,11 +115,9 @@ Route::middleware('auth')->prefix('mypage')->name('mypage.')->group(function () 
 // 管理者ルート（ログイン必須）
 Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {
     Route::resource('products', AdminProductController::class);
-
     // 管理者登録（ポリシー使用）
     Route::get('register', [AdminRegisterController::class, 'create'])->middleware('can:admin')->name('register');
     Route::post('register', [AdminRegisterController::class, 'store'])->middleware('can:admin');
-
     // 商品画像削除
     Route::delete('product-images/{id}', [ProductImageJaController::class, 'destroy'])->name('product_images.destroy');
 });
@@ -104,17 +125,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
 // ホーム画面（ログイン後のリダイレクト用）
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-
 //Square
 Route::post('/process-payment', [PaymentController::class, 'processPayment']);
 
-
-//AmazonPayのSDKバージョン取得
+//AmazonPayのSDKハ゛ーシ゛ョン取得
 Route::get('/amazonpay/version', [AmazonPayTestController::class, 'version']);
-
 Route::get('/amazonpay/start', [AmazonPayController::class, 'redirectToAmazonPay'])->name('amazonpay.start');
 Route::get('/amazonpay/return', [AmazonPayController::class, 'handleReturn'])->name('amazonpay.return');
-
 
 // Laravel-Adminのルーティング
 Encore\Admin\Facades\Admin::routes();
@@ -131,7 +148,40 @@ Route::get('/contact', [ContactController::class, 'showForm'])->name('contact.fo
 Route::post('/contact', [ContactController::class, 'submitForm'])->name('contact.submit');
 Route::get('/contact/complete', [ContactController::class, 'complete'])->name('contact.complete');
 
-
 Route::get('/thank-you', function () {
     return view('thank-you');
 })->name('order.thank-you');
+
+Route::get('/kiyaku', function () {
+    return view('kiyaku');
+});
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+});
+Route::get('/tokutei', function () {
+    return view('tokutei');
+});
+
+//法人取引会員登録でのメール送信しました確認画面
+Route::get('/corporate/register/confirm_message', function () {
+    return view('auth.confirm_message'); // 任意の Blade テンプレート
+})->name('corporate.register.confirm_message');
+
+
+// 法人ユーザー向けのメール再送信ルート
+Route::post('/corporate/resend-verification', function () {
+    $email = session('resent_email');
+
+    if (!$email) {
+        return redirect()->route('corporate.register')->withErrors(['error' => 'セッションが切れました。もう一度登録してください。']);
+    }
+
+    $user = User::where('email', $email)->first();
+
+    if ($user && !$user->hasVerifiedEmail()) {
+        event(new Registered($user)); // ← ここで再送
+        return back()->with('status', '認証メールを再送信しました。');
+    }
+
+    return back()->withErrors(['error' => 'メール再送信に失敗しました。']);
+})->name('corporate.verification.resend');

@@ -11,8 +11,8 @@
             <ul>
                 <li><a href="{{ url('/contact') }}">お問い合わせ</a></li>
                 <li><a href="{{ url('/kiyaku') }}">利用規約</a></li>
-                <li><a href="{{ url('/privacy') }}">個人情報保護について</a></li>
-                <li><a href="{{ url('/houjin') }}">CCM法人取引専用サイト</a></li>
+                <li><a href="{{ url('/privacy-policy') }}">個人情報保護について</a></li>
+                <li><a href="{{ url('/admin/login') }}">CCM法人取引専用サイト</a></li>
                 <li><a href="{{ url('/tokutei') }}">特定商取引法に基づく表示</a></li>
             </ul>
         </div>

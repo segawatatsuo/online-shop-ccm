@@ -5,6 +5,10 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
+use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\CustomVerifyEmail;
+use Illuminate\Support\Facades\Notification;
+
 class AuthServiceProvider extends ServiceProvider
 {
     /**
@@ -25,6 +29,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        // メール認証通知の差し替え
+        VerifyEmail::toMailUsing(function ($notifiable, $url) {
+            return (new CustomVerifyEmail)->toMail($notifiable);
+        });
     }
 }
