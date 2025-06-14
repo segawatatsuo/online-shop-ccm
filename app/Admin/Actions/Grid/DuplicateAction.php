@@ -11,22 +11,24 @@ class DuplicateAction extends BatchAction
 
     public function script()
     {
-        return <<<SCRIPT
-            $('.duplicate-selected').on('click', function () {
-                var ids = $.admin.grid.selected();
-                if (ids.length === 0) {
-                    return alert('レコードを選択してください');
-                }
+        $url = admin_url('product/duplicate'); // ← ここで正しいURLを生成
 
-                $.post('/admin/product/duplicate', {
-                    _token: LA.token,
-                    ids: ids
-                }, function (data) {
-                    $.pjax.reload('#pjax-container');
-                    toastr.success('複製が完了しました');
-                });
+        return <<<SCRIPT
+        $('.duplicate-selected').on('click', function () {
+            var ids = $.admin.grid.selected();
+            if (ids.length === 0) {
+                return alert('レコードを選択してください');
+            }
+
+            $.post('$url', {
+                _token: LA.token,
+                ids: ids
+            }, function (data) {
+                $.pjax.reload('#pjax-container');
+                toastr.success('複製が完了しました');
             });
-        SCRIPT;
+        });
+    SCRIPT;
     }
 
     public function render()

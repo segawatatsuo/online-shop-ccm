@@ -36,11 +36,12 @@ class ProductJaController extends AdminController
         $grid = new Grid(new ProductJa());
 
         $grid->column('id', 'ID')->sortable();
+        $grid->column('not_display', '非表示');
 
         // リレーション経由でカテゴリ名を表示
         $grid->column('category.brand', 'ブランド');
-
         $grid->column('product_code', __('商品コード'));
+        $grid->column('wholesale', __('法人商品'));
         $grid->column('price', __('価格'));
         $grid->column('classification', __('分類'));
         $grid->column('classification_ja', __('分類名'));
@@ -116,13 +117,14 @@ class ProductJaController extends AdminController
         $form->text('name', __('商品名'));
         $form->textarea('description', __('説明文'));
         $form->image('image', __('Image'));
+        $form->switch('wholesale', __('法人商品'));
         $form->number('price', __('価格'));
         //$form->number('member_price', __('Member price'));
         $form->text('product_code', __('商品コード'));
         $form->text('classification', __('分類'));
         $form->text('classification_ja', __('分類名'));
         $form->text('kind', __('種類'));
-        $form->color('color', __('色'));
+        //$form->color('color', __('色'));
         //$form->text('color_map', __('Color map'));
         $form->text('title_header', __('タイトルヘッダー'));
         $form->number('stock', __('在庫数'));

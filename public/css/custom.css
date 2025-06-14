@@ -1,0 +1,91 @@
+/* --- ログアウトボタンを右上に固定 --- */
+.logout-form {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.logout-form-bottom {
+    margin-top: 24px;
+    text-align: right;
+}
+
+.logout-button {
+    background-color: #50391a;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background-color: #6b4c28;
+}
+
+/* --- 画面中央配置 --- */
+.central-container {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* デフォルトでは上下中央 */
+    min-height: calc(100vh - 100px);
+    padding: 30px 20px;
+}
+
+/* --- カード全体 --- */
+.card {
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* --- ヘッダー部分 --- */
+.card-header {
+    background-color: #50391a;
+    color: white;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* --- 本文部分 --- */
+.card-body {
+    padding: 20px;
+}
+
+/* --- ブランド名カード風表示 --- */
+.brand-card {
+    background-color: white;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+/* --- スマホ対応 --- */
+@media (max-width: 600px) {
+
+    .central-container {
+        align-items: flex-start; /* 上寄せ */
+        padding-top: 40px;       /* 上に少しスペースをとる */
+        min-height: auto;        /* 高さ制限を外す（必要に応じて） */
+    }
+
+    .logout-button {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .card {
+        margin: 0 10px;
+    }
+
+    .brand-card {
+        font-size: 14px;
+    }
+}
