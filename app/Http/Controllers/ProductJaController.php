@@ -77,7 +77,7 @@ class ProductJaController extends Controller
                 })
                 ->where('not_display', '=', 0);
 
-            // ユーザータイプに応じてwholesale条件を分岐
+            // ユーザータイプに応じてwholesale(法人商品)条件を分岐
             if ($user && $user->user_type === 'corporate') {
                 // 法人会員 → wholesale = 1 のみ
                 $baseQuery = $baseQuery->where('wholesale', 1);
@@ -99,6 +99,8 @@ class ProductJaController extends Controller
                 ->get();
         }
 
+        //dd($premiumSilk, $diamondLegs);
+
         return view('products.category', [
             'category' => $category,
             'premiumSilk' => $premiumSilk,
@@ -108,16 +110,9 @@ class ProductJaController extends Controller
 
 
 
-
+    /*
     public function show($category, $id)
     {
-        /*
-        $product = ProductJa::with('category')
-            ->where('id', $id)
-            ->whereHas('category', function ($query) use ($category) {
-                $query->where('brand', $category);
-            })
-            ->firstOrFail();*/
 
         $product = ProductJa::with(['category', 'mainImage', 'subImages'])
             ->where('id', $id)
@@ -128,6 +123,24 @@ class ProductJaController extends Controller
 
         $user = auth()->user();
 
+
         return view('products.show', compact('product', 'user'));
+    }
+        */
+
+    public function show($category, $id)
+    {
+        $product = ProductJa::with(['category', 'mainImage'])
+            ->where('id', $id)
+            ->whereHas('category', function ($query) use ($category) {
+                $query->where('brand', $category);
+            })
+            ->firstOrFail();
+
+        $subImages = $product->subImages()->where('is_main', 0)->get();
+
+        $user = auth()->user();
+
+        return view('products.show', compact('product', 'subImages', 'user'));
     }
 }

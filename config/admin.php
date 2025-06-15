@@ -155,7 +155,7 @@ return [
     */
     'upload' => [
 
-        // Disk in `config/filesystem.php`.
+        // Disk in `config/filesystem.php`.disk が "admin" になっている場合は、config/filesystems.php を確認：
         'disk' => 'admin',
 
         // Image and file upload path under the disk above.
@@ -163,6 +163,9 @@ return [
             'image' => 'images',
             'file'  => 'files',
         ],
+
+        // 👇 ここを追加
+        'host' => env('ADMIN_UPLOAD_URL', ''),
     ],
 
     /*
@@ -226,7 +229,7 @@ return [
          * or specific method to path like: get:admin/auth/logs.
          */
         'except' => [
-            env('ADMIN_ROUTE_PREFIX', 'admin').'/auth/logs*',
+            env('ADMIN_ROUTE_PREFIX', 'admin') . '/auth/logs*',
         ],
     ],
 
@@ -293,7 +296,7 @@ return [
     |
     */
     'layout' => ['sidebar-mini', 'sidebar-collapse'],
-    'layout' => ['sidebar-mini', 'fixed'],//サイドバーをデフォルトはopen状態に変更
+    'layout' => ['sidebar-mini', 'fixed'], //サイドバーをデフォルトはopen状態に変更
     /*
     |--------------------------------------------------------------------------
     | Login page background image
@@ -354,9 +357,7 @@ return [
     'minify_assets' => [
 
         // Assets will not be minified.
-        'excepts' => [
-
-        ],
+        'excepts' => [],
 
     ],
 
@@ -410,23 +411,21 @@ return [
     | https://github.com/laravel-admin-extensions.
     |
     */
-    'extensions' => [
-
-    ],
+    'extensions' => [],
 
 
-'menu' => [
-    [
-        'title' => 'ダッシュボード',
-        'icon'  => 'fa-dashboard',
-        'uri'   => '/',
+    'menu' => [
+        [
+            'title' => 'ダッシュボード',
+            'icon'  => 'fa-dashboard',
+            'uri'   => '/',
+        ],
+        [
+            'title' => '商品管理',
+            'icon'  => 'fa-box',
+            'uri'   => 'product-ja', // このURLが /admin/product-ja に対応している必要があります
+        ],
     ],
-    [
-        'title' => '商品管理',
-        'icon'  => 'fa-box',
-        'uri'   => 'product-ja', // このURLが /admin/product-ja に対応している必要があります
-    ],
-],
 
 
 ];

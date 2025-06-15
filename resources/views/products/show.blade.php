@@ -10,12 +10,12 @@
 
             <!--breadcrumbsパート-->
             <!--
-            <div class="breadcrumbs">ホーム / エアーストッキング / 健康肌-テラコッタ / [健康肌][PS03] エアーストッキング プレミアシルク テラコッタ AirStocking
-                Premier
-                Silk
-                120g Terra-cotta
-            </div>
-            -->
+                    <div class="breadcrumbs">ホーム / エアーストッキング / 健康肌-テラコッタ / [健康肌][PS03] エアーストッキング プレミアシルク テラコッタ AirStocking
+                        Premier
+                        Silk
+                        120g Terra-cotta
+                    </div>
+                    -->
 
 
             <!--leftsideパート-->
@@ -24,7 +24,9 @@
 
                 @if ($product->mainImage)
                     <div class="igm-box main-img js-main-img">
-                        <img src="{{ asset($product->mainImage->image_path) }}" alt="Main Image" style="max-width:400px;">
+                        {{-- <img src="{{ asset($product->mainImage->image_path) }}" alt="Main Image" style="max-width:400px;"> --}}
+                        <img src="{{ url('uploads/' . $product->mainImage->image_path) }}" alt="Main Image"
+                            style="max-width:400px;">
                     </div>
                 @endif
 
@@ -34,8 +36,9 @@
                 <ul class="product-list sub-img js-sub-img">
 
                     <li class="data-thumb current">
-                        <img src="{{ asset($product->mainImage->image_path) }}" alt="">
+                        <img src="{{ url('uploads/' . $product->mainImage->image_path) }}" alt="">
                     </li>
+                    {{--
                     <li class="data-thumb"><img src="{{ asset('/images/other/point/1.jpg') }}" alt=""></li>
                     <li class="data-thumb"><img src="{{ asset('/images/other/point/2.jpg') }}" alt=""></li>
                     <li class="data-thumb"><img src="{{ asset('/images/other/point/3.jpg') }}" alt=""></li>
@@ -43,7 +46,19 @@
                     <li class="data-thumb"><img src="{{ asset('/images/other/point/5.gif') }}" alt=""></li>
                     <li class="data-thumb"><img src="{{ asset('/images/other/point/6.gif') }}" alt=""></li>
                     <li class="data-thumb"><img src="{{ asset('/images/other/point/7.jpg') }}" alt=""></li>
+                    --}}
+                    @foreach ($subImages as $image)
+                        <li class="data-thumb"><img src="{{ url('uploads/' . $image->image_path) }}" alt="サブ画像"
+                                class="" style=""></li>
+                    @endforeach
                 </ul>
+
+
+
+
+
+
+
                 <!--</div>-->
 
             </div>
@@ -52,7 +67,9 @@
             <!--rightsideパート-->
             <div class="rightside">
 
-                <p class="title"><h1>{{ $product->name }}</h1></p>
+                <p class="title">
+                <h1>{{ $product->name }}</h1>
+                </p>
 
                 @if ($product->mainImage)
                     <div class="igm-point">
@@ -110,7 +127,7 @@
                 --}}
 
 
-                
+
 
 
 
@@ -127,7 +144,7 @@
                 </form>
 
 
-{!! $product->description !!}
+                {!! $product->description !!}
             </div>
         </div>
     </main>

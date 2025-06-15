@@ -74,7 +74,7 @@
                             <div class="content">
                                 <a href="{{ asset('product/airstocking/' . $product->id) }}">
                                     @if ($product->mainImage)
-                                        <img src="{{ asset($product->mainImage->image_path) }}" alt="">
+                                        <img src="{{  url('uploads/' . $product->mainImage->image_path) }}" alt="">
                                     @else
                                         <img src="{{ asset('images/noimage.png') }}" alt="画像なし">
                                     @endif
@@ -106,7 +106,8 @@
                             <div class="content">
                                 <a href="{{ asset('product/airstocking/' . $product->id) }}">
                                     @if ($product->mainImage)
-                                        <img src="{{ asset($product->mainImage->image_path) }}" alt="">
+                                        {{--<img src="{{ asset($product->mainImage->image_path) }}" alt="">--}}
+                                        <img src="{{  url('uploads/' . $product->mainImage->image_path) }}" alt="">
                                     @else
                                         <img src="{{ asset('images/noimage.png') }}" alt="画像なし">
                                     @endif
@@ -130,7 +131,7 @@
             </div>
         </div>
     </main>
-
++
 
 
 

@@ -42,9 +42,14 @@ class ProductJa extends Model
     {
         return $this->hasOne(ProductImageJa::class)->where('is_main', 1);
     }
-
+    /*
     public function subImages(): HasMany
     {
         return $this->hasMany(ProductImageJa::class)->where('is_sub', 1);
+    }
+    */
+    public function subImages()
+    {
+        return $this->hasMany(ProductImageJa::class, 'product_ja_id');
     }
 }

@@ -52,12 +52,12 @@ return [
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
         ],
-        //laravel-admin用に追加した
+        // Laravel-Admin 用のカスタムディスク
         'admin' => [
             'driver' => 'local',
-            'root' => public_path('uploads'),
+            'root' => public_path('uploads'),  // 実体は public/uploads に保存される
             'visibility' => 'public',
-            'url' => env('APP_URL') . '/uploads',
+            'url' => env('ADMIN_UPLOAD_URL', '/uploads'), // 👈 ここを明示的に指定
         ],
 
     ],

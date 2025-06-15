@@ -81,24 +81,31 @@ class ProductJaController extends AdminController
     {
         $show = new Show(ProductJa::findOrFail($id));
 
-        //$show->field('id', __('Id'));
-        //$show->field('category_id', __('カテゴリID'));
         $show->field('category.brand', 'ブランド');
         $show->field('name', '商品名');
         $show->field('description', __('説明文'));
-        $show->field('image', __('Image'));
+
+        $show->field('wholesale', __('法人商品'));
         $show->field('price', __('価格'));
-        //$show->field('member_price', __('Member price'));
+
         $show->field('product_code', __('商品コード'));
         $show->field('classification', __('分類'));
         $show->field('classification_ja', __('分類名'));
         $show->field('kind', __('種類'));
-        $show->field('color', __('色'));
-        //$show->field('color_map', __('Color map'));
+
         $show->field('title_header', __('タイトルヘッダー'));
         $show->field('stock', __('在庫数'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
+
+        // ✅ 追加：複数画像表示
+        $show->images('商品画像')->as(function ($images) {
+            $html = '';
+            foreach ($images as $img) {
+                $html .= "<img src='/uploads/{$img['image_path']}' style='max-width:120px;margin:5px;border:1px solid #ccc;' />";
+            }
+            return $html;
+        })->unescape();
 
         return $show;
     }
@@ -116,7 +123,7 @@ class ProductJaController extends AdminController
         $form->text('category.brand', 'ブランド');
         $form->text('name', __('商品名'));
         $form->textarea('description', __('説明文'));
-        $form->image('image', __('Image'));
+        //$form->image('image', __('Image'));
         $form->switch('wholesale', __('法人商品'));
         $form->number('price', __('価格'));
         //$form->number('member_price', __('Member price'));
