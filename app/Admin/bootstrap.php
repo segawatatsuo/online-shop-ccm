@@ -24,3 +24,15 @@
 Encore\Admin\Form::forget(['map', 'editor']);
 
 Encore\Admin\Admin::css('/css/custom-admin.css');
+
+
+
+Encore\Admin\Facades\Admin::menu(function (Encore\Admin\Widgets\Menu $menu) {
+    $menu->add([
+        [
+            'title' => '商品管理',
+            'icon'  => 'fa-box',
+            'uri'   => 'product-ja', // このURLが /admin/product-ja に対応している必要があります
+        ],
+    ]);
+});
