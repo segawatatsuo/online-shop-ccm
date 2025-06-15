@@ -163,25 +163,14 @@ class ProductJaController extends AdminController
         }
 
         foreach (\App\Models\ProductJa::findMany($ids) as $product) {
-            // sort_order が null でないことを確認してからクエリを実行
-            if ($product->sort_order !== null) {
-                // 複製前に、後ろのsort_orderを+1してスペース確保
-                \App\Models\ProductJa::where('sort_order', '>', $product->sort_order)
-                    ->increment('sort_order');
-            } else {
-                // sort_order が null の場合の処理（例: デフォルト値を設定するか、ログに警告を出すなど）
-                // ここでは仮に、最も大きなsort_orderの次に来るように設定します
-                $maxSortOrder = \App\Models\ProductJa::max('sort_order');
-                $product->sort_order = ($maxSortOrder !== null) ? $maxSortOrder : 0; // null の場合は0を設定
-            }
-            
+
+            // 複製前に、後ろのsort_orderを+1してスペース確保
+            \App\Models\ProductJa::where('sort_order', '>', $product->sort_order)
+                ->increment('sort_order');
+
             $new = $product->replicate();
             $new->name = $product->name . '（複製）'; // 任意
-            
-            // 新しいレコードのsort_orderは、元のレコードのsort_order+1
-            // 上のif文で $product->sort_order が null だった場合に備えて、値を設定しておく
-            $new->sort_order = $product->sort_order + 1; 
-            
+            $new->sort_order = $product->sort_order + 1; //コピー元のレコードのソート番号+1。こうすることで、コピー元のレコードの下に並ばせる
             $new->save();
         }
 
