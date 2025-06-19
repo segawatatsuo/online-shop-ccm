@@ -1,11 +1,50 @@
 {
-	auto_https off
+	http_port 80
+	https_port 443
+	# 開発環境用の設定
+	local_certs
 }
 
-square.test {
-	root * /home/segawa/online-shop-ccm/public
-	php_fastcgi unix//run/php/php8.2-fpm.sock
-	file_server
+http://dev.test {
+	redir https://dev.test{uri}
+}
 
-	tls /home/segawa/online-shop-ccm/certs/square.test.pem /home/segawa/online-shop-ccm/certs/square.test-key.pem
+https://dev.test {
+	# tls行を削除してCaddyに自動証明書生成を任せる
+
+	# Laravel Project: /shop → /home/segawa/shop/public
+	handle_path /shop* {
+		root * /home/segawa/shop/public
+		php_fastcgi unix//run/php/php8.2-fpm.sock
+		file_server
+		rewrite * /index.php{uri}
+	}
+
+	# Laravel Project: /admin → /home/segawa/admin/public
+	handle_path /admin* {
+		root * /home/segawa/admin/public
+		php_fastcgi unix//run/php/php8.2-fpm.sock
+		file_server
+		rewrite * /index.php{uri}
+	}
+
+	# Laravel Project: /export → /home/segawa/export/public
+	handle_path /export* {
+		root * /home/segawa/export/public
+		php_fastcgi unix//run/php/php8.2-fpm.sock
+		file_server
+		rewrite * /index.php{uri}
+	}
+
+	# phpMyAdmin: /phpmyadmin
+	handle_path /phpmyadmin* {
+		root * /usr/share/phpmyadmin
+		php_fastcgi unix//run/php/php8.2-fpm.sock
+		file_server
+	}
+
+	# fallback
+	handle {
+		respond "404 Not Found" 404
+	}
 }

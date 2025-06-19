@@ -1,0 +1,24 @@
+{
+  http_port 80
+  https_port 443
+  #auto_https off
+}
+
+square.test {
+    tls /home/segawa/online-shop-ccm/certs/square.test.pem /home/segawa/online-shop-ccm/certs/square.test-key.pem
+
+    # Laravel 用
+    @laravel not path /phpmyadmin*  # /phpmyadmin 以外すべて Laravel に渡す
+    handle @laravel {
+        root * /home/segawa/online-shop-ccm/public
+        php_fastcgi unix//run/php/php8.2-fpm.sock
+        file_server
+    }
+
+    # phpMyAdmin 用
+    handle_path /phpmyadmin* {
+        root * /usr/share/phpmyadmin
+        php_fastcgi unix//run/php/php8.2-fpm.sock
+        file_server
+    }
+}

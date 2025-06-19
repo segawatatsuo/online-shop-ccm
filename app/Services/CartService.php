@@ -20,7 +20,8 @@ class CartService
                 continue;
             }
 
-            $price = $user ? $product->member_price : $product->price;
+            //$price = $user ? $product->member_price : $product->price;
+            $price = $item['price'] ?? ($user ? $product->member_price : $product->price);
             $subtotal = $price * $item['quantity'];
 
             $items[] = [
@@ -42,7 +43,8 @@ class CartService
 
     public function addProduct($product, $quantity, $user = null)
     {
-        $price = $user ? $product->member_price : $product->price;
+        //$price = $user ? $product->member_price : $product->price;
+        $price = $product->price;
         $cart = session()->get('cart', []);
 
         if (isset($cart[$product->id])) {
@@ -55,8 +57,8 @@ class CartService
                 'price' => $price,
             ];
         }
-
-        session()->put('cart', $cart);
+          session()->put('cart', $cart);
+          //dd(session('cart'));
     }
 
     public function updateQuantity($productId, $quantity)

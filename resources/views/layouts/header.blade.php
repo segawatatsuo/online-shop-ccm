@@ -13,10 +13,10 @@
                     <li><a href="{{ asset('product/wax') }}">美脚脱毛</a></li>
 
                     {{-- カートが空でなければ表示 --}}
-                    @if(session('cart') && count(session('cart')) > 0)
-                        <li><a href="{{ url('/cart') }}"><span title="カート">🛒</span>（ {{ count(session('cart')) }} ）</a></li>
+                    @if (session('cart') && count(session('cart')) > 0)
+                        <li><a href="{{ url('/cart') }}"><span title="カート">🛒</span>（ {{ count(session('cart')) }}
+                                ）</a></li>
                     @endif
-
 
 
                 </ul>
