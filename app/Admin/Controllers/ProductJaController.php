@@ -88,6 +88,8 @@ class ProductJaController extends AdminController
         $show->field('wholesale', __('法人商品'));
         $show->field('price', __('価格'));
 
+        $show->field('not_display',__('非表示'));
+
         $show->field('product_code', __('商品コード'));
         $show->field('classification', __('分類'));
         $show->field('classification_ja', __('分類名'));
@@ -123,16 +125,13 @@ class ProductJaController extends AdminController
         $form->text('category.brand', 'ブランド');
         $form->text('name', __('商品名'));
         $form->textarea('description', __('説明文'));
-        //$form->image('image', __('Image'));
         $form->switch('wholesale', __('法人商品'));
+        $form->switch('not_display',__('非表示'));
         $form->number('price', __('価格'));
-        //$form->number('member_price', __('Member price'));
         $form->text('product_code', __('商品コード'));
         $form->text('classification', __('分類'));
         $form->text('classification_ja', __('分類名'));
         $form->text('kind', __('種類'));
-        //$form->color('color', __('色'));
-        //$form->text('color_map', __('Color map'));
         $form->text('title_header', __('タイトルヘッダー'));
         $form->number('stock', __('在庫数'));
 

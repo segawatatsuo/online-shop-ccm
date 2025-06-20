@@ -99,7 +99,7 @@ class ProductJaController extends Controller
                 ->get();
         }
 
-        //dd($premiumSilk, $diamondLegs);
+        //dd($premiumSilk);
 
         return view('products.category', [
             'category' => $category,

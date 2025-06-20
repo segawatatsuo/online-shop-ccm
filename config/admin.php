@@ -165,7 +165,7 @@ return [
         ],
 
         // 👇 ここを追加
-        'host' => env('ADMIN_UPLOAD_URL', ''),
+        //'host' => env('ADMIN_UPLOAD_URL', ''),
     ],
 
     /*
