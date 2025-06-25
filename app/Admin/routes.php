@@ -16,6 +16,9 @@ Route::group([
 
     $router->resource('product-jas', 'ProductJaController');
 
+    //法人顧客
+    $router->resource('corporate_customers','CorporateCustomerController');
+
     // ✅ 複製用のPOSTルートをここに追加！
     Route::post('product/duplicate', [ProductJaController::class, 'duplicate']);
 
