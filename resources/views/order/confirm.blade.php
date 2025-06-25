@@ -105,7 +105,7 @@
         <a href="{{ route('cart.index') }}" class="btn btn-secondary">戻る</a>
         <form action="{{ route('cart.square-payment') }}" method="POST" class="d-inline">
             @csrf
-            <button type="submit" class="btn btn-order-confirm">お支払い</button>
+            <button type="submit" class="a-button" style="border: none">お支払い</button>
         </form>
     </div>
 

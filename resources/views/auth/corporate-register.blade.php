@@ -209,13 +209,7 @@
                         <dd><input type="text" name="delivery_phone" class="form-control" placeholder="090-999-0000"
                                 value="{{ old('delivery_phone') }}" /></dd>
                     </dl>
-                    {{--
-                    <dl class="post-table flex-between">
-                        <dt>メールアドレス</dt>
-                        <dd><input type="text" name="delivery_email" class="form-control"
-                                placeholder="mail@example.com" value="{{ old('delivery_email') }}" /></dd>
-                    </dl>
-                    --}}
+
                     <dl class="post-table flex-between">
                         <dt>郵便番号</dt>
                         <dd>
@@ -246,7 +240,7 @@
 
 
             <div style="margin-top: 20px;background-color:#ffffff;">
-                <button type="submit" class="btn-order-confirm">
+                <button type="submit" class="a-button" style="border: none">
                     登録内容確認
                 </button>
 

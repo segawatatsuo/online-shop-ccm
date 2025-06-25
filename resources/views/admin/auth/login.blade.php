@@ -43,7 +43,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="a-button">
+                    <button type="submit" class="a-button" style="border: none">
                         {{ __('ログイン') }}
                     </button>
 

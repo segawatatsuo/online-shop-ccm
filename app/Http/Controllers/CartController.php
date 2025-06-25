@@ -57,16 +57,6 @@ class CartController extends Controller
     public function show()
     {
         try {
-            /*
-            Session::put('cart', [
-                'items' => [
-                    ['name' => '商品A', 'price' => 1000, 'qty' => 1],
-                    ['name' => '商品B', 'price' => 2000, 'qty' => 2],
-                ],
-                'customer_name' => '山田 太郎',
-                'email' => 'yamada@example.com'
-            ]);
-            */
             $cart = session('cart');
             return view('cart.show', compact('cart'));
         } catch (\Throwable $e) {
@@ -91,12 +81,7 @@ class CartController extends Controller
     {
         return '注文完了ページ（ここで注文をDBに保存など）';
     }
-    /*
-    public function squarePayment()
-    {
-        return view('cart.square-payment');
-    }
-    */
+
     public function squarePayment(Request $request)
     {
         // セッションからカート情報を取得

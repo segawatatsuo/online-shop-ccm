@@ -19,6 +19,7 @@ use App\Http\Controllers\Auth\CustomRegisterController; // ここは残します
 use App\Http\Controllers\Auth\CorporateRegisterController;
 use PhpParser\Node\Stmt\Return_;
 use App\Http\Controllers\Auth\VerificationController;
+use App\Models\Order;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 use Illuminate\Support\Facades\Session;
@@ -50,10 +51,12 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('add', [CartController::class, 'add'])->name('add');
     Route::post('update', [CartController::class, 'update'])->name('update');
     Route::post('remove', [CartController::class, 'remove'])->name('remove');
+    
     // Amazon Pay
     Route::get('show', [CartController::class, 'show'])->name('show');
     Route::post('checkout-session', [CartController::class, 'createCheckoutSession'])->name('checkout-session');
     Route::get('complete', [CartController::class, 'review'])->name('amazonpay.review');
+    
     //Squareのカード入力画面
     Route::post('square-payment', [CartController::class, 'squarePayment'])->name('square-payment');
 });
@@ -65,6 +68,8 @@ Route::prefix('order')->name('order.')->group(function () {
     Route::post('storeOrder', [OrderController::class, 'storeOrder'])->name('storeOrder'); //store
     Route::get('complete', [OrderController::class, 'complete'])->name('complete');
     Route::post('hoge', [OrderController::class, 'hoge'])->name('hoge');
+
+    Route::get('modify/{type}', [OrderController::class, 'modify'])->name('modify');
 });
 
 // ★★★ カスタムメール認証ルートを Auth::routes() より前に定義 ★★★

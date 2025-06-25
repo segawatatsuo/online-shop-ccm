@@ -98,7 +98,7 @@
 
                 <dl class="post-table flex-between">
                     <dt>お届け希望日</dt>
-                    <dd><input type="text" name="delivery_date" class="p-extended-address form-control"
+                    <dd><input type="date" name="delivery_date" class="p-extended-address form-control"
                             placeholder="本日より3営業日以降になります(土日祝を除く)" value="{{ old('delivery_date') }}" /></dd>
                 </dl>
 
@@ -204,10 +204,9 @@
 
 
             <div style="margin-top: 20px;background-color:#ffffff;">
-                <button type="submit" class="btn-order-confirm">
+                <button type="submit" class="a-button" style="border: none">
                     ご注文内容確認
                 </button>
-
             </div>
 
         </main>

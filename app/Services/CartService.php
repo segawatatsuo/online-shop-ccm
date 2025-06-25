@@ -13,19 +13,20 @@ class CartService
         $cart = session()->get('cart', []);
         $items = [];
         $total = 0;
-
+        
         foreach ($cart as $productId => $item) {
             $product = ProductJa::find($productId);
             if (!$product) {
                 continue;
             }
-
-            //$price = $user ? $product->member_price : $product->price;
-            $price = $item['price'] ?? ($user ? $product->member_price : $product->price);
+            //$price = $item['price'] ?? ($user ? $product->member_price : $product->price);
+            $price = $item['price'];
             $subtotal = $price * $item['quantity'];
+   
 
             $items[] = [
                 'product_id' => $productId,
+                'product_code' => $product->product_code,
                 'name' => $product->name,
                 'quantity' => $item['quantity'],
                 'price' => $price,
@@ -34,7 +35,10 @@ class CartService
 
             $total += $subtotal;
         }
+        //合計金額をセッションに保存
+        session(['total' => $total]);
 
+        
         return [
             'items' => $items,
             'total' => $total,
@@ -52,6 +56,7 @@ class CartService
         } else {
             $cart[$product->id] = [
                 'product_id' => $product->id,
+                'product_code' => $product->product_code,
                 'name' => $product->name,
                 'quantity' => $quantity,
                 'price' => $price,

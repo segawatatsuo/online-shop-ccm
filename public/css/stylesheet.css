@@ -451,25 +451,33 @@ img {
 /* ====================
   ボタン (button.cssより)
 ==================== */
-.a-button {
+.a-button,
+.b-button {
     display: inline-block;
     min-width: 200px;
     letter-spacing: .02em;
-    line-height: 18px;
-    margin-bottom: 12px;
-    margin-right: 12px;
-    margin-top: 10px;
+    line-height: 1.4;
+    margin: 10px 12px 12px 0;
     padding: 8px 36px;
     text-align: center;
-    background-color: #ffd814;
-    color: rgb(0, 0, 0);
     text-decoration: none;
-    line-height: 1.4;
     border-radius: 100px;
     font-size: 13px;
     font-family: "Noto Sans JP", sans-serif;
     width: 200px;
     cursor: pointer;
+    border: none;
+}
+
+/* 個別の色指定 */
+.a-button {
+    background-color: #ffd814;
+    color: #000;
+}
+
+.b-button {
+    background-color: #707070;
+    color: #fff;
 }
 
 /* ====================

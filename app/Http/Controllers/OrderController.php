@@ -33,7 +33,7 @@ class OrderController extends Controller
         $this->cartService = $cartService;
     }
 
-    public function create() 
+    public function create()
     {
         // 🔽 セッションからカート(セッションデータのキー名が「cart」の情報を配列で取得。無ければ空の配列を返す）
         $cart = session()->get('cart', []);
@@ -41,9 +41,17 @@ class OrderController extends Controller
         if (empty($cart)) {
             return redirect()->route('products.index')->with('warning', 'カートが空です。');
         }
-        
+
         $deliveryTimes = DeliveryTime::pluck('time'); // 配送時間帯のtimeカラムの値のみを取得
 
+        // 認証済みユーザーが法人かどうかをチェック
+        $user = auth()->user();
+        if ($user && $user->user_type === 'corporate') {
+            // 法人ユーザーの場合ここで合計金額の表示が必要なので取得
+            $total = session('total');
+            return view('order.corporate_confirm', compact('cart', 'user', 'total', 'deliveryTimes'));
+        }
+        // 一般ユーザー用：新規お届け先登録画面へ
         return view('order.create', compact('cart', 'deliveryTimes'));
     }
 
@@ -140,16 +148,15 @@ class OrderController extends Controller
             }
 
             DB::commit();
-                        // ...（注文保存後）
+            // ...（注文保存後）
             Mail::to($customer->email)->send(new OrderConfirmed($order, $customer, $delivery));
 
             Mail::to('shop@example.com')->send(new OrderNotification($order, $customer, $delivery));
-            
+
             Session::forget(['cart', 'address']);
             //GET
             //return redirect()->route('order.complete')->with('success', '注文が完了しました。');
             return redirect()->route('order.complete');
-
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -174,4 +181,9 @@ class OrderController extends Controller
         return view('order.complete'); // ビューは resources/views/order/complete.blade.php など
     }
 
+    public function modify($type)
+    {
+        $user = auth()->user();
+        return view('order.modify_address', compact('type', 'user')); // ビューは resources/views/order/complete.blade.php など
+    }
 }

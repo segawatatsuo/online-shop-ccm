@@ -42,58 +42,6 @@
     </div>
 
 
-    {{-- 配送情報 
-    <div class="card mb-4">
-        <div class="card-header">配送情報</div>
-        <div class="card-body grid-2">
-            <div><strong>配送希望日：</strong> {{ $address['delivery_date'] }} {{ $address['delivery_date'] }}</div>
-            <div><strong>配送時間：</strong> {{ $address['delivery_time'] }}</div>
-            <div><strong>ご要望他：</strong> {{ $address['your_request'] }}</div>
-        </div>
-    </div>
-    --｝｝
-
-    {{-- 商品情報
-    <div class="card mb-4">
-        <div class="card-header">ご注文商品</div>
-        <div class="card-body">
-            @php
-                $cart = session('cart', []);
-                $total = 0;
-            @endphp
-            <table>
-                <thead>
-                    <tr>
-                        
-                        <th>商品名</th>
-                        <th>数量</th>
-                        <th>小計</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($cart as $item)
-                        @php
-                            $subtotal = $item['price'] * $item['quantity'];
-                            $total += $subtotal;
-                        @endphp
-                        <tr>
-                            
-                            <td>{{ $item['name'] }}</td>
-                            <td>{{ $item['quantity'] }}</td>
-                            <td>{{ number_format($subtotal) }}円</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th colspan="2" style="text-align:right;">合計金額</th>
-                        <th>{{ number_format($total) }}円</th>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    </div>
- --}}
 
     {{-- ボタン --}}
     <div class="text-center mt-4">
@@ -101,7 +49,7 @@
 
         <form action="{{ route('corporate.register.store') }}" method="POST" class="d-inline">
             @csrf
-            <button type="submit" class="btn btn-order-confirm">登録</button>
+            <button type="submit" class="a-button" style="border: none">登録</button>
         </form>
     </div>
 

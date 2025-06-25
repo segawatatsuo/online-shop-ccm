@@ -21,6 +21,7 @@ class CorporateRegisterController extends Controller
 
     public function showForm()
     {
+        //dd("showForm");
         return view('auth.corporate-register');
     }
 
