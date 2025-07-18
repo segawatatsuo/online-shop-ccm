@@ -2,6 +2,9 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 use App\Admin\Controllers\ProductJaController;
+use App\Admin\Controllers\EmailTemplateController;
+use App\Admin\Controllers\ShippingMailController;
+use Encore\Admin\Facades\Admin;
 
 Admin::routes();
 
@@ -17,11 +20,26 @@ Route::group([
     //商品メニュー
     $router->resource('product-jas', 'ProductJaController');
 
+    //売上メニュー
+    $router->resource('orders', 'OrderController');
+
+
     //法人顧客メニュー
     $router->resource('corporate_customers','CorporateCustomerController');
 
     //トップページメニュー
     $router->resource('top_pages','TopPageController');
+
+    //メールテンプレート
+    $router->resource('email-templates', 'EmailTemplateController');
+
+    //セッティング
+    $router->resource('settings', 'SettingController');
+
+    //会社情報
+    $router->resource('company_infos', 'CompanyInfoController');
+
+
 
     // ✅ 複製用のPOSTルートをここに追加！
     Route::post('product/duplicate', [ProductJaController::class, 'duplicate']);

@@ -1,0 +1,246 @@
+@charset "utf-8";
+
+/* ====================
+  ファーストビュー
+==================== */
+.first-view {
+    height: calc(100vh - 60px);
+    background-image: url(../images/top/AirStocking.jpg);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+}
+
+.first-view-nail {
+    height: calc(60vh - 60px);
+    background-image: url(../images/nail/top.jpg);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+}
+
+/* ====================
+  リード文
+==================== */
+.lead {
+    background-color: #2F3132;
+    padding: 60px 0;
+}
+
+.lead-nail {
+    padding: 60px 0 20px;
+}
+
+.lead .lead-copy {
+    color: aliceblue;
+    max-width: 1280px;
+    text-align: center;
+    margin: 0 auto;
+    font-size: 20px;
+    font-family: '游明朝', 'Yu Mincho', YuMincho, 'Hiragino Mincho Pro', serif;
+}
+
+.lead-nail .nail-copy {
+    color: #7e2d2d;
+    max-width: 1280px;
+    text-align: center;
+    margin: 0 auto;
+    font-size: 36px;
+    font-family: '游明朝', 'Yu Mincho', YuMincho, 'Hiragino Mincho Pro', serif;
+}
+
+.mincho {
+    font-family: '游明朝', 'Yu Mincho', YuMincho, 'Hiragino Mincho Pro', serif;
+}
+
+/* ====================
+  特徴セクション (feature)
+==================== */
+.feature {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 80px auto;
+    padding: 0 20px; /* 左右の余白 */
+}
+
+.feature.reverse {
+    flex-direction: row-reverse;
+}
+
+.feature-text {
+    flex: 1;
+    padding: 0 40px;
+}
+
+.feature-text h2 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.feature-text p {
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+.feature img {
+    flex: 1;
+    max-width: 50%; /* 画像がテキストと並んで表示されるように */
+    height: auto;
+    display: block;
+}
+
+
+/* ====================
+  動画セクション (movie)
+==================== */
+.movie-bg {
+    background-color: #f0f0f0;
+    padding: 80px 0;
+    text-align: center;
+}
+
+.movie {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.movie h2 {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.movie video {
+    width: 100%;
+    height: auto;
+    max-height: 540px; /* 適切な最大高さを設定 */
+}
+
+/* ====================
+  商品一覧 (LINE UP)
+==================== */
+.line-up {
+    max-width: 1200px; /* 全体の最大幅を広げました */
+    margin: 75px auto;
+    padding: 0 20px; /* 左右の余白 */
+}
+
+.line-up h2 {
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 40px; /* タイトルの下にも少し余白 */
+}
+
+.line-up .container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* PCでは5列 */
+    gap: 20px; /* 要素間の隙間 */
+    margin-top: 0; /* 親要素のmargin-bottomがあるのでここでは0 */
+    margin-bottom: 60px;
+}
+
+.line-up .container li {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+    box-sizing: border-box;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.line-up .container li img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 10px;
+}
+
+.line-up .container li .title {
+    font-size: 14px;
+    margin-bottom: 5px;
+    flex-grow: 1;
+}
+
+.line-up .container li .price {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.line-up .container li form {
+    margin-top: auto;
+}
+
+.line-up .container li .form-control {
+    margin-bottom: 10px;
+}
+
+/* ====================
+  メディアクエリ (PCとスマホの共通部分)
+==================== */
+@media (max-width: 800px) {
+    /* リード文 */
+    .lead {
+        padding: 30px 0;
+    }
+
+    /* 特徴セクション */
+    .feature,
+    .feature.reverse {
+        flex-direction: column; /* スマホでは縦並び */
+        margin: 40px auto;
+        padding: 0 15px;
+    }
+
+    .feature-text {
+        padding: 0; /* スマホではパディングをリセット */
+        margin-bottom: 20px; /* テキストの下に余白 */
+    }
+
+    .feature-text h2 {
+        font-size: 24px;
+        margin-bottom: 15px;
+        line-height: 1.4;
+    }
+
+    .feature-text p {
+        font-size: 14px;
+    }
+
+    .feature img {
+        max-width: 80%; /* 画像の幅を調整 */
+    }
+
+    /* 動画セクション */
+    .movie {
+        padding: 0 15px;
+    }
+
+    .movie h2 {
+        font-size: 28px;
+        margin-bottom: 30px;
+    }
+
+    /* 商品一覧 (LINE UP) - スマホ用 */
+    .line-up {
+        margin-top: 50px;
+        padding: 0 15px;
+    }
+
+    .line-up h2 {
+        font-size: 28px;
+        margin-bottom: 30px;
+    }
+
+    .line-up .container {
+        grid-template-columns: repeat(2, 1fr); /* スマホでは2列 */
+        gap: 15px;
+    }
+}

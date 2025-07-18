@@ -1,50 +1,101 @@
-@charset "utf-8";
+        /* ヘッダー*/
+        .header {
+            position: fixed;/*画面の最上部に固定され、スクロールしても見える。*/
+            top: 0;/*上・左・右をゼロにして、幅いっぱいに固定。*/
+            left: 0;
+            right: 0;
+            /*background: rgba(255, 255, 255, 0.95);/*半透明の白背景（透ける）。*/
+            background-color: #50391a;
+            backdrop-filter: blur(10px);/*後ろの要素に10pxのぼかし効果。*/
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);/*薄い下線で仕切りを演出。*/
+            z-index: 1000;/*前面に表示（他要素より上に）*/
+            transition: all 0.3s ease;/*ホバーや動きに対してスムーズな変化。*/
+        }
 
+        .nav-container {
+            max-width: 1280px;/*中央揃えで1280px以内におさめ、**左右に余白（padding）**を追加。*/
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;/*ロゴとメニューを横並びに。*/
+            justify-content: space-between;/*両端（ロゴとメニュー）に分かれる。*/
+            align-items: center;/*高さ方向の中央揃え。*/
+            height: 70px;/*ヘッダーの高さを指定。*/
+            height: 60px;
+        }
 
-/* ====================
-  ヘッダー
-==================== */
-.header {
-    background-color: #50391a;
-    position: sticky;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);/*線形グラデーション（まっすぐな方向に色が変わる）*/
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;/*背景を見せるため文字色を透明に。*/
+            background-clip: text;/*背景を文字にクリップ。*/
+
+    /* font-size, font-weight, background-clip などはロゴが画像なので不要かもしれません。
+       もしテキストロゴと画像ロゴを切り替える場合などを考慮しているなら残してください。 */
+    display: flex; /* 追加: Flexbox を有効にする */
+    align-items: center; /* 追加: 縦方向の中央揃え */
+    justify-content: center; /* 追加: 横方向の中央揃え (必要であれば) */
+    height: 100%; /* 追加: 親要素の高さに合わせる */
+
+        }
+
+.logo img {
+    max-height: 100%; /* 追加: 親要素の高さを超えないようにする */
+    width: auto; /* 幅は自動調整 */
+    display: block; /* img要素はinline要素なので、余計な余白を消すためにblockにする */
 }
 
-.header-inner {
-    max-width: 1200px;
-    height: 60px;
-    margin: 0 auto;
-    padding: 0 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
 
-.toggle-menu-button {
-    display: none;
-}
+        .nav-menu {
+            display: flex;
+            list-style: none;/*リストマーク（●など）を消す。*/
+            gap: 40px;/*アイテム間のスペースを確保*/
+        }
 
-.header-logo {
-    display: block;
-    width: 170px;
-}
+        .nav-menu a {
+            text-decoration: none;/*下線なしのリンク*/
+            color: #333;
+            color: white;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;/*ホバーアニメーションの ::after をこの要素の中に配置*/
+        }
 
-.site-menu ul {
-    display: flex;
-}
+        .nav-menu a:hover {
+            color: #667eea;/*リンクにマウスを載せたとき、色が紫系に変化。*/
+            color: #000;
+        }
 
-.site-menu ul li {
-    margin-left: 20px;
-    margin-right: 20px;
-}
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #000; /* メニューに出る下線をグラデーションから単色 (黒) に変更 */
+            transition: width 0.3s ease;
+        }
 
-.site-menu ul li a {
-    color: #ffffff;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 110%;
-    white-space: nowrap;
-}
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            /*background: #333;*/
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+

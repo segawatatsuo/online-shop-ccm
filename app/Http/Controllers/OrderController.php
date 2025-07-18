@@ -1,189 +1,200 @@
 <?php
 
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
+namespace App\Admin\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Customer;
-use App\Models\Delivery;
-use App\Http\Requests\OrderCustomerRequest; // 作成したリクエストクラスをuseする
-use Illuminate\Support\Facades\Auth;
-
-use Illuminate\Support\Facades\Mail;
-use App\Mail\OrderThanksMail;
-use App\Services\CartService;
-
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
+use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Show;
 
 
-use App\Mail\OrderConfirmed;
-use App\Mail\OrderNotification;
-use App\Models\DeliveryTime; // 追加
+use App\Admin\Controllers\OrderItemController; // OrderItemのCRUDを管理するコントローラ
+use App\Admin\Actions\SendShippingMail; // 後で作成するカスタムアクションをインポート
+use App\Admin\Actions\CheckShippingMailAction; // 追加: メール内容確認アクション
 
-class OrderController extends Controller
+class OrderController extends AdminController
 {
+    /**
+     * Title for current resource.
+     *
+     * @var string
+     */
+    protected $title = '注文管理';
 
-    protected $cartService;
-    public function __construct(CartService $cartService)
+    /**
+     * Make a grid builder.
+     *
+     * @return Grid
+     */
+protected function grid()
     {
-        $this->cartService = $cartService;
+        $grid = new Grid(new Order());
+
+        $grid->column('order_number', __('注文番号'));
+        $grid->column('customer.sei', '姓');
+        $grid->column('customer.mei', '名');
+        $grid->column('total_price', __('総合計'))->display(function ($amount) {
+            return '¥' . number_format($amount);
+        });
+
+        $grid->column('delivery_date', __('配送希望日'));
+        $grid->column('delivery_time', __('配送希望時間'));
+        $grid->column('your_request', __('メッセージ'));
+        $grid->column('status', __('Status'));
+        $grid->column('created_at', __('作成日時'));
+        $grid->column('updated_at', __('修正日時'));
+
+        // より簡単な方法でボタンを追加
+        $grid->actions(function (Grid\Displayers\Actions $actions) {
+            $id = $actions->getKey();
+            
+            // HTMLでボタンを直接追加
+            $actions->append('<a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="checkShippingMail(' . $id . ')">
+                <i class="fa fa-envelope"></i> メール内容確認
+            </a>');
+        });
+
+        return $grid;
     }
-
-    public function create()
+    /**
+     * Make a show builder.
+     *
+     * @param mixed $id
+     * @return Show
+     */
+    protected function detail($id)
     {
-        // 🔽 セッションからカート(セッションデータのキー名が「cart」の情報を配列で取得。無ければ空の配列を返す）
-        $cart = session()->get('cart', []);
+        /*表示（編集不可画面）*/
 
-        if (empty($cart)) {
-            return redirect()->route('products.index')->with('warning', 'カートが空です。');
-        }
+        // EagerローディングでcustomerとorderItemsリレーションを取得
+        $order = Order::with(['customer', 'orderItems'])->findOrFail($id);
+        $show = new Show($order);
 
-        $deliveryTimes = DeliveryTime::pluck('time'); // 配送時間帯のtimeカラムの値のみを取得
+        $show->field('order_number', __('注文番号'));
 
-        // 認証済みユーザーが法人かどうかをチェック
-        $user = auth()->user();
-        if ($user && $user->user_type === 'corporate') {
-            // 法人ユーザーの場合ここで合計金額の表示が必要なので取得
-            $total = session('total');
-            return view('order.corporate_confirm', compact('cart', 'user', 'total', 'deliveryTimes'));
-        }
-        // 一般ユーザー用：新規お届け先登録画面へ
-        return view('order.create', compact('cart', 'deliveryTimes'));
-    }
+        // 方法1: リレーション経由でアクセサを呼び出す
+        $show->field('customer.full_name', '氏名');
 
-    //確認
-    public function confirm(OrderCustomerRequest $request) //リクエストクラスを使う
-    {
-        $validatedData = $request->validated(); // 全てのバリデーション済みデータを配列で取得
-        // セッションに保存（戻るときに使用）
-        session(['address' => $validatedData]);
-        return view('order.confirm', ['address' => $validatedData]);
-    }
+        $show->field('customer.zip', __('郵便番号'));
+        $show->field('customer.full_address', __('住所'));
+        $show->field('customer.phone', __('電話番号'));
+        $show->field('customer.email', __('メールアドレス'));
 
-    public function hoge(Request $request)
-    {
-        $address = Session::get('address');
-        $cart = Session::get('cart');
+        $show->field('delivery_date', __('配達希望日'));
+        $show->field('delivery_time', __('配達希望時間'));
+        $show->field('your_request', __('ご要望'));
 
-        if (!$address || !$cart) {
-            return redirect()->back()->with('error', 'カートまたは住所情報が見つかりません。');
-        }
+        // 注文商品をテーブル形式で表示
+        $show->field('orderItems', __('注文商品'))->as(function ($orderItems) use ($order) {
+            $html = '<div class="table-responsive">';
+            $html .= '<table class="table table-striped table-hover">';
+            $html .= '<thead class="table-dark">';
+            $html .= '<tr>';
+            $html .= '<th scope="col">商品コード</th>';
+            $html .= '<th scope="col">商品名</th>';
+            $html .= '<th scope="col" class="text-center">数量</th>';
+            $html .= '<th scope="col" class="text-end">単価</th>';
+            $html .= '<th scope="col" class="text-end">小計</th>';
+            $html .= '</tr>';
+            $html .= '</thead>';
+            $html .= '<tbody>';
 
-        DB::beginTransaction();
-
-        try {
-
-            // 1. 顧客情報の保存
-            $customer = Customer::create([
-                'sei'     => $address['order_sei'],
-                'mei'     => $address['order_mei'],
-                'email'    => $address['order_email'],
-                'phone'    => $address['order_phone'],
-                'zip'      => $address['order_zip'],
-                'input_add01' => $address['order_add01'],
-                'input_add02' => $address['order_add02'],
-                'input_add03' => $address['order_add03'],
-            ]);
-
-            // 2. 配送先の保存
-            if ($address['same_as_orderer'] == '1') {
-                // 注文者と同じ場合、配送先をコピー
-                $delivery = Delivery::create([
-                    'sei'     => $customer->sei,
-                    'mei'     => $customer->mei,
-                    'email'    => $customer->email,
-                    'phone'    => $customer->phone,
-                    'zip'      => $customer->zip,
-                    'input_add01' => $customer->input_add01,
-                    'input_add02' => $customer->input_add02,
-                    'input_add03' => $customer->input_add03,
-                ]);
-                //dd($delivery);
-            } else {
-                // 配送先が異なる場合
-                $delivery = Delivery::create([
-                    'sei'     => $address['delivery_sei'],
-                    'mei'     => $address['delivery_mei'],
-                    'email'    => $address['delivery_email'],
-                    'phone'    => $address['delivery_phone'],
-                    'zip'      => $address['delivery_zip'],
-                    'input_add01' => $address['delivery_add01'],
-                    'input_add02' => $address['delivery_add02'],
-                    'input_add03' => $address['delivery_add03'],
-                ]);
+            foreach ($orderItems as $item) {
+                $html .= '<tr>';
+                $html .= '<td>' . htmlspecialchars($item->product_code) . '</td>';
+                $html .= '<td>' . htmlspecialchars($item->name) . '</td>';
+                $html .= '<td class="text-center">' . number_format($item->quantity) . '</td>';
+                $html .= '<td class="text-end">¥' . number_format($item->price) . '</td>';
+                $html .= '<td class="text-end">¥' . number_format($item->subtotal) . '</td>';
+                $html .= '</tr>';
             }
 
+            // 合計行を追加（Orderモデルのtotal_priceを使用）
+            $html .= '<tr class="table-info">';
+            $html .= '<td colspan="4" class="text-end"><strong>合計:</strong></td>';
+            $html .= '<td class="text-end"><strong>¥' . number_format($order->total_price) . '</strong></td>';
+            $html .= '</tr>';
 
-            // 3. 注文番号生成
-            $orderNumber = $this->generateOrderNumber();
+            $html .= '</tbody>';
+            $html .= '</table>';
+            $html .= '</div>';
+
+            return $html;
+        })->unescape();
+
+        // 詳細画面にもアクションボタンを追加
+        $show->panel()
+            ->tools(function ($tools) {
+                $tools->add('<a class="btn btn-primary" href="javascript:void(0)" onclick="checkShippingMail(' . $this->getKey() . ')">
+                    <i class="fa fa-envelope"></i> メール内容確認
+                </a>');
+            });
+
+        return $show;
+    }
 
 
-            // 4. 注文作成
-            $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+    protected function form()
+    {
+        $form = new Form(new Order());
 
+        // 注文番号
+        $form->text('order_number', __('注文番号'));
 
-            $order = Order::create([
-                'order_number' => $orderNumber,
-                'customer_id'  => $customer->id,
-                'delivery_id'  => $delivery->id,
-                'total_price'  => $total,
-                'delivery_time' => $address['delivery_time'],
-                'delivery_date' => $address['delivery_date'],
-                'your_request' => $address['your_request']
-            ]);
-
-            // 5. 商品ごとの注文保存
-            foreach ($cart as $item) {
-                OrderItem::create([
-                    'order_id'   => $order->id,
-                    'product_id' => $item['product_id'],
-                    'name'       => $item['name'],
-                    'quantity'   => $item['quantity'],
-                    'price'      => $item['price'],
-                ]);
+        // 顧客情報
+        $form->select('customer_id', __('顧客'))->options(function ($id) {
+            $customer = Customer::find($id);
+            if ($customer) {
+                return [$customer->id => $customer->full_name];
             }
+        })->ajax('/admin/api/customers');
 
-            DB::commit();
-            // ...（注文保存後）
-            Mail::to($customer->email)->send(new OrderConfirmed($order, $customer, $delivery));
+        // 配送先情報
+        $form->text('customer.zip', __('郵便番号'));
+        $form->text('customer.full_address', __('住所'));
+        $form->text('customer.phone', __('電話番号'));
+        $form->text('customer.email', __('メールアドレス'));
 
-            Mail::to('shop@example.com')->send(new OrderNotification($order, $customer, $delivery));
+        // 配達情報
+        $form->date('delivery_date', __('配達希望日'));
+        $form->time('delivery_time', __('配達希望時間'));
+        $form->textarea('your_request', __('ご要望'));
 
-            Session::forget(['cart', 'address']);
-            //GET
-            //return redirect()->route('order.complete')->with('success', '注文が完了しました。');
-            return redirect()->route('order.complete');
-        } catch (\Exception $e) {
+        // --- ここから商品明細部分 ---
+        // HasMany関係でorderItemsを表示
+        $form->hasMany('orderItems', __('注文商品'), function (Form\NestedForm $form) {
+            $form->text('product_code', __('商品コード'))->rules('required');
+            $form->text('name', __('商品名'))->rules('required');
+            $form->decimal('price', __('単価'))->rules('required|numeric|min:0');
+            $form->number('quantity', __('数量'))->rules('required|integer|min:1');
+            // 小計は通常、保存時や表示時に計算されるため、編集フィールドには含めないことが多い
+            // 必要であれば、`display`メソッドやカスタムロジックで表示することも可能
+        });
+        // --- ここまで商品明細部分 ---
 
-            DB::rollBack();
+        // 合計金額（読み取り専用）
+        // total_priceがorderItemsから自動計算される場合、hasManyの保存フックなどで更新する
+        $form->currency('total_price', __('合計金額'))->symbol('¥')->readonly();
 
-            \Log::error('OrderController::hoge - Error during order save: ' . $e->getMessage(), ['exception' => $e, 'address_session' => Session::get('address'), 'cart_session' => Session::get('cart')]);
+        // 保存前後のフックで合計金額を更新する例
+        $form->saving(function (Form $form) {
+            // orderItemsが送信された場合
+            if (isset($form->orderItems)) {
+                $total = 0;
+                foreach ($form->orderItems as $item) {
+                    // 新規追加や既存の項目でquantityとpriceがあることを確認
+                    if (isset($item['quantity']) && isset($item['price'])) {
+                        $total += (float) $item['quantity'] * (float) $item['price'];
+                    }
+                }
+                $form->total_price = $total;
+            }
+        });
 
-            return back()->with('error', 'エラーが発生しました: ' . $e->getMessage());
-        }
-    }
-    // 注文番号の生成（例: ORD202505300001）
-    private function generateOrderNumber()
-    {
-        $date = now()->format('Ymd');
-        $latestOrder = Order::whereDate('created_at', now()->toDateString())->latest('id')->first();
-        $number = $latestOrder ? ((int)substr($latestOrder->order_number, -4)) + 1 : 1;
-        return 'ORD' . $date . str_pad($number, 4, '0', STR_PAD_LEFT);
-    }
 
-
-    public function complete()
-    {
-        return view('order.complete'); // ビューは resources/views/order/complete.blade.php など
-    }
-
-    public function modify($type)
-    {
-        $user = auth()->user();
-        return view('order.modify_address', compact('type', 'user')); // ビューは resources/views/order/complete.blade.php など
+        return $form;
     }
 }

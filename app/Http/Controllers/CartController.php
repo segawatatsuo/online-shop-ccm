@@ -26,7 +26,9 @@ class CartController extends Controller
         $result = $this->cartService->getCartItems($user);
         $cart = $result['items'];
         $total = $result['total'];
-        return view('cart.index', compact('cart', 'total'));
+
+        $category = session()->get('category');
+        return view('cart.index', compact('cart', 'total', 'category'));
     }
 
     public function add(Request $request)

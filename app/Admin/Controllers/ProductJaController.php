@@ -25,7 +25,7 @@ class ProductJaController extends AdminController
      * @var string
      */
     //protected $title = 'ProductJa';
-    protected $title = '商品';
+    protected $title = '商品情報';
     /**
      * Make a grid builder.
      *
@@ -45,7 +45,7 @@ class ProductJaController extends AdminController
         $grid->column('price', __('価格'));
         $grid->column('classification', __('分類'));
         $grid->column('classification_ja', __('分類名'));
-        $grid->column('color', __('色'));
+        $grid->column('kind', __('種類'));
         $grid->column('name', '商品名');
 
         // バッチアクション追加

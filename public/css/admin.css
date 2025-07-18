@@ -1,0 +1,6 @@
+.asterisk:after {
+    position: absolute;
+    content: '*';
+    right: 0px;
+    color: red;
+}

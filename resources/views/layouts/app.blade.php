@@ -4,88 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>エアーストッキング</title>
-    <script src="{{ asset('js/toggle-menu.js') }}"></script>
-    {{--}}
-    <link rel="stylesheet" href="{{ asset('css/common.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/concept.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/menu.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/button.css') }}">
- 
-    --}}
+    <title>@yield('title', 'Modern Responsive Site')</title>
 
-   <link rel="stylesheet" href="{{ asset('css/stylesheet.css') }}">
-
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    {{-- 各ページ専用のCSSなどをここで差し込める --}}
+    {{-- @head --}}
     @yield('head')
 
-
-    <script src="https://kit.fontawesome.com/f57af4dcea.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-        {{-- ▼ここにbladeに書かれたCSSを適宜追加！ --}}
-        @stack('styles')
-
+    {{-- 共通CSS --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    {{-- <link rel="stylesheet" href="{{ asset('css/style.css') }}">--}}
+    <link rel="stylesheet" href="{{ asset('css/header.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
+    {{-- ページごとの追加CSS --}}
+    @stack('styles')
 </head>
 
 <body>
 
-    {{-- 共通ヘッダー --}}
-    @include('layouts.header')
+    {{-- ヘッダー --}}
+    @include('partials.header')
 
-    <!--<main class="main">-->
-        @yield('content')
-    <!--</main>-->
+    {{-- コンテンツ --}}
+    @yield('content')
 
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // 削除ボタンのイベント
-                document.querySelectorAll('.remove-btn').forEach(function(button) {
-                    button.addEventListener('click', function() {
-                        const form = this.closest('form');
+    {{-- フッター --}}
+    @include('partials.footer')
 
-                        Swal.fire({
-                            title: '削除してもよろしいですか？',
-                            text: "この商品をカートから削除します。",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonText: 'はい、削除します',
-                            cancelButtonText: 'キャンセル',
-                            reverseButtons: true
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                form.submit();
-                            }
-                        });
-                    });
-                });
+    {{-- スクリプト --}}
+    <script src="{{ asset('js/script.js') }}"></script>
 
-                // フラッシュメッセージ SweetAlert2 表示(商品をカートに追加しました！は非表示)
-                /*
-                @if (session('success') && session('success') !== '商品をカートに追加しました！')
-                    Swal.fire({
-                        icon: 'success',
-                        title: '完了！',
-                        text: '{{ session('success') }}',
-                        showConfirmButton: false,
-                        timer: 1800
-                    });
-                @endif
-                */
-            });
-        </script>
-    @endpush
-
-
-
-
-    @stack('scripts') {{-- ← ここでbladeに書かれたJavascriptJavascriptを適宜追加！ --}}
-    {{-- 共通フッター --}}
-    @include('layouts.footer')
-
+    <!-- bladeに書かれたJavaScriptの読み込み位置（通常はbodyの最後に） -->
+    @stack('scripts')
 </body>
 
 </html>

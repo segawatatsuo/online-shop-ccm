@@ -157,7 +157,7 @@ return [
 
         // Disk in `config/filesystem.php`.disk が "admin" になっている場合は、config/filesystems.php を確認：
         'disk' => 'admin',
-
+        //'disk' => 'uploads', // ← ここを変更
         // Image and file upload path under the disk above.
         'directory' => [
             'image' => 'images',
@@ -425,7 +425,12 @@ return [
             'icon'  => 'fa-box',
             'uri'   => 'product-ja', // このURLが /admin/product-ja に対応している必要があります
         ],
+
+
+
     ],
+
+
 
 
 ];

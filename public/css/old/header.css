@@ -1,0 +1,50 @@
+@charset "utf-8";
+
+
+/* ====================
+  ヘッダー
+==================== */
+.header {
+    background-color: #50391a;
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header-inner {
+    max-width: 1200px;
+    height: 60px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-menu-button {
+    display: none;
+}
+
+.header-logo {
+    display: block;
+    width: 170px;
+}
+
+.site-menu ul {
+    display: flex;
+}
+
+.site-menu ul li {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.site-menu ul li a {
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 110%;
+    white-space: nowrap;
+}

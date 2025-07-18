@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProductJa;
+use App\Models\TopPage;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -30,45 +31,16 @@ class ProductJaController extends Controller
 
     public function category($category)
     {
-        /*
-        //collect() は空のコレクションを作るLaravelの関数です。これで変数が常に存在し、Bladeでエラーになりません。
-        $premiumSilk = collect();
-        $diamondLegs = collect();
-
-        if ($category === 'airstocking') {
-            $baseQuery = ProductJa::with('category')
-                ->whereHas('category', function ($query) use ($category) {
-                    $query->where('brand', $category);
-                });
-
-            $premiumSilk = (clone $baseQuery)
-                ->where('classification', 'Premium Silk')
-                ->where('not_display', '=', 0)
-                ->with('mainImage')
-                ->get();
-
-            $diamondLegs = (clone $baseQuery)
-                ->where('classification', 'Diamond Legs')
-                ->where('not_display', '=', 0)
-                ->with('mainImage')
-                ->get();
-        }
-
-        //dd($premiumSilk, $diamondLegs);
-
-        return view('products.category', [
-            'category' => $category,
-            'premiumSilk' => $premiumSilk,
-            'diamondLegs' => $diamondLegs
-          ]);
-          */
-
-
         $premiumSilk = collect();
         $diamondLegs = collect();
 
         if ($category === 'airstocking') {
             $user = Auth::user();
+
+            // セッションに今のカテゴリーを保存
+            session()->put('category', $category);
+
+            $topPageItem = TopPage::where('category', 1)->first(); //トップページのairstockingのHeroイメージや説明コピーなどを取得
 
             // 商品の基本クエリ
             $baseQuery = ProductJa::with(['category', 'mainImage'])
@@ -97,15 +69,25 @@ class ProductJaController extends Controller
             $diamondLegs = (clone $baseQuery)
                 ->where('classification', 'Diamond Legs')
                 ->get();
+
+            return view('products.category', [
+                'category' => $category,
+                'premiumSilk' => $premiumSilk,
+                'diamondLegs' => $diamondLegs,
+                'topPageItem' => $topPageItem
+            ]);
+        } else {
+
+            /*******************************/
+            /*今はまだ他のカテゴリーを実装していない*/
+            /*******************************/
+            return view('products.category', [
+                'category' => $category,
+                //'premiumSilk' => $premiumSilk,
+                //'diamondLegs' => $diamondLegs,
+                //'topPageItem' => $topPageItem
+            ]);
         }
-
-        //dd($premiumSilk);
-
-        return view('products.category', [
-            'category' => $category,
-            'premiumSilk' => $premiumSilk,
-            'diamondLegs' => $diamondLegs
-        ]);
     }
 
 

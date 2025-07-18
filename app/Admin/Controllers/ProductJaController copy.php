@@ -25,7 +25,7 @@ class ProductJaController extends AdminController
      * @var string
      */
     //protected $title = 'ProductJa';
-    protected $title = '商品';
+    protected $title = '商品情報';
     /**
      * Make a grid builder.
      *

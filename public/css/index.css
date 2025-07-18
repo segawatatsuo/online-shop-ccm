@@ -1,12 +1,20 @@
-@charset "utf-8";
-
-@media (max-width: 800px) {
     .line-up {
-        max-width: 100%;
-        margin-top: 20px;
-        margin-left: auto;
-        margin-right: auto;
-        padding-bottom: 40px;
-        justify-content: center;
-    }
+    display: flex;
+    flex-direction: column;     /* 縦に並べる */
+    align-items: center;        /* 中央揃え */
+    max-width: 1200px;
+    margin: 75px auto;
+    padding: 0 20px;
+    gap: 30px;                  /* 画像の間隔 */
+}
+
+.line-up a {
+    display: block;
+    text-align: center;
+}
+
+.line-up img.pic {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }

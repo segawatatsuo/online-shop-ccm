@@ -1,0 +1,444 @@
+/* アニメーション定義 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* アニメーションクラス（fadeInUp 使用） */
+.fade-in-appear {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease;
+}
+
+.fade-in-appear.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* アニメーションクラス（fadeIn 使用） */
+.fade-in-animate {
+    animation: fadeIn 0.6s ease;
+}
+
+/* 共通レスポンシブ（max-width:768px） */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+
+    .nav-menu {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background-color: #333;
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 50px 0;
+        transition: left 0.3s ease;
+    }
+
+    .nav-menu.active {
+        left: 0;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .social-icons {
+        gap: 20px;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .feature-row {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .feature-row:nth-child(even) {
+        direction: ltr;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .product-detail {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .product-images {
+        height: 500px;
+    }
+
+    .product-title {
+        font-size: 2rem;
+        margin-bottom: 5px;
+    }
+.product-price {
+ font-size: 2rem; /* 価格のフォントサイズ */
+}
+    .thumbnail-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+    }
+
+    .thumbnail-grid .thumbnail:nth-child(7),
+    .thumbnail-grid .thumbnail:nth-child(8) {
+        grid-column: span 1;
+        grid-row: 3;
+    }
+
+    .thumbnail-grid .thumbnail:nth-child(7) {
+        grid-column: 1;
+    }
+
+    .thumbnail-grid .thumbnail:nth-child(8) {
+        grid-column: 2;
+    }
+
+    .cart-header h2 {
+        font-size: 2rem;
+    }
+
+    .cart-table {
+        overflow-x: auto;
+    }
+
+    .cart-table table {
+        min-width: 600px;
+    }
+
+    .cart-actions {
+        flex-direction: column;
+    }
+
+    .quantity-controls {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .grid-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .info-card {
+        margin-bottom: 20px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .btn {
+        padding: 12px 25px;
+        font-size: 1em;
+        margin-bottom: 15px;
+        display: block;
+        width: 90%;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+
+    .btn-primary {
+        margin-top: 15px;
+    }
+
+
+    .btn {
+        padding: 12px 25px;
+        font-size: 1em;
+        margin-left: 0;
+        margin-bottom: 15px;
+        display: block; /* ボタンをブロック要素にする */
+        width: 100%; /* 横幅を100%にする */
+        max-width: 350px; /* 必要に応じて最大幅を設定（お好みで調整） */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+
+
+
+    .post-content {
+        padding: 20px;
+    }
+
+    .post-content h1 {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+    }
+
+    .post-table {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 0;
+    }
+
+    .post-table dt {
+        flex: none;
+        width: 100%;
+        text-align: left;
+        margin-bottom: 5px;
+        padding-right: 0;
+    }
+
+    .post-table dd {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .input-half {
+        width: 100%;
+        max-width: 180px;
+    }
+
+    .form-select {
+        width: 100%;
+    }
+
+    .btn-01.small {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .same-address-block dt {
+        text-align: left !important;
+    }
+
+    .same-address-block dd {
+        justify-content: flex-start;
+    }
+
+    .a-button {
+        width: 90%;
+        max-width: 300px;
+        padding: 15px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+    }
+}
+
+/* 共通レスポンシブ（max-width:480px） */
+@media (max-width: 480px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .feature-content h3,
+    .section3 h2,
+    .video-container h2 {
+        font-size: 2rem;
+    }
+
+    .product-images {
+        height: 400px;
+    }
+
+    .product-title {
+        font-size: 1.5rem;
+    }
+
+    .purchase-section {
+        padding: 20px;
+    }
+
+    .quantity-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    /*
+    .cart-header h2 {
+        font-size: 1.5rem;
+    }
+    */
+    .cart-table th,
+    .cart-table td {
+        padding: 12px 10px;
+        font-size: 0.85rem;
+    }
+
+    .total-amount {
+        font-size: 1.6rem;
+    }
+
+    .section-title {
+        font-size: 1.8em;
+    }
+
+    .post-content h1 {
+        font-size: 1.6rem;
+    }
+
+    .post-table dt,
+    .post-table dd label {
+        font-size: 0.85rem !important;
+    }
+
+    .form-control,
+    .form-select {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+
+    .btn-01.small {
+        font-size: 0.75rem;
+        padding: 5px 8px;
+    }
+
+
+}
+
+@media (max-width: 768px) {
+    /* 他のスタイルは省略 */
+
+    .button-area {
+        display: flex; /* ボタンエリアをflexboxにする */
+        flex-direction: column; /* 要素を縦並びにする */
+        align-items: center; /* 中央寄せにする */
+        gap: 15px; /* ボタン間の間隔を設定 */
+    }
+
+    .d-inline-block {
+        display: block; /* form要素をブロック要素にする */
+        width: 100%; /* 横幅を100%にする */
+        max-width: 350px; /* 必要に応じて最大幅を設定（お好みで調整） */
+    }
+
+    .btn {
+        width: 100%; /* ボタンの幅を100%にする */
+        max-width: 350px; /* 必要に応じて最大幅を設定（お好みで調整） */
+        margin-left: auto; /* 中央寄せ */
+        margin-right: auto; /* 中央寄せ */
+        /* padding, font-size などは既存の .btn スタイルでOK */
+    }
+}
+
+/* _responsive.css 内の @media (max-width: 768px) ブロック内 */
+@media (max-width: 768px) {
+    /* ... 既存のスタイル ... */
+
+    .product-detail {
+        grid-template-columns: 1fr; /* 2カラムから1カラムに変更済み。これは残します。 */
+        gap: 30px; /* 必要に応じて調整。既存の40pxも可。 */
+    }
+
+    .product-images {
+        /* height: 500px; */ /* この行をコメントアウトまたは削除します。高さを自動調整させます。 */
+        height: auto; /* 画像セクションの高さを自動調整 */
+        grid-template-rows: auto 1fr; /* メイン画像をauto、サムネイルグリッドを1frに設定 */
+        gap: 20px; /* 必要に応じて調整 */
+    }
+
+    .main-image {
+        height: 300px; /* スマホでのメイン画像の高さを調整（任意の値に調整してください） */
+        /* width: 100%; は通常不要ですが、もしメイン画像がはみ出す場合は追加してください */
+    }
+
+    .main-image img {
+        object-fit: contain; /* 画像全体を表示するようにします */
+    }
+
+    .thumbnail-grid {
+        /* 既存の grid-template-columns: repeat(3, 1fr); はそのまま残し、
+           必要に応じて自動調整されるように auto-fit を検討することも可能です。 */
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* サムネイルを可変グリッドに */
+        gap: 8px; /* サムネイル間のギャップを調整 */
+    }
+
+    .thumbnail {
+        height: 80px; /* サムネイルの高さを固定（必要に応じて調整） */
+    }
+
+    /* 以下は、カートに入れるセクションが画像の上に重なる問題に関連する調整です */
+    /* product-info は .product-detail の2番目のカラムなので、1カラムになった際に自然と下に移動します */
+    /* ただし、パディングやマージンで微調整が必要な場合があります */
+    .product-info {
+        padding: 0 15px; /* 左右のパディングを調整して、コンテンツが見切れないようにします */
+        margin-top: 20px; /* 画像セクションとの間に少しスペースを空ける */
+    }
+
+    .purchase-section {
+        padding: 20px; /* 購入セクションのパディングを調整 */
+    }
+
+    .quantity-section {
+        flex-direction: column; /* 数量選択を縦並びに */
+        align-items: flex-start; /* 左寄せ */
+        gap: 10px;
+    }
+
+    .quantity-input {
+        width: 100%; /* 数量入力欄の幅を100%に */
+        max-width: 150px; /* 必要に応じて最大幅を設定 */
+    }
+
+    /* .add-to-cart ボタンも調整が必要な場合があります */
+    .add-to-cart {
+        width: 100%; /* 幅を親要素に合わせる */
+        max-width: none; /* max-widthの制限をなくすか、適切な値を設定 */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* .d-inline-block クラスが使われているようですので、そちらも確認します */
+    .d-inline-block {
+        display: block; /* form要素をブロック要素にする */
+        width: 100%; /* 横幅を100%にする */
+        max-width: 350px; /* 必要に応じて最大幅を設定（お好みで調整） */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* ... 既存のスタイル ... */
+}
+
+/* さらに小さいスマホ向け（max-width:480px）のブレイクポイントも確認 */
+@media (max-width: 480px) {
+    /* ... 既存のスタイル ... */
+    .product-images {
+        height: auto; /* ここもautoに */
+    }
+    .main-image {
+        height: 250px; /* より小さい画面でのメイン画像の高さを調整 */
+    }
+    .thumbnail {
+        height: 60px; /* より小さい画面でのサムネイルの高さを調整 */
+    }
+    /* ... 既存のスタイル ... */
+}

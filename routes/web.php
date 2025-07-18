@@ -34,6 +34,7 @@ Route::get('/', function () {
     return view('index'); // resources/views/index.blade.php
 })->name('products.index');
 
+// 管理者ログイン
 Route::get('admin/login', [App\Http\Controllers\Admin\AdminLoginController::class, 'showLoginForm'])->name('admin.login');
 Route::post('admin/login', [App\Http\Controllers\Admin\AdminLoginController::class, 'login']);
 
@@ -190,3 +191,8 @@ Route::post('/corporate/resend-verification', function () {
 
     return back()->withErrors(['error' => 'メール再送信に失敗しました。']);
 })->name('corporate.verification.resend');
+
+
+Route::get('/top', function () {
+    return view('top');
+});

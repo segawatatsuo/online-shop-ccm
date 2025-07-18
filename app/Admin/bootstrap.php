@@ -36,3 +36,5 @@ Encore\Admin\Facades\Admin::menu(function (Encore\Admin\Widgets\Menu $menu) {
         ],
     ]);
 });
+
+

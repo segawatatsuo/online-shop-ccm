@@ -1,0 +1,382 @@
+
+
+        /* ヒーローセクション*/
+        .hero {
+            width: 100%;
+            height: 100vh;
+            /* 画像の上に薄紫を乗せる
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%), url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            */
+            /*
+            background: url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            */
+            /*background: url("/storage/images/processed/AirStocking.jpg");/*asset() を使えないため、相対パスか絶対パスで書いてください。*/
+            background: var(--hero-bg-image); /* ここでCSS変数を使用 */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            padding: 0 20px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        /* メインコンテンツ */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* セクション1 */
+        .section1 {
+            padding: 100px 0;
+        }
+
+        .feature-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            margin-bottom: 80px;
+        }
+
+        .feature-row:nth-child(even) {
+            direction: rtl;
+        }
+
+        .feature-row:nth-child(even)>* {
+            direction: ltr;
+        }
+
+        .feature-content h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            /*background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+            background-color: #50391a;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feature-content p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #666;
+        }
+
+        .feature-image {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-image:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-image img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-image:hover img {
+            transform: scale(1.05);
+        }
+
+        /* セクション2 - 動画 */
+        .section2 {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .video-container {
+            text-align: center;
+        }
+
+        .video-container h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            /*background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+            background-color: #50391a;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            aspect-ratio: 16/9;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* セクション3 - 商品 */
+        .section3 {
+            padding: 100px 0;
+        }
+
+        .section3 h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 80px;
+            /*background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+            background-color: #50391a;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .product-block {
+            margin-bottom: 80px;
+        }
+
+        .product-block h3 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            /*transition: all 0.3s ease;*/
+            text-align: center;
+        }
+
+        .product-card:hover {
+            /*transform: translateY(-10px);*/
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            /*
+            height: 200px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            */
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* ここを追加 */
+        .product-image img {
+            max-width: 100%;
+            /*枠の幅を超えないようにします*/
+            max-height: 100%;
+            /*枠の高さ（200px）を超えないようにします*/
+            object-fit: contain;
+            /*アスペクト比を維持したまま、全体を収めます（画像が枠に対して小さくなることもあります）*/
+        }
+
+
+
+        .product-code {
+            font-size: 0.8rem;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .product-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            /*color: #667eea;*/
+            color: #0f1111;
+            margin-bottom: 15px;
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-to-cart {
+            width: 100%;
+            padding: 12px;
+            /*background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);*/
+            background-color: #FFD814;
+            /*color: white;*/
+            color: #0f1111;
+            border: none;
+            border-radius: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            /*transition: all 0.3s ease;*/
+            transition: background-color 0.2s ease;
+        }
+
+        .add-to-cart:hover {
+            /*
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            */
+            background-color: #F7CA00;
+        }
+
+
+
+
+
+
+
+
+
+.product-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* カードの高さを統一 */
+        }
+
+        .product-card:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .product-code {
+            font-size: 0.8rem;
+            color: #999;
+            margin-bottom: 2px; /* 5px から 2px に変更 */
+        }
+
+        .product-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            flex-grow: 1; /* 商品名エリアを可変にして余白を調整 */
+            display: flex;
+            align-items: flex-end; /* 商品名を下寄せ */
+        }
+
+        /* 価格とフォーム部分を下に配置 */
+        .product-bottom {
+            margin-top: 10px; /* 固定の小さな余白に変更 */
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f1111;
+            margin-bottom: 15px;
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-to-cart {
+            width: 100%;
+            padding: 12px;
+            background-color: #FFD814;
+            color: #0f1111;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .add-to-cart:hover {
+            background-color: #F7CA00;
+        }

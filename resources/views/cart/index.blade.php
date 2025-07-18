@@ -1,121 +1,75 @@
 @extends('layouts.app')
 
+@section('title', 'トップページ')
 
-@section('head')
-    <link rel="stylesheet" href="{{ asset('css/cart.css') }}">
-@endsection
-
+@push('styles')
+    {{-- _responsive.cssは本当は共通CSSだがtop-page.cssの後に読み込まないと崩れるため --}}
+    <link rel="stylesheet" href="{{ asset('css/cart-page.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/_responsive.css') }}">
+@endpush
 
 @section('content')
-    <main class="main">
+    <main class="container">
+        <div class="cart-header">
+            <h2>ショッピングカート</h2>
+        </div>
 
-        <div class="container">
+        <div class="cart-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>商品名</th>
+                        <th>金額</th>
+                        <th>数量</th>
+                        <th>小計</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php $total = 0; @endphp {{-- Initialize total outside the loop, before the tbody, or even before the table if you prefer. --}}
+                    @foreach ($cart as $item)
+                        @php
+                            $subtotal = $item['price'] * $item['quantity'];
+                            $total += $subtotal;
+                        @endphp
+                        <tr>
+                            <td class="product-name">{{ $item['name'] }}</td>
+                            <td class="product-price">&yen;{{ number_format($item['price']) }}</td>
+                            <td>
+                                <div class="quantity-controls">
+                                    <form method="POST" action="{{ route('cart.update') }}" class="d-flex">
+                                        @csrf
+                                        <input type="hidden" name="product_id" value="{{ $item['product_id'] }}">
+                                        <input type="number" name="quantity" class="quantity-input"
+                                            value="{{ $item['quantity'] }}" min="1">
+                                        <button type="submit" class="update-btn" onclick="updateQuantity(this)">更新</button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td class="subtotal">&yen;{{ number_format($subtotal) }}</td>
+                            <td>
+                                <form method="POST" action="{{ route('cart.remove') }}" class="remove-form">
+                                    @csrf
+                                    <input type="hidden" name="product_id" value="{{ $item['product_id'] }}">
+                                    <button type="submit" class="delete-btn remove-btn">削除</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach {{-- This closes the @foreach loop --}}
+                </tbody>
+            </table>
+        </div>
 
-            @if (empty($cart))
-                <p>カートは空です。</p>
+        <div class="cart-total">
+            <h4>お買い物カゴの合計</h4>
+            {{-- Display the calculated total here --}}
+            <div class="total-amount" id="totalAmount">&yen;{{ number_format($total) }}</div>
+        </div>
 
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        Swal.fire({
-                            icon: 'info',
-                            title: 'カートが空です',
-                            text: 'お買い物を続けてください',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    });
-                </script>
-            @else
-                <h1>ショッピングカート</h1>
-
-                <div class="tb-scrooll">
-                    <table class="shop_table" cellspacing="0" style="width: 100%">
-                        <thead>
-                            <tr>
-
-                                <th class="product-name">商品</th>
-                                <th class="product-price">金額</th>
-                                <th class="product-quantity">数量</th>
-                                <th class="product-subtotal">小計</th>
-                                <th class="product-remove"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-
-
-                            @php $total = 0; @endphp
-
-                            @foreach ($cart as $item)
-                                @php
-                                    $subtotal = $item['price'] * $item['quantity'];
-                                    $total += $subtotal;
-                                @endphp
-                                <tr>
-                                    <td>{{ $item['name'] }}</td>
-                                    <td>¥{{ number_format($item['price']) }}</td>
-                                    <td>
-                                        <form method="POST" action="{{ route('cart.update') }}" class="d-flex">
-                                            @csrf
-                                            <input type="hidden" name="product_id" value="{{ $item['product_id'] }}">
-                                            <input type="number" name="quantity" value="{{ $item['quantity'] }}"
-                                                min="1" class="form-control me-2" style="width:80px">
-                                            <button class="btn btn-sm btn-primary">更新</button>
-                                        </form>
-                                    </td>
-                                    <td>¥{{ number_format($subtotal) }}</td>
-                                    <td>
-                                        <form method="POST" action="{{ route('cart.remove') }}" class="remove-form">
-                                            @csrf
-                                            <input type="hidden" name="product_id" value="{{ $item['product_id'] }}">
-                                            <button type="button" class="btn btn-sm btn-danger remove-btn">削除</button>
-                                        </form>
-
-                                    </td>
-                                </tr>
-                            @endforeach
-
-                        </tbody>
-                    </table>
-                </div>
-
-
-
-                <div class="cart-collaterals">
-                    <div class="cart_totals ">
-                        <h2>お買い物カゴの合計</h2>
-
-                        <table cellspacing="0">
-
-                            <tr class="order-total">
-                                <th>合計</th>
-                                <td data-title="合計"><strong>
-                                        <span class="woocommerce-Price-amount amount">
-                                            <span
-                                                class="woocommerce-Price-currencySymbol">&yen;</span>{{ number_format($total) }}</span></strong>
-                                </td>
-                            </tr>
-
-                        </table>
-
-                        <a href="{{ url()->previous() }}" class="btn btn-secondary">
-                            <div class="a-button">買い物を続ける</div>
-                        </a>
-
-                        <a href="{{ route('order.create') }}">
-                            <div class="a-button">購入手続きに進む</div>
-                        </a>
-
-
-
-                    </div>
-                </div>
-            @endif
-
-
+        <div class="cart-actions">
+            <button class="continue-shopping" onclick="window.location.href='{{ asset('product/'.$category) }}'">買い物を続ける</button>
+             <button class="checkout-btn" onclick="window.location.href='{{ route('order.create') }}'">購入手続きに進む</button>
         </div>
     </main>
-
-
 
 @endsection

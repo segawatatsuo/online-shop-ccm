@@ -1,37 +1,47 @@
-@extends('layouts.app') {{-- 必要に応じて調整 --}}
+@extends('layouts.app')
+
+@section('title', 'トップページ')
+
+@push('styles')
+    {{-- _responsive.cssは本当は共通CSSだがtop-page.cssの後に読み込まないと崩れるため --}}
+    <link rel="stylesheet" href="{{ asset('css/kakunin-page.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/_responsive.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/square.css') }}">
+@endpush
 
 @section('head')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
         // Square Application ID と Location ID は実際の値に置き換えてください
         const SQUARE_APP_ID = 'sandbox-sq0idb-FLpYRCd5CtAkwcfFupdDiQ';
         const SQUARE_LOCATION_ID = 'LDMBNMJX0HGH7';
     </script>
-    <link rel="stylesheet" href="{{ asset('css/square.css') }}">
+    
 @endsection
 
 @section('content')
+
     <main class="main">
-        <h1>お支払いフォーム</h1>
+        <div class="container">
+            <h2 class="section-title">お支払いフォーム</h2>
+            <p>お支払い金額：<span id="display-amount">{{ number_format($totalAmount) }}</span>円</p>
+            <div id="payment-form"></div>
+            <button id="pay-button" disabled>支払う</button>
 
-        <p>お支払い金額：<span id="display-amount">{{ number_format($totalAmount) }}</span>円</p>
+            <div id="loading-overlay"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); justify-content: center; align-items: center; z-index: 1000;">
+                <div class="spinner"></div>
+                <p>支払い処理中です。しばらくお待ちください...</p>
+            </div>
 
-        <div id="payment-form"></div>
-        <button id="pay-button" disabled>支払う</button>
-
-        <div id="loading-overlay"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); justify-content: center; align-items: center; z-index: 1000;">
-            <div class="spinner"></div>
-            <p>支払い処理中です。しばらくお待ちください...</p>
+            <div style="margin-top: 10px"><a href="https://squareup.com/jp/ja" target="_blank">当店はSquareオンライン決済を利用しています</a>
+            </div>
+            <div style="margin-top: 10px"><img style="max-width: 400px"
+                    src="{{ asset('/images/card/PayPay_digital_logo_download_0818-04.png') }}"></div>
         </div>
-
-        <div style="margin-top: 10px"><a href="https://squareup.com/jp/ja" target="_blank">当店はSquareオンライン決済を利用しています</a>
-        </div>
-        <div style="margin-top: 10px"><img style="max-width: 400px"
-                src="{{ asset('/images/card/PayPay_digital_logo_download_0818-04.png') }}"></div>
     </main>
-
     <div id="messages" style="margin-top: 20px;"></div>
 
     <script type="text/javascript">
@@ -54,7 +64,7 @@
             });
             */
         };
-  
+
         const friendlyErrorMessages = {
             // Square Web Payments SDKのエラーコード (tokenizeの結果)
             INVALID_CARD: "カード番号が無効です。入力内容をご確認ください。",
@@ -109,7 +119,7 @@
                 // Square Payments SDKの初期化
                 payments = Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
                 console.log('Square payments initialized:', payments);
-                
+
                 // カードフォームの初期化
                 card = await initializeCard(payments);
                 console.log('Card initialized:', card);
@@ -158,7 +168,8 @@
                         const token = result.token;
                         console.log('Square Token:', token);
 
-                        const purchaseAmountText = document.getElementById('display-amount').innerText;
+                        const purchaseAmountText = document.getElementById('display-amount')
+                            .innerText;
                         const purchaseAmount = parseInt(purchaseAmountText.replace(/,/g, ''));
 
                         // 2. 取得したトークンと金額をサーバーに送信
@@ -167,7 +178,8 @@
                             headers: {
                                 "Content-Type": "application/json",
                                 "Accept": "application/json",
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content'),
                             },
                             body: JSON.stringify({
                                 token: token,
@@ -211,4 +223,40 @@
             });
         });
     </script>
+    <!--</main>-->
+
+
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 削除ボタンのイベント
+            document.querySelectorAll('.remove-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const form = this.closest('form');
+
+                    Swal.fire({
+                        title: '削除してもよろしいですか？',
+                        text: "この商品をカートから削除します。",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'はい、削除します',
+                        cancelButtonText: 'キャンセル',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            // フラッシュメッセージ SweetAlert2 表示(商品をカートに追加しました！は非表示)
+            /*
+             */
+        });
+    </script>
+
+
 @endsection

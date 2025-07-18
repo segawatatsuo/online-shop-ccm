@@ -1,7 +1,7 @@
 <header class="header">
     <div class="header-inner">
-        <a class="header-logo" href="{{ url('/') }}">
-            <img src="{{ asset('images/top/logo.png') }}" alt="">
+        <a class="header-logo" href="{{ {{ asset('/') }} }}">
+            <img src="{{ asset('images/top/logo.png') }}" alt="ccmedico">
         </a>
         <button class="toggle-menu-button"></button>
         <div class="header-site-menu">
