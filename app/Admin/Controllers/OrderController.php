@@ -43,9 +43,13 @@ class OrderController extends AdminController
         $grid->column('delivery_date', __('配送希望日'));
         $grid->column('delivery_time', __('配送希望時間'));
         $grid->column('your_request', __('メッセージ'));
-        $grid->column('status', __('Status'));
+
+        $grid->column('shipping_date', __('発送日'));
+        $grid->column('tracking_number', __('配送伝票番号'));
+        $grid->column('shipping_company', __('運送会社名'));
+
         $grid->column('created_at', __('作成日時'));
-        $grid->column('updated_at', __('修正日時'));
+
 
         // ここにカスタムアクションを追加
         // 各行に「発送メール送信」アクションを追加します。

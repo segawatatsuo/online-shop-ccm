@@ -83,11 +83,9 @@ class EmailTemplateController extends AdminController
         $form->display('id', __('Id'));
         $form->text('slug', __('スラッグ'))->readonly(); // スラッグは編集不可
         $form->text('subject', __('件名'))->required();
-        $form->textarea('body', __('本文'))->rows(20)->required()->help('差し込み項目: {{customer_name}}, {{customer_address}}, {{delivery_name}}, {{delivery_address}}, {{shipping_date}}, {{shipping_company}}, {{tracking_number}}, {{order_id}}, {{order_items}} (HTMLテーブル形式), {{footer}}');
+        $form->textarea('body', __('本文'))->rows(20)->required()->help('差し込み項目: {{name}}, {{order_number}}, {{shipping_date}}, {{shipping_company}}, {{tracking_number}}, {{customer_name}}, {{customer_zip}}, {{customer_address}}, {{customer_phone}}, {{delivery_name}}, {{delivery_zip}}, {{delivery_address}}, {{delivery_phone}}, {{order_items}}, {{shipping}}, {{total_amount}}, {{footer}}');
         $form->textarea('description', __('説明'));
 
-        $form->display('created_at', __('作成日時'));
-        $form->display('updated_at', __('更新日時'));
 
         return $form;
     }

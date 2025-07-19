@@ -36,6 +36,7 @@ class SendShippingMail extends RowAction
 
         // 関連顧客情報を取得
         $customer = $order->customer;
+        $delivery = $order->delivery;
 
         // メールテンプレート取得（slug = thank-you-mail）
         $template = EmailTemplate::where('slug', 'thank-you-mail')->first();
@@ -50,8 +51,40 @@ class SendShippingMail extends RowAction
 
         // 差し込み（置き換え）
         $body = str_replace(
-            ['{name}', '{order_number}', '{shipping_date}', '{shipping_company}', '{tracking_number}'],
-            [$customer->full_name, $order->order_number, $order->shipping_date, $order->shipping_company, $order->tracking_number],
+            [
+                '{{name}}',
+                '{{order_number}}',
+                '{{shipping_date}}',
+                '{{shipping_company}}',
+                '{{tracking_number}}',
+                '{{customer_name}}',
+                '{{customer_zip}}',
+                '{{customer_address}}',
+                '{{customer_phone}}',
+                '{{delivery_name}}',
+                '{{delivery_zip}}',
+                '{{delivery_address}}',
+                '{{delivery_phone}}',
+                '{{order_items}}',
+                '{{shipping}}',
+                '{{total_amount}}',
+                '{{footer}}'
+            ],
+            [
+                $customer->full_name,
+                $order->order_number,
+                $order->shipping_date,
+                $order->shipping_company,
+                $order->tracking_number,
+                $customer->full_name,
+                $customer->zip,
+                $customer->full_address,
+                $customer->phone,
+                $delivery->full_name,
+                $delivery->zip,
+                $delivery->full_address,
+                $delivery->phone,
+            ],
             $body
         );
 
@@ -73,4 +106,3 @@ class SendShippingMail extends RowAction
         $this->confirm('この注文の発送メールを送信しますか？');
     }
 }
-
