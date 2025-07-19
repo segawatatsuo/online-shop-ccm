@@ -145,6 +145,10 @@ class OrderController extends AdminController
         $show->field('delivery_time', __('配達希望時間'));
         $show->field('your_request', __('ご要望'));
 
+        $show->field('shipping_date', __('発送日'));
+        $show->field('tracking_number', __('配送伝票番号'));
+        $show->field('shipping_company', __('運送会社名'));
+
         // 注文商品をテーブル形式で表示
         $show->field('orderItems', __('注文商品'))->as(function ($orderItems) use ($order) {
             $html = '<div class="table-responsive">';
@@ -218,7 +222,9 @@ class OrderController extends AdminController
 
         // 配送先情報
         $form->text('customer.zip', __('郵便番号'));
-        $form->text('customer.full_address', __('住所'));
+        $form->text('customer.input_add01', __('住所1'));
+        $form->text('customer.input_add02', __('住所2'));
+        $form->text('customer.input_add03', __('住所3'));
         $form->text('customer.phone', __('電話番号'));
         $form->text('customer.email', __('メールアドレス'));
 
@@ -226,6 +232,12 @@ class OrderController extends AdminController
         $form->date('delivery_date', __('配達希望日'));
         $form->time('delivery_time', __('配達希望時間'));
         $form->textarea('your_request', __('ご要望'));
+
+
+        $form->text('shipping_date', __('発送日'));
+        $form->text('tracking_number', __('配送伝票番号'));
+        $form->text('shipping_company', __('運送会社名'));
+
 
         // --- ここから商品明細部分 ---
         // HasMany関係でorderItemsを表示

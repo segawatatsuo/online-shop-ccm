@@ -4,39 +4,73 @@ namespace App\Admin\Actions;
 
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Models\EmailTemplate;
+use App\Models\Order;
+use Carbon\Carbon;
 
-/**
- * 発送メール送信カスタムアクション
- * グリッドの各行に表示され、特定の注文に対して発送メール送信をシミュレートします。
- */
 class SendShippingMail extends RowAction
 {
-    // アクションボタンの表示名
     public $name = '発送メール送信';
 
-    /**
-     * アクションが実行された際の処理
-     *
-     * @param Model $model 現在の行のモデルインスタンス（この場合はOrderモデル）
-     * @return \Encore\Admin\Actions\Response
-     */
-    public function handle(Model $model)
+    public function handle(Model $order, Request $request)
     {
-        // ここに実際のメール送信ロジックを記述します。
-        // 例: Mail::to($model->customer->email)->send(new ShippingMail($model));
-        // データベースのステータス更新などを行うこともできます。
-        // $model->update(['status' => '発送済み']);
+        // --- バリデーション ---
+        $today = Carbon::today();
+        if (empty($order->tracking_number)) {
+            return $this->response()->error('配送伝票番号が入力されていません')->refresh();
+        }
 
-        // 成功メッセージとページのリフレッシュを返す
-        return $this->response()->success('発送メールを送信しました: ' . $model->order_number)->refresh();
+        if (empty($order->shipping_company)) {
+            return $this->response()->error('運送会社が入力されていません')->refresh();
+        }
+
+        if (empty($order->shipping_date)) {
+            return $this->response()->error('発送日が未入力です')->refresh();
+        }
+        /*
+        if (Carbon::parse($order->shipping_date)->lt($today)) {
+            return $this->response()->error('発送日（shipping_date）が本日より前です')->refresh();
+        }*/
+
+        // 関連顧客情報を取得
+        $customer = $order->customer;
+
+        // メールテンプレート取得（slug = thank-you-mail）
+        $template = EmailTemplate::where('slug', 'thank-you-mail')->first();
+
+        if (!$template) {
+            return $this->response()->error('メールテンプレートが見つかりません')->refresh();
+        }
+
+        // メール本文
+        $subject = $template->subject ?? '発送完了のお知らせ';
+        $body = $template->body;
+
+        // 差し込み（置き換え）
+        $body = str_replace(
+            ['{name}', '{order_number}', '{shipping_date}', '{shipping_company}', '{tracking_number}'],
+            [$customer->full_name, $order->order_number, $order->shipping_date, $order->shipping_company, $order->tracking_number],
+            $body
+        );
+
+        // 実際にメール送信
+        try {
+            Mail::raw($body, function ($message) use ($customer, $subject) {
+                $message->to($customer->email)
+                    ->subject($subject);
+            });
+
+            return $this->response()->success('発送メールを送信しました')->refresh();
+        } catch (\Exception $e) {
+            return $this->response()->error('送信エラー: ' . $e->getMessage())->refresh();
+        }
     }
 
-    /**
-     * アクション実行前の確認ダイアログを設定
-     * ユーザーが誤ってアクションを実行しないように確認を促します。
-     */
     public function dialog()
     {
-        $this->question('確認', 'この注文の発送メールを送信してもよろしいですか？');
+        $this->confirm('この注文の発送メールを送信しますか？');
     }
 }
+
