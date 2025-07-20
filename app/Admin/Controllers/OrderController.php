@@ -55,9 +55,9 @@ class OrderController extends AdminController
         // 各行に「発送メール送信」アクションを追加します。
         $grid->actions(function ($actions) {
             // デフォルトの表示、編集、削除ボタンを保持したい場合はコメントアウトを解除
-             //$actions->disableView();
-             //$actions->disableEdit();
-             //$actions->disableDelete();
+            //$actions->disableView();
+            //$actions->disableEdit();
+            //$actions->disableDelete();
 
             $actions->add(new SendShippingMail());
         });
@@ -198,7 +198,7 @@ class OrderController extends AdminController
         $show->field('actions', __('アクション'))->as(function () use ($id) {
             $checkShippingAction = new CheckShippingMail($id);
             $url = '/admin/orders/' . $id . '/check-shipping-mail'; // 適切なURLに変更してください
-            
+
             return '<a href="' . $url . '" class="btn btn-primary">
                         <i class="fa fa-envelope"></i> 発送メール確認
                     </a>';
