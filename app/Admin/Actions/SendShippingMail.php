@@ -45,6 +45,24 @@ class SendShippingMail extends RowAction
             return $this->response()->error('メールテンプレートが見つかりません')->refresh();
         }
 
+
+//明細部分を取り出す
+$orderItemsHtml = '<table border="1" cellpadding="5" cellspacing="0">';
+$orderItemsHtml .= '<tr><th>商品ID</th><th>商品名</th><th>数量</th><th>単価</th><th>小計</th></tr>';
+
+foreach ($order->orderItems as $item) {
+    $orderItemsHtml .= '<tr>';
+    $orderItemsHtml .= '<td>' . $item->product_id . '</td>';
+    $orderItemsHtml .= '<td>' . $item->name . '</td>';
+    $orderItemsHtml .= '<td>' . $item->quantity . '</td>';
+    $orderItemsHtml .= '<td>' . number_format($item->price) . '円</td>';
+    $orderItemsHtml .= '<td>' . number_format($item->subtotal) . '円</td>';
+    $orderItemsHtml .= '</tr>';
+}
+
+$orderItemsHtml .= '</table>';
+
+
         // メール本文
         $subject = $template->subject ?? '発送完了のお知らせ';
         $body = $template->body;
@@ -84,11 +102,18 @@ class SendShippingMail extends RowAction
                 $delivery->zip,
                 $delivery->full_address,
                 $delivery->phone,
+
+        $orderItemsHtml, // ← 差し込み内容
+        number_format($order->shipping_fee) . '円',
+        number_format($order->total_amount) . '円',
+        'ご利用ありがとうございました。'
+
+
             ],
             $body
         );
 
-        // 実際にメール送信
+        /*
         try {
             Mail::raw($body, function ($message) use ($customer, $subject) {
                 $message->to($customer->email)
@@ -99,6 +124,22 @@ class SendShippingMail extends RowAction
         } catch (\Exception $e) {
             return $this->response()->error('送信エラー: ' . $e->getMessage())->refresh();
         }
+            */
+
+//今は Mail::raw() を使っていますが、HTMLの <table> を使う場合は Mail::send() を使って、HTML対応にする必要があります：
+try {
+    Mail::send([], [], function ($message) use ($customer, $subject, $body) {
+        $message->to($customer->email)
+            ->subject($subject)
+            ->setBody($body, 'text/html'); // ← HTMLメールとして送信
+    });
+
+    return $this->response()->success('発送メールを送信しました')->refresh();
+} catch (\Exception $e) {
+    return $this->response()->error('送信エラー: ' . $e->getMessage())->refresh();
+}
+
+
     }
 
     public function dialog()
