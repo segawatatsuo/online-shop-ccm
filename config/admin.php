@@ -411,7 +411,11 @@ return [
     | https://github.com/laravel-admin-extensions.
     |
     */
-    'extensions' => [],
+'extensions' => [
+    'summernote' => [
+        'enable' => true,
+    ],
+],
 
 
     'menu' => [

@@ -7,7 +7,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-
+use Encore\Admin\Form\Field\Summernote;
 
 
 
@@ -60,10 +60,17 @@ class EmailTemplateController extends AdminController
         $show->field('id', __('Id'));
         $show->field('slug', __('スラッグ'));
         $show->field('subject', __('件名'));
+        /*
         $show->field('body', __('本文'))->unescape()->as(function ($body) {
-            // ここでプレビュー表示なども可能
             return nl2br(e($body));
         });
+        */
+
+
+$show->field('body', __('本文'))->unescape()->as(function ($body) {
+    return $body; // e()やnl2br()を使わず、HTMLとして表示
+});
+
         $show->field('description', __('説明'));
         $show->field('created_at', __('作成日時'));
         $show->field('updated_at', __('更新日時'));
@@ -83,7 +90,12 @@ class EmailTemplateController extends AdminController
         $form->display('id', __('Id'));
         $form->text('slug', __('スラッグ'))->readonly(); // スラッグは編集不可
         $form->text('subject', __('件名'))->required();
-        $form->textarea('body', __('本文'))->rows(20)->required()->help('差し込み項目: {{name}}, {{order_number}}, {{shipping_date}}, {{shipping_company}}, {{tracking_number}}, {{customer_name}}, {{customer_zip}}, {{customer_address}}, {{customer_phone}}, {{delivery_name}}, {{delivery_zip}}, {{delivery_address}}, {{delivery_phone}}, {{order_items}}, {{shipping}}, {{total_amount}}, {{footer}}');
+        //$form->textarea('body', __('本文'))->rows(20)->required()->help('差し込み項目: {{name}}, {{order_number}}, {{shipping_date}}, {{shipping_company}}, {{tracking_number}}, {{customer_name}}, {{customer_zip}}, {{customer_address}}, {{customer_phone}}, {{delivery_name}}, {{delivery_zip}}, {{delivery_address}}, {{delivery_phone}}, {{order_items}}, {{shipping}}, {{total_amount}}, {{footer}}');
+        $form->summernote('body', __('本文'))->required()->help(
+    '差し込み項目: {{name}}, {{order_number}}, {{shipping_date}}, {{shipping_company}}, {{tracking_number}}, {{customer_name}}, {{customer_zip}}, {{customer_address}}, {{customer_phone}}, {{delivery_name}}, {{delivery_zip}}, {{delivery_address}}, {{delivery_phone}}, {{order_items}}, {{shipping}}, {{total_amount}}, {{footer}}'
+);
+        
+        
         $form->textarea('description', __('説明'));
 
 
