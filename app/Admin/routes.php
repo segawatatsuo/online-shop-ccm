@@ -27,6 +27,9 @@ Route::group([
     //法人顧客メニュー
     $router->resource('corporate_customers','CorporateCustomerController');
 
+    //顧客メニュー
+    $router->resource('customers','CustomerController');
+
     //トップページメニュー
     $router->resource('top_pages','TopPageController');
 
