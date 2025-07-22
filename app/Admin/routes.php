@@ -4,6 +4,7 @@ use Illuminate\Routing\Router;
 use App\Admin\Controllers\ProductJaController;
 use App\Admin\Controllers\EmailTemplateController;
 use App\Admin\Controllers\ShippingMailController;
+use App\Admin\Controllers\AdminNoticeController;
 use Encore\Admin\Facades\Admin;
 
 Admin::routes();
@@ -42,7 +43,8 @@ Route::group([
     //会社情報
     $router->resource('company_infos', 'CompanyInfoController');
 
-
+    //社内のお知らせ
+     $router->resource('admin-notices', 'AdminNoticeController');
 
     // ✅ 複製用のPOSTルートをここに追加！
     Route::post('product/duplicate', [ProductJaController::class, 'duplicate']);

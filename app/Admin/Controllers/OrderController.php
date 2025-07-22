@@ -13,6 +13,7 @@ use Encore\Admin\Show;
 // カスタムアクションをインポート
 use App\Admin\Actions\SendShippingMail;
 use App\Admin\Actions\CheckShippingMail; // 修正: CheckShippingMailAction から CheckShippingMail へ
+use Carbon\Carbon;
 
 class OrderController extends AdminController
 {
@@ -28,14 +29,64 @@ class OrderController extends AdminController
      *
      * @return Grid
      */
+
+
+
     protected function grid()
     {
         $grid = new Grid(new Order());
 
+
+
+        // ✅ 月別絞り込み機能の追加
+        if (request()->has('month')) {
+            try {
+                [$year, $month] = explode('-', request()->get('month'));
+                $grid->model()->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month);
+            } catch (\Exception $e) {
+                \Log::warning('不正な月パラメータ: ' . request()->get('month'));
+            }
+        }
+
+        // ✅ 今日の日付だけでフィルター
+        if (request()->has('date')) {
+            $date = request()->get('date');
+            $start = $date . ' 00:00:00';
+            $end = $date . ' 23:59:59';
+
+            $grid->model()->whereBetween('created_at', [$start, $end]);
+        }
+
+
+        // フィルタの追加
+        $grid->filter(function ($filter) {
+            $filter->disableIdFilter();
+
+            // 日付での範囲検索（created_at）
+            $filter->between('created_at', '注文日時')->datetime();
+
+            // カスタム日付フィルタ（例: ?date=2025-07-22 形式の対応）
+            if (request()->has('date')) {
+                $date = request()->get('date');
+                $start = $date . ' 00:00:00';
+                $end = $date . ' 23:59:59';
+                $filter->where(function ($query) use ($start, $end) {
+                    $query->whereBetween('created_at', [$start, $end]);
+                }, '日付指定');
+            }
+
+            // 卸売りなどのタイプがある場合（例: typeカラムがある想定）
+            $filter->equal('order_type', '注文種別')->select([
+                'retail' => '一般',
+                'wholesale' => '卸売り',
+            ]);
+        });
+
         $grid->column('order_number', __('注文番号'));
         $grid->column('customer.sei', '姓');
         $grid->column('customer.mei', '名');
-        // 金額カラムに適用するクロージャ
+
         $grid->column('total_price', __('総合計'))->display(function ($amount) {
             return '¥' . number_format($amount);
         });
@@ -43,82 +94,47 @@ class OrderController extends AdminController
         $grid->column('delivery_date', __('配送希望日'));
         $grid->column('delivery_time', __('配送希望時間'));
         $grid->column('your_request', __('メッセージ'));
-
         $grid->column('shipping_date', __('発送日'));
         $grid->column('tracking_number', __('配送伝票番号'));
         $grid->column('shipping_company', __('運送会社名'));
-
         $grid->column('created_at', __('作成日時'));
 
-
-        // ここにカスタムアクションを追加
-        // 各行に「発送メール送信」アクションを追加します。
+        // 行アクション（発送メール）
         $grid->actions(function ($actions) {
-            // デフォルトの表示、編集、削除ボタンを保持したい場合はコメントアウトを解除
-            //$actions->disableView();
-            //$actions->disableEdit();
-            //$actions->disableDelete();
-
             $actions->add(new SendShippingMail());
         });
 
-        // プルダウンメニューの表示問題を修正するためのCSS追加
+        // フッターにCSS（省略可）
         $grid->footer(function () {
-            return '
-            <style>
-                .grid-actions .dropdown-menu {
-                    position: fixed !important;
-                    z-index: 9999 !important;
-                    min-width: 120px;
-                }
-                .grid-actions .dropdown {
-                    position: static !important;
-                }
-                .box-body {
-                    overflow: visible !important;
-                }
-                .table-responsive {
-                    overflow: visible !important;
-                }
-                .content-wrapper {
-                    overflow: visible !important;
-                }
-                /* アクションボタンのドロップダウンメニューの位置調整 */
-                .grid-actions .dropdown-menu {
-                    position: absolute !important;
-                    top: 100% !important;
-                    left: 0 !important;
-                    transform: none !important;
-                }
-                /* 最後の行の場合は上に表示 */
-                .grid-actions .dropdown.dropup .dropdown-menu {
-                    top: auto !important;
-                    bottom: 100% !important;
-                }
-            </style>
-            <script>
-                $(document).ready(function() {
-                    // ドロップダウンメニューの位置を動的に調整
-                    $(".grid-actions .dropdown-toggle").on("click", function() {
-                        var dropdown = $(this).closest(".dropdown");
-                        var menu = dropdown.find(".dropdown-menu");
-                        var rect = this.getBoundingClientRect();
-                        var windowHeight = window.innerHeight;
-                        
-                        // 画面下部の場合は上に表示
-                        if (rect.bottom + menu.outerHeight() > windowHeight) {
-                            dropdown.addClass("dropup");
-                        } else {
-                            dropdown.removeClass("dropup");
-                        }
-                    });
+            return <<<HTML
+        <style>
+            .grid-actions .dropdown-menu { position: fixed !important; z-index: 9999 !important; min-width: 120px; }
+            .grid-actions .dropdown { position: static !important; }
+            .box-body, .table-responsive, .content-wrapper { overflow: visible !important; }
+            .grid-actions .dropdown-menu { position: absolute !important; top: 100% !important; left: 0 !important; transform: none !important; }
+            .grid-actions .dropdown.dropup .dropdown-menu { top: auto !important; bottom: 100% !important; }
+        </style>
+        <script>
+            $(document).ready(function() {
+                $(".grid-actions .dropdown-toggle").on("click", function() {
+                    var dropdown = $(this).closest(".dropdown");
+                    var menu = dropdown.find(".dropdown-menu");
+                    var rect = this.getBoundingClientRect();
+                    var windowHeight = window.innerHeight;
+                    if (rect.bottom + menu.outerHeight() > windowHeight) {
+                        dropdown.addClass("dropup");
+                    } else {
+                        dropdown.removeClass("dropup");
+                    }
                 });
-            </script>
-            ';
+            });
+        </script>
+        HTML;
         });
 
         return $grid;
     }
+
 
 
     /**

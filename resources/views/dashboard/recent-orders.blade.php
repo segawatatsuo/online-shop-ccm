@@ -1,4 +1,11 @@
-<table class="table">
+@php
+    use App\Models\Order;
+    use App\Models\Customer;
+
+    $orders = Order::orderBy('created_at', 'desc')->limit(3)->get();
+@endphp
+
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>注文ID</th>
@@ -8,7 +15,13 @@
         </tr>
     </thead>
     <tbody>
-        <tr><td>#123</td><td>山田 太郎</td><td>¥5,400</td><td>5/16 14:21</td></tr>
-        <tr><td>#122</td><td>佐藤 花子</td><td>¥3,980</td><td>5/16 12:10</td></tr>
+        @foreach ($orders as $order)
+            <tr>
+                <td>{{ $order->order_number }}</td>
+                <td>{{ $order->customer->full_name ?? '未登録' }}</td> {{-- フィールド名に応じて調整 --}}
+                <td>¥{{ number_format($order->total_price) }}</td> {{-- フィールド名に応じて調整 --}}
+                <td>{{ $order->created_at->format('Y-m-d H:i') }}</td>
+            </tr>
+        @endforeach
     </tbody>
 </table>
