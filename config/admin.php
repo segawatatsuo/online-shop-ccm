@@ -164,8 +164,8 @@ return [
             'file'  => 'files',
         ],
 
-        // 👇 ここを追加
-        //'host' => env('ADMIN_UPLOAD_URL', ''),
+        // 👇 ここを追加または修正（APP_URL を使うのが安全）
+        'host' => env('APP_URL') . '/uploads',
     ],
 
     /*
