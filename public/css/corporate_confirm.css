@@ -1,0 +1,251 @@
+/* 基本設定 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    /*background-color: #f4f4f4;*/
+    color: #333;
+}
+
+/* コンテナ */
+.order-container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px; /* ここで内側の余白を確保 */
+    background-color: #fff;
+    /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
+    /*border-radius: 8px;*/
+    box-sizing: border-box; /* パディングを含めて幅を計算 */
+}
+
+.order-title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2em;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+}
+
+/* カードのラッパー (お届け先、ご注文者) */
+.order-summary-wrapper {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap; /* レスポンシブ対応 */
+}
+
+/* 各カードの共通スタイル */
+.order-card {
+    flex: 1 1 300px; /* flex-grow, flex-shrink, flex-basis */
+    padding: 25px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fdfdfd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box; /* パディングとボーダーを含めて幅を計算 */
+}
+
+.order-card-title {
+    color: #0056b3;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 10px;
+}
+
+.order-field {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap; /* ラベルと値が長い場合に折り返す */
+}
+
+.order-label {
+    font-weight: bold;
+    color: #555;
+    min-width: 80px; /* ラベルの幅を揃える */
+    margin-right: 10px;
+    flex-shrink: 0; /* ラベルが縮まないように */
+}
+
+.order-value {
+    flex-grow: 1;
+    word-break: break-word; /* 長い住所などで改行 */
+    min-width: 0; /* flexアイテムの最小幅を0に設定し、内容によってはみ出すのを防ぐ */
+}
+
+/* 注文商品セクション */
+.order-items-card {
+    margin-bottom: 30px;
+}
+
+/* 新しいお届け希望日時カード用のマージン（もし必要であれば個別に調整） */
+.order-delivery-info-card {
+    margin-bottom: 30px !important; /* 一時的に適用確認用 */
+}
+
+
+.order-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.order-items-table th,
+.order-items-table td {
+    border: 1px solid #e0e0e0;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.order-items-table th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+    white-space: nowrap; /* ヘッダーの改行を防ぐ */
+}
+
+.order-items-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.order-items-table tr:hover {
+    background-color: #f0f0f0;
+}
+
+/* 合計金額セクション */
+.order-total-card {
+    padding: 25px;
+    border: 1px solid #0056b3;
+    border-radius: 8px;
+    background-color: #e6f2ff;
+    text-align: right;
+    margin-top: 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box; /* パディングとボーダーを含めて幅を計算 */
+}
+
+.order-total-title {
+    color: #004085;
+    font-size: 1.8em;
+    margin-bottom: 10px;
+}
+
+.order-total-amount {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #d9534f; /* 赤系の色で目立たせる */
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    .order-container {
+        padding: 15px; /* 画面が狭いときに左右の余白を調整 */
+    }
+
+    .order-summary-wrapper {
+        flex-direction: column; /* 縦並びにする */
+        gap: 20px; /* 縦方向の隙間 */
+    }
+
+    .order-card {
+        flex: 1 1 100%; /* 全幅にする */
+    }
+
+    /* テーブルのモバイル対応 */
+    .order-items-table,
+    .order-items-table thead,
+    .order-items-table tbody,
+    .order-items-table th,
+    .order-items-table td,
+    .order-items-table tr {
+        display: block; /* テーブル要素をブロックレベルに */
+    }
+
+    .order-items-table thead tr {
+        position: absolute;
+        top: -9999px; /* ヘッダーを非表示に */
+        left: -9999px;
+    }
+
+    .order-items-table tr {
+        margin-bottom: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        display: flex; /* 各行をFlexboxコンテナに */
+        flex-wrap: wrap; /* 子要素を折り返す */
+        align-items: center; /* 中央揃え */
+        padding: 10px; /* 行のパディング */
+    }
+
+    .order-items-table td {
+        border: none;
+        position: relative;
+        padding-left: 0; /* ラベル分を調整するため0に */
+        padding-top: 25px; /* ラベルのスペースを確保 */
+        text-align: left; /* 値を左寄せに */
+        width: 100%; /* 各セルを全幅にする */
+        box-sizing: border-box; /* パディングを含めて幅を計算 */
+    }
+
+    .order-items-table td::before {
+        content: attr(data-label) ":"; /* data-label 属性をラベルとして表示し、コロンを追加 */
+        position: absolute;
+        top: 5px; /* セルの上部に配置 */
+        left: 10px; /* 左寄せ */
+        width: calc(100% - 20px); /* 幅を調整 */
+        white-space: nowrap;
+        font-weight: bold;
+        text-align: left;
+        color: #555;
+        overflow: hidden; /* はみ出したテキストを隠す */
+        text-overflow: ellipsis; /* はみ出したテキストを三点リーダーで表示 */
+    }
+
+    .order-total-card {
+        text-align: center; /* 中央寄せ */
+    }
+
+    .order-total-amount {
+        font-size: 2em; /* フォントサイズを調整 */
+    }
+}
+
+@media (max-width: 480px) {
+    .order-container {
+        padding: 10px;
+    }
+
+    .order-title {
+        font-size: 1.8em;
+    }
+
+    .order-card-title {
+        font-size: 1.3em;
+    }
+
+    .order-field {
+        flex-direction: column; /* ラベルと値を縦並びに */
+        align-items: flex-start;
+    }
+
+    .order-label {
+        min-width: unset;
+        margin-right: 0;
+        margin-bottom: 5px; /* ラベルと値の間に隙間 */
+    }
+
+    .order-items-table td {
+        padding-top: 20px; /* ラベルのスペースを少し小さく */
+    }
+
+    .order-items-table td::before {
+        top: 2px; /* ラベルの位置を調整 */
+        left: 5px; /* ラベルの左位置を調整 */
+        font-size: 0.9em; /* ラベルのフォントサイズを小さく */
+    }
+}
+
