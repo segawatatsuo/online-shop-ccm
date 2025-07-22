@@ -1,9 +1,24 @@
+{{--}}
 @extends('layouts.app')
 
 @push('styles')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{{ asset('css/change_of_delivery_address.css') }}">
 @endpush
+--}}
+
+
+@extends('layouts.app')
+
+@section('title', 'トップページ')
+
+@push('styles')
+    {{-- _responsive.cssは本当は共通CSSだがtop-page.cssの後に読み込まないと崩れるため --}}
+    <link rel="stylesheet" href="{{ asset('css/change_of_delivery_address.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/_responsive.css') }}">
+@endpush
+
+
 
 @section('content')
     <main class="main">
