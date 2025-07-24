@@ -196,3 +196,12 @@ Route::post('/corporate/resend-verification', function () {
 Route::get('/top', function () {
     return view('top');
 });
+
+Route::get('/ssl-test', function () {
+    try {
+        $response = Http::timeout(10)->get('https://example.com');
+        return '✅ 通信成功: ステータスコード ' . $response->status();
+    } catch (\Exception $e) {
+        return '❌ 通信エラー: ' . $e->getMessage();
+    }
+});
