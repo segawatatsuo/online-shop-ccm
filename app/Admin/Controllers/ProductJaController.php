@@ -83,7 +83,11 @@ class ProductJaController extends AdminController
 
         $show->field('category.brand', 'ブランド');
         $show->field('name', '商品名');
-        $show->field('description', __('説明文'));
+
+        $show->field('description_1_heading', '商品見出し1');
+        $show->field('description_1', __('説明文1'));
+        $show->field('description_2_heading', '商品見出し2');
+        $show->field('description_2', __('説明文2'));
 
         $show->field('wholesale', __('法人商品'));
         $show->field('price', __('価格'));
@@ -124,7 +128,14 @@ class ProductJaController extends AdminController
         //$form->number('category_id', __('カテゴリID'));
         $form->text('category.brand', 'ブランド');
         $form->text('name', __('商品名'));
-        $form->textarea('description', __('説明文'));
+        
+        $form->text('description_1_heading', '商品見出し1');
+        $form->textarea('description_1', __('説明文1'));
+        $form->text('description_2_heading', '商品見出し2');
+        $form->textarea('description_2', __('説明文2'));
+
+
+
         $form->switch('wholesale', __('法人商品'));
         $form->switch('not_display',__('非表示'));
         $form->number('price', __('価格'));
