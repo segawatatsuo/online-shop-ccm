@@ -26,6 +26,9 @@ use Illuminate\Support\Facades\Session;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 
+
+use Square\Environments;
+
 // ホーム → 商品一覧にリダイレクト
 //Route::get('/', fn() => redirect('/products'));
 
@@ -203,5 +206,62 @@ Route::get('/ssl-test', function () {
         return '✅ 通信成功: ステータスコード ' . $response->status();
     } catch (\Exception $e) {
         return '❌ 通信エラー: ' . $e->getMessage();
+    }
+});
+
+
+Route::get('/square-api-test', function () {
+    // .envから環境変数を取得
+    $squareEnvironment = env('SQUARE_ENVIRONMENT', 'sandbox');
+    $baseUrl = ($squareEnvironment === 'sandbox')
+        ? Environments::Sandbox->value // Sandbox環境のURL
+        : Environments::Production->value; // Production環境のURL
+
+    // Square APIの適当なエンドポイント（例: /v2/locations）
+    // 実際には認証なしではアクセスできないが、接続性テストには使える
+    $testUrl = $baseUrl . '/v2/locations';
+
+    // cURLを使って通信テスト
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $testUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HEADER, true); // ヘッダーも取得
+    curl_setopt($ch, CURLOPT_NOBODY, true); // ボディは取得しない (HEADリクエストのように)
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10); // タイムアウトを10秒に設定
+
+    // cacert.pemのパスを明示的に指定
+    $caCertPath = '/home/iiyama/online-shop-ccm/storage/ssl/cacert.pem';
+    if (file_exists($caCertPath)) {
+        curl_setopt($ch, CURLOPT_CAINFO, $caCertPath);
+        curl_setopt($ch, CURLOPT_CAPATH, dirname($caCertPath)); // CAPATHも設定
+    } else {
+        return 'エラー: cacert.pemが見つかりません。パスを確認してください: ' . $caCertPath;
+    }
+
+    // 接続のデバッグ情報を出力
+    curl_setopt($ch, CURLOPT_VERBOSE, true);
+    $verbose = fopen('php://temp', 'rw+');
+    curl_setopt($ch, CURLOPT_STDERR, $verbose);
+
+    $response = curl_exec($ch);
+    $curlError = curl_error($ch);
+    $curlErrno = curl_errno($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    rewind($verbose);
+    $verboseLog = stream_get_contents($verbose);
+    fclose($verbose);
+
+    curl_close($ch);
+
+    if ($curlError) {
+        return 'Square APIへの通信エラーが発生しました。<br>' .
+               'cURLエラー (' . $curlErrno . '): ' . $curlError . '<br>' .
+               '詳細ログ:<pre>' . htmlspecialchars($verboseLog) . '</pre>';
+    } else {
+        return 'Square APIへの通信に成功しました。<br>' .
+               'HTTPステータスコード: ' . $httpCode . '<br>' .
+               '詳細ログ:<pre>' . htmlspecialchars($verboseLog) . '</pre>' .
+               '（注意: 認証エラーは正常な接続を示します。通信自体が成功しているかを確認してください。）';
     }
 });
