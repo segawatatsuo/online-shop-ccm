@@ -192,7 +192,9 @@
 
                         if (response.ok) {
                             window.showSuccess(data.message || "支払い処理が成功しました。");
-                            window.location.href = "/order/complete";
+                            //window.location.href = "/order/complete";
+                            // ここを修正します: Laravelのurl()ヘルパーを使って正しいURLを生成します
+                             window.location.href = "{{ url('/order/complete') }}";
                         } else {
                             let errorMessage = "お支払いに失敗しました。";
                             if (data.errors && data.errors.length > 0) {
