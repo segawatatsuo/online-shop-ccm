@@ -173,7 +173,8 @@
                         const purchaseAmount = parseInt(purchaseAmountText.replace(/,/g, ''));
 
                         // 2. 取得したトークンと金額をサーバーに送信
-                        const response = await fetch("/process-payment", {
+                        // ここを修正します: /public/ を追加
+                        const response = await fetch("public/process-payment", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
