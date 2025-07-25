@@ -173,8 +173,8 @@
                         const purchaseAmount = parseInt(purchaseAmountText.replace(/,/g, ''));
 
                         // 2. 取得したトークンと金額をサーバーに送信
-                        // ここを修正します: /public/ を追加
-                        const response = await fetch("public/process-payment", {
+                        // ここを修正します: Laravelのurl()ヘルパーを使って正しいURLを生成します
+                        const response = await fetch("{{ url('/process-payment') }}", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
