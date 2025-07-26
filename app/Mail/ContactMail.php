@@ -20,7 +20,7 @@ class ContactMail extends Mailable
      */
     public function __construct($data)
     {
-         $this->data = $data;
+        $this->data = $data;
     }
 
     /**
@@ -30,8 +30,8 @@ class ContactMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('お問い合わせがありました')
-                    ->view('emails.contact')
-                    ->with(['data' => $this->data]);
+        return $this->subject('ホームページからお問い合わせがありました')
+            ->view('emails.contact')
+            ->with(['data' => $this->data]);
     }
 }
