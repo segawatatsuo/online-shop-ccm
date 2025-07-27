@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\ContactMail;
 
 
 class ContactController extends Controller
@@ -21,8 +22,8 @@ class ContactController extends Controller
             'message' => 'required|string|max:1000',
         ]);
 
-        // メール送信（省略可・後述）
-        // Mail::to('your@email.com')->send(new ContactMail($request->all()));
+        // メール送信
+        Mail::to('your@email.com')->send(new ContactMail($request->all()));
 
         return redirect()->route('contact.complete');
     }
