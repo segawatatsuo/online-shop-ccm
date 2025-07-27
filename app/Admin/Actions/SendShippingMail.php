@@ -55,56 +55,43 @@ class SendShippingMail extends RowAction
             return $this->response()->error('顧客または配送先情報が見つかりません');
         }
 
-        $template = EmailTemplate::where('slug', 'thank-you-mail')->first();
+        // 発送メール用のテンプレートを取得
+        $template = EmailTemplate::where('slug', 'shipping-mail')->first();
 
         if (!$template) {
-            return $this->response()->error('メールテンプレートが見つかりません');
+            return $this->response()->error('発送メールテンプレートが見つかりません（slug: shipping-mail）');
         }
 
-        // 件名をテンプレートから
-        $subject = $template->subject ?? '発送完了のお知らせ';
+        // テンプレートから件名と本文を取得
+        $subject = $this->replacePlaceholders($template->subject, $order);
+        $bodyTemplate = $template->body;
 
-        // メール本文を生成
-        try {
-            $emailBody = view('emails.thank_you', ['order' => $order])->render();
-        } catch (\Exception $e) {
-            \Log::error('View rendering error: ' . $e->getMessage());
-            return $this->response()->error('メールテンプレートの生成に失敗しました: ' . $e->getMessage());
-        }
+        // メール本文を生成（プレースホルダーを実際の値に置換）
+        $emailBody = $this->generateEmailBody($bodyTemplate, $order);
 
-        // 件名表示（編集不可）
-        $this->text('subject', '件名')->default($subject)->disable();
+        // 件名表示（編集可能）
+        $this->text('subject', '件名')->default($subject);
+
+        // メール本文表示（編集可能）
+        $this->textarea('email_body_template', 'メール本文テンプレート')->default($bodyTemplate)->rows(15);
 
         // 隠しフィールド（メール送信時に使用）- data属性も追加
         $this->hidden('order_id')->value($orderId)->attribute('data-order-id', $orderId);
-        $this->hidden('email_subject')->value($subject);
-        $this->hidden('email_body')->value($emailBody);
+        $this->hidden('template_id')->value($template->id);
 
         // 送信先メールアドレス表示
         $this->text('recipient', '送信先')->default($customer->email ?? 'N/A')->disable();
 
-        // プレビュー情報をテキストで表示
-        $previewInfo = "注文番号: " . ($order->order_number ?? 'N/A') . "\n";
-        $previewInfo .= "顧客名: " . ($customer->sei ?? '') . ' ' . ($customer->mei ?? '') . "\n";
-        $previewInfo .= "発送日: " . ($order->shipping_date ?? 'N/A') . "\n";
-        $previewInfo .= "運送会社: " . ($order->shipping_company ?? 'N/A') . "\n";
-        $previewInfo .= "追跡番号: " . ($order->tracking_number ?? 'N/A') . "\n\n";
-        $previewInfo .= "商品一覧:\n";
-        
-        if ($order->orderItems && $order->orderItems->count() > 0) {
-            foreach ($order->orderItems as $item) {
-                $previewInfo .= "- " . ($item->product_name ?? $item->name ?? 'N/A') . " × " . ($item->quantity ?? 0) . "\n";
-            }
-        } else {
-            $previewInfo .= "商品情報なし\n";
-        }
-        
-        $previewInfo .= "\n合計金額: ¥" . number_format($order->total_price ?? 0);
+        // プレースホルダー説明
+        $placeholderInfo = $this->getPlaceholderInfo();
+        $this->textarea('placeholder_info', '使用可能なプレースホルダー')->default($placeholderInfo)->rows(8)->disable();
 
+        // プレビュー情報をテキストで表示
+        $previewInfo = $this->generatePreviewText($order, $emailBody);
         $this->textarea('preview_info', 'メール内容プレビュー')->default($previewInfo)->rows(10)->disable();
 
         // プレビューリンクを表示（正しいURLで）
-        $previewUrl = url('admin/mail-preview/' . $orderId); // route()の代わりにurl()ヘルパーを使用
+        $previewUrl = url('admin/mail-preview/' . $orderId);
         $this->text('preview_link', 'HTMLプレビューリンク')->default($previewUrl)->disable();
 
         // カスタムJavaScriptでプレビューボタンを追加（サーバー環境対応版）
@@ -133,7 +120,7 @@ class SendShippingMail extends RowAction
                             }
                             
                             if (orderId) {
-                                var previewUrl = baseUrl + '/admin/mail-preview/' + orderId;
+                                var previewUrl = baseUrl + '/admin/mail-preview-template/' + orderId;
                                 console.log('Opening preview URL:', previewUrl);
                                 window.open(previewUrl, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
                             } else {
@@ -149,6 +136,102 @@ class SendShippingMail extends RowAction
     }
 
     /**
+     * プレースホルダーを実際の値に置換
+     */
+    private function replacePlaceholders($text, $order)
+    {
+        $customer = $order->customer;
+        $delivery = $order->delivery;
+
+        $placeholders = [
+            '{{customer_name}}' => ($customer->sei ?? '') . ' ' . ($customer->mei ?? ''),
+            '{{customer_sei}}' => $customer->sei ?? '',
+            '{{customer_mei}}' => $customer->mei ?? '',
+            '{{order_number}}' => $order->order_number ?? '',
+            '{{order_date}}' => $order->created_at ? $order->created_at->format('Y年m月d日') : '',
+            '{{shipping_date}}' => $order->shipping_date ? \Carbon\Carbon::parse($order->shipping_date)->format('Y年m月d日') : '',
+            '{{shipping_company}}' => $order->shipping_company ?? '',
+            '{{tracking_number}}' => $order->tracking_number ?? '',
+            '{{delivery_address}}' => $this->getDeliveryAddress($delivery),
+            '{{delivery_name}}' => ($delivery->sei ?? '') . ' ' . ($delivery->mei ?? ''),
+            '{{total_price}}' => '¥' . number_format($order->total_price ?? 0),
+            '{{product_list}}' => $this->getProductListText($order->orderItems),
+        ];
+
+        return str_replace(array_keys($placeholders), array_values($placeholders), $text);
+    }
+
+    /**
+     * メール本文を生成
+     */
+    private function generateEmailBody($template, $order)
+    {
+        return $this->replacePlaceholders($template, $order);
+    }
+
+    /**
+     * 配送先住所を整形
+     */
+    private function getDeliveryAddress($delivery)
+    {
+        if (!$delivery) return '';
+        
+        return '〒' . ($delivery->zip ?? '') . ' ' . 
+               ($delivery->input_add01 ?? '') . 
+               ($delivery->input_add02 ?? '') . 
+               ($delivery->input_add03 ?? '');
+    }
+
+    /**
+     * 商品リストをテキスト形式で取得
+     */
+    private function getProductListText($orderItems)
+    {
+        if (!$orderItems || $orderItems->count() === 0) {
+            return '商品情報なし';
+        }
+
+        $productList = '';
+        foreach ($orderItems as $item) {
+            $productList .= '・' . ($item->product_name ?? $item->name ?? 'N/A') . 
+                           ' × ' . ($item->quantity ?? 0) . 
+                           ' (¥' . number_format(($item->price ?? 0) * ($item->quantity ?? 0)) . ')' . "\n";
+        }
+
+        return rtrim($productList, "\n");
+    }
+
+    /**
+     * プレースホルダー情報を取得
+     */
+    private function getPlaceholderInfo()
+    {
+        return "使用可能なプレースホルダー:\n\n" .
+               "{{customer_name}} - 顧客氏名（姓 名）\n" .
+               "{{customer_sei}} - 顧客姓\n" .
+               "{{customer_mei}} - 顧客名\n" .
+               "{{order_number}} - 注文番号\n" .
+               "{{order_date}} - 注文日\n" .
+               "{{shipping_date}} - 発送日\n" .
+               "{{shipping_company}} - 運送会社\n" .
+               "{{tracking_number}} - 追跡番号\n" .
+               "{{delivery_address}} - 配送先住所\n" .
+               "{{delivery_name}} - 配送先氏名\n" .
+               "{{total_price}} - 合計金額\n" .
+               "{{product_list}} - 商品リスト";
+    }
+
+    /**
+     * プレビューテキストを生成
+     */
+    private function generatePreviewText($order, $emailBody)
+    {
+        $previewInfo = "=== メール内容プレビュー ===\n\n";
+        $previewInfo .= strip_tags($emailBody);
+        return $previewInfo;
+    }
+
+    /**
      * メール送信処理
      */
     public function handle(Model $model, Request $request)
@@ -158,10 +241,6 @@ class SendShippingMail extends RowAction
 
         $orderId = $request->input('order_id');
 
-        // デバッグ用ログ
-        \Log::info('SendShippingMail handle() - Received Order ID: ' . $orderId);
-        \Log::info('SendShippingMail handle() - Model passed: ' . ($model ? get_class($model) . ' ID:' . $model->getKey() : 'null'));
-
         // リクエストにorder_idがない場合は、渡されたmodelを使用
         if (!$orderId && $model) {
             $orderId = $model->getKey();
@@ -169,13 +248,7 @@ class SendShippingMail extends RowAction
         }
 
         if (!$orderId) {
-            $debugData = [
-                'request_data' => $request->all(),
-                'model_exists' => $model ? 'Yes' : 'No',
-                'model_class' => $model ? get_class($model) : 'null',
-                'model_id' => $model ? $model->getKey() : 'null'
-            ];
-            return $this->response()->error('注文IDが取得できませんでした。デバッグ: ' . json_encode($debugData, JSON_UNESCAPED_UNICODE))->refresh();
+            return $this->response()->error('注文IDが取得できませんでした。')->refresh();
         }
 
         // 確実にデータを再取得
@@ -184,9 +257,6 @@ class SendShippingMail extends RowAction
         if (!$order) {
             return $this->response()->error('注文情報が見つかりません（ID: ' . $orderId . '）')->refresh();
         }
-
-        // デバッグ用ログ
-        \Log::info('SendShippingMail handle() - Found order: ' . $order->order_number);
 
         // バリデーション
         if (empty($order->tracking_number)) {
@@ -204,26 +274,22 @@ class SendShippingMail extends RowAction
             return $this->response()->error('顧客情報が見つかりません')->refresh();
         }
 
-        $subject = $request->input('email_subject');
-        $body = $request->input('email_body');
+        // フォームから件名とテンプレートを取得
+        $subject = $request->input('subject');
+        $bodyTemplate = $request->input('email_body_template');
 
-        // メール本文が空の場合は再生成
-        if (empty($body)) {
-            try {
-                $body = view('emails.thank_you', ['order' => $order])->render();
-                \Log::info('SendShippingMail handle() - Regenerated email body');
-            } catch (\Exception $e) {
-                \Log::error('SendShippingMail handle() - View rendering error: ' . $e->getMessage());
-                return $this->response()->error('メールテンプレートの生成に失敗しました: ' . $e->getMessage())->refresh();
-            }
-        }
+        // 件名のプレースホルダーを置換
+        $finalSubject = $this->replacePlaceholders($subject, $order);
+
+        // 本文のプレースホルダーを置換
+        $finalBody = $this->replacePlaceholders($bodyTemplate, $order);
 
         // メール送信
         try {
-            Mail::send([], [], function ($message) use ($customer, $subject, $body) {
+            Mail::send([], [], function ($message) use ($customer, $finalSubject, $finalBody) {
                 $message->to($customer->email)
-                    ->subject($subject)
-                    ->setBody($body, 'text/html');
+                    ->subject($finalSubject)
+                    ->setBody($finalBody, 'text/html');
             });
 
             return $this->response()->success('発送メールを送信しました（注文: ' . $order->order_number . '）')->refresh();

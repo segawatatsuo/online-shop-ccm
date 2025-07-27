@@ -271,8 +271,32 @@ Route::get('/square-api-test', function () {
 
 // Admin画面での商品発送メールのプレビュー
 // ルートをAdmin認証が必要なグループ内に配置
+/*
 Route::middleware(['admin.auth'])->group(function () {
     Route::get('admin/mail-preview/{orderId}', [MailPreviewController::class, 'preview'])
         ->name('admin.mail-preview')
         ->where('orderId', '[0-9]+'); // 数字のみ許可
 });
+*/
+
+// Admin画面での商品発送メールのプレビュー
+// ルートをAdmin認証が必要なグループ内に配置
+Route::middleware(['admin.auth'])->group(function () {
+    // 従来のビューベースプレビュー
+    Route::get('admin/mail-preview/{orderId}', [MailPreviewController::class, 'preview'])
+        ->name('admin.mail-preview')
+        ->where('orderId', '[0-9]+'); // 数字のみ許可
+    
+    // テンプレートベースプレビュー
+    Route::get('admin/mail-preview-template/{orderId}', [MailPreviewController::class, 'previewTemplate'])
+        ->name('admin.mail-preview-template')
+        ->where('orderId', '[0-9]+'); // 数字のみ許可
+});
+
+// または、admin認証ミドルウェアがない場合は
+// Route::get('admin/mail-preview/{orderId}', [MailPreviewController::class, 'preview'])
+//     ->name('admin.mail-preview')
+//     ->where('orderId', '[0-9]+');
+// Route::get('admin/mail-preview-template/{orderId}', [MailPreviewController::class, 'previewTemplate'])
+//     ->name('admin.mail-preview-template')
+//     ->where('orderId', '[0-9]+');
