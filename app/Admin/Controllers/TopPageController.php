@@ -27,12 +27,12 @@ class TopPageController extends AdminController
     {
         $grid = new Grid(new TopPage());
 
-        $grid->column('id', __('Id'));
-        $grid->column('category', __('Category'));
+        //$grid->column('id', __('Id'));
+        $grid->column('category', __('カテゴリー'))->using(Category::all()->pluck('brand_name', 'id')->toArray());
 
-        $grid->column('hero_img', __('Hero img'));
-        $grid->column('hero_head_copy', __('hero_head_copy'));
-        $grid->column('hero_lead_copy', __('hero_lead_copy'));
+        $grid->column('hero_img', __('メイン画像'));
+        $grid->column('hero_head_copy', __('メイン画像上の見出し'));
+        $grid->column('hero_lead_copy', __('メイン画像上のコピー'));
         /*
         $grid->column('section1_display_hide', __('Section1 display hide'));
         $grid->column('section1_img', __('Section1 img'));
@@ -73,7 +73,7 @@ class TopPageController extends AdminController
     {
         $show = new Show(TopPage::findOrFail($id));
 
-        $show->field('category', __('カテゴリー'))->using(Category::all()->pluck('brand_name', 'id')->toArray());;
+        $show->field('category', __('カテゴリー'))->using(Category::all()->pluck('brand_name', 'id')->toArray());
         $show->field('hero_img', __('メイン画像'))->image();
         $show->field('hero_head_copy', __('メイン画像上の見出し'));
         $show->field('hero_lead_copy', __('メイン画像上のコピー'));
@@ -111,14 +111,14 @@ class TopPageController extends AdminController
     {
         $form = new Form(new TopPage());
 
-        $form->select('category', 'カテゴリ')->options(Category::all()->pluck('brand_name', 'id'))->setLabelClass(['class1','asterisk']);
+        $form->select('category', 'カテゴリ')->options(Category::all()->pluck('brand_name', 'id'))->setLabelClass(['class1', 'asterisk']);
 
         $form->image('hero_img', __('メイン画像')) // フォームのフィールド名
             ->disk('admin')      // 定義したディスク名 (例: 'uploads' または 'public')
             ->move('images')     // uploads/images/ に保存
             ->removable()        // 削除ボタンつき
             ->uniqueName()      // 同じ名前のファイルを上書きしない
-            ->setLabelClass(['class1','asterisk']);//アスタリスク記号はpublic/css/admin.cssに内容が記載されている
+            ->setLabelClass(['class1', 'asterisk']); //アスタリスク記号はpublic/css/admin.cssに内容が記載されている
 
         $form->text('hero_head_copy', __('メイン画像上の見出し'));
         $form->color('hero_head_copy_color', __('文字色'));
@@ -154,7 +154,7 @@ class TopPageController extends AdminController
         $form->textarea('section3_copy', __('セクション3コピー'))->rows(4);
 
         $form->switch('movie_section_display_hide', __('ムービーセクション表示'));
-        $form->text('movie_section', __('動画URL'));
+        $form->text('movie_section_url', __('動画URL'));
 
 
 

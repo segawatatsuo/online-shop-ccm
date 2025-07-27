@@ -36,7 +36,13 @@ class OrderController extends AdminController
     {
         $grid = new Grid(new Order());
 
+        // 作成日時の降順で表示
+        $grid->model()->orderBy('created_at', 'desc');
 
+
+        //ユーザーが「作成日時」のヘッダーをクリックして昇順・降順を切り替え可能に
+        $grid->column('created_at', __('作成日時'))->sortable();
+        
 
         // ✅ 月別絞り込み機能の追加
         if (request()->has('month')) {
