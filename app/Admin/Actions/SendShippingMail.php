@@ -103,13 +103,16 @@ class SendShippingMail extends RowAction
 
         $this->textarea('preview_info', 'メール内容プレビュー')->default($previewInfo)->rows(10)->disable();
 
-        // プレビューリンクを表示
-        $previewUrl = route('admin.mail-preview', ['orderId' => $orderId]);
+        // プレビューリンクを表示（正しいURLで）
+        $previewUrl = url('admin/mail-preview/' . $orderId); // route()の代わりにurl()ヘルパーを使用
         $this->text('preview_link', 'HTMLプレビューリンク')->default($previewUrl)->disable();
 
-        // カスタムJavaScriptでプレビューボタンを追加（モーダル対応版）
+        // カスタムJavaScriptでプレビューボタンを追加（サーバー環境対応版）
         Admin::script("
             $(document).ready(function() {
+                // ベースURLを取得（Laravel環境に応じて自動設定）
+                var baseUrl = '" . url('/') . "';
+                
                 // モーダルが開かれた時に実行
                 $(document).on('shown.bs.modal', '.modal', function() {
                     var modal = $(this);
@@ -130,7 +133,7 @@ class SendShippingMail extends RowAction
                             }
                             
                             if (orderId) {
-                                var previewUrl = '/admin/mail-preview/' + orderId;
+                                var previewUrl = baseUrl + '/admin/mail-preview/' + orderId;
                                 console.log('Opening preview URL:', previewUrl);
                                 window.open(previewUrl, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
                             } else {
