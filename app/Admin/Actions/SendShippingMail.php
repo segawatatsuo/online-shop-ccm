@@ -10,186 +10,182 @@ use App\Models\EmailTemplate;
 use App\Models\Order;
 use Carbon\Carbon;
 use Encore\Admin\Form;
-use Encore\Admin\Admin; // Adminファサードをインポート
+use Encore\Admin\Admin;
 
 class SendShippingMail extends RowAction
 {
     public $name = '発送メール送信';
 
+    protected $currentOrderId = null;
+
+    public function __construct($row = null)
+    {
+        parent::__construct();
+        if ($row) {
+            $this->currentOrderId = $row->getKey();
+            \Log::info('Constructor - Order ID set: ' . $this->currentOrderId);
+        }
+    }
+
     /**
      * プレビュー表示のためのフォームを定義します。
-     * このメソッドは、アクションがクリックされた際にモーダルフォームを表示するためにEncore Adminによって呼び出されます。
-     *
-     * @return Form
      */
     public function form()
     {
-        // RowActionから現在のモデルインスタンス（注文情報）を取得します。
-        $order = $this->row;
-        $today = Carbon::today();
+        $orderId = $this->row->id ?? null;
 
-        // プレビュー前に基本的なバリデーションを行います。
-        // これらのチェックはメールを生成するために必要です。
-        if (empty($order->tracking_number)) {
-            // エラーメッセージを返してフォームの表示を中断します。
-            return $this->response()->error('配送伝票番号が入力されていません');
-        }
-        if (empty($order->shipping_company)) {
-            return $this->response()->error('運送会社が入力されていません');
-        }
-        if (empty($order->shipping_date)) {
-            return $this->response()->error('発送日が未入力です');
+        if (!$orderId) {
+            return $this->response()->error('注文IDが取得できません。');
         }
 
-        // 関連する顧客情報と配送先情報を取得します。
+        $order = Order::with(['customer', 'delivery', 'orderItems'])->find($orderId);
+
+        if (!$order) {
+            return $this->response()->error('注文情報が見つかりません（ID: ' . $orderId . '）');
+        }
+
+        if (empty($order->tracking_number) || empty($order->shipping_company) || empty($order->shipping_date)) {
+            return $this->response()->error('配送情報が不足しています');
+        }
+
         $customer = $order->customer;
         $delivery = $order->delivery;
 
-        // メールテンプレート（slugが'thank-you-mail'のもの）を取得します。
+        if (!$customer || !$delivery) {
+            return $this->response()->error('顧客または配送先情報が見つかりません');
+        }
+
         $template = EmailTemplate::where('slug', 'thank-you-mail')->first();
 
-        // テンプレートが見つからない場合はエラーを返します。
         if (!$template) {
             return $this->response()->error('メールテンプレートが見つかりません');
         }
 
-        // 注文明細のHTML部分を生成します。
-        // メール内で見やすくするために、簡単なインラインスタイルを追加しています。
-        $orderItemsHtml = '<table border="1" cellpadding="5" cellspacing="0" style="width:100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px;">';
-        $orderItemsHtml .= '<thead><tr>';
-        $orderItemsHtml .= '<th style="padding: 8px; border: 1px solid #ddd; text-align: left; background-color: #f2f2f2;">商品ID</th>';
-        $orderItemsHtml .= '<th style="padding: 8px; border: 1px solid #ddd; text-align: left; background-color: #f2f2f2;">商品名</th>';
-        $orderItemsHtml .= '<th style="padding: 8px; border: 1px solid #ddd; text-align: left; background-color: #f2f2f2;">数量</th>';
-        $orderItemsHtml .= '<th style="padding: 8px; border: 1px solid #ddd; text-align: left; background-color: #f2f2f2;">単価</th>';
-        $orderItemsHtml .= '<th style="padding: 8px; border: 1px solid #ddd; text-align: left; background-color: #f2f2f2;">小計</th>';
-        $orderItemsHtml .= '</tr></thead>';
-        $orderItemsHtml .= '<tbody>';
+        // 件名をテンプレートから
+        $subject = $template->subject ?? '発送完了のお知らせ';
 
-        foreach ($order->orderItems as $item) {
-            $orderItemsHtml .= '<tr>';
-            $orderItemsHtml .= '<td style="padding: 8px; border: 1px solid #ddd;">' . $item->product_id . '</td>';
-            $orderItemsHtml .= '<td style="padding: 8px; border: 1px solid #ddd;">' . $item->name . '</td>';
-            $orderItemsHtml .= '<td style="padding: 8px; border: 1px solid #ddd;">' . $item->quantity . '</td>';
-            $orderItemsHtml .= '<td style="padding: 8px; border: 1px solid #ddd;">' . number_format($item->price) . '円</td>';
-            $orderItemsHtml .= '<td style="padding: 8px; border: 1px solid #ddd;">' . number_format($item->subtotal) . '円</td>';
-            $orderItemsHtml .= '</tr>';
+        // メール本文を生成
+        try {
+            $emailBody = view('emails.thank_you', ['order' => $order])->render();
+        } catch (\Exception $e) {
+            \Log::error('View rendering error: ' . $e->getMessage());
+            return $this->response()->error('メールテンプレートの生成に失敗しました: ' . $e->getMessage());
         }
 
-        $orderItemsHtml .= '</tbody></table>';
+        // 件名表示（編集不可）
+        $this->text('subject', '件名')->default($subject)->disable();
 
-        // メールの件名と本文をテンプレートから取得し、デフォルト値を設定します。
-        $subject = $template->subject ?? '発送完了のお知らせ';
-        $body = $template->body;
+        // 隠しフィールド（メール送信時に使用）- data属性も追加
+        $this->hidden('order_id')->value($orderId)->attribute('data-order-id', $orderId);
+        $this->hidden('email_subject')->value($subject);
+        $this->hidden('email_body')->value($emailBody);
 
-        // プレースホルダーを実際のデータに置き換えます。
-        $body = str_replace(
-            [
-                '{{name}}',
-                '{{order_number}}',
-                '{{shipping_date}}',
-                '{{shipping_company}}',
-                '{{tracking_number}}',
-                '{{customer_name}}',
-                '{{customer_zip}}',
-                '{{customer_address}}',
-                '{{customer_phone}}',
-                '{{delivery_name}}',
-                '{{delivery_zip}}',
-                '{{delivery_address}}',
-                '{{delivery_phone}}',
-                '{{order_items}}',
-                '{{shipping}}',
-                '{{total_amount}}',
-                '{{footer}}'
-            ],
-            [
-                $customer->full_name,
-                $order->order_number,
-                $order->shipping_date,
-                $order->shipping_company,
-                $order->tracking_number,
-                $customer->full_name,
-                $customer->zip,
-                $customer->full_address,
-                $customer->phone,
-                $delivery->full_name,
-                $delivery->zip,
-                $delivery->full_address,
-                $delivery->phone,
-                $orderItemsHtml, // 生成した注文明細HTMLを差し込みます
-                number_format($order->shipping_fee) . '円',
-                number_format($order->total_amount) . '円',
-                'ご利用ありがとうございました。' // フッターの固定メッセージ
-            ],
-            $body
-        );
+        // 送信先メールアドレス表示
+        $this->text('recipient', '送信先')->default($customer->email ?? 'N/A')->disable();
 
-        // フォームにプレビュー用のフィールドと、送信用の隠しフィールドを追加します。
-        // 件名を表示（編集不可）
-        $this->text('subject', '件名')
-             ->default($subject)
-             ->disable();
+        // プレビュー情報をテキストで表示
+        $previewInfo = "注文番号: " . ($order->order_number ?? 'N/A') . "\n";
+        $previewInfo .= "顧客名: " . ($customer->sei ?? '') . ' ' . ($customer->mei ?? '') . "\n";
+        $previewInfo .= "発送日: " . ($order->shipping_date ?? 'N/A') . "\n";
+        $previewInfo .= "運送会社: " . ($order->shipping_company ?? 'N/A') . "\n";
+        $previewInfo .= "追跡番号: " . ($order->tracking_number ?? 'N/A') . "\n\n";
+        $previewInfo .= "商品一覧:\n";
+        
+        if ($order->orderItems && $order->orderItems->count() > 0) {
+            foreach ($order->orderItems as $item) {
+                $previewInfo .= "- " . ($item->product_name ?? $item->name ?? 'N/A') . " × " . ($item->quantity ?? 0) . "\n";
+            }
+        } else {
+            $previewInfo .= "商品情報なし\n";
+        }
+        
+        $previewInfo .= "\n合計金額: ¥" . number_format($order->total_price ?? 0);
 
-        // 生のHTMLコンテンツを保持するための隠しtextarea
-        // このtextareaはユーザーには見えず、JavaScriptで内容を取得するために使用します。
-        $this->textarea('email_raw_html_hidden', 'メール内容プレビュー (HTMLソース)')
-             ->default($body)
-             ->attribute('id', 'email-raw-html-hidden') // JavaScriptで参照するためのID
-             ->attribute('style', 'display:none;') // 完全に非表示にする
-             ->disable();
+        $this->textarea('preview_info', 'メール内容プレビュー')->default($previewInfo)->rows(10)->disable();
 
-        // レンダリングされたHTMLを表示するためのダミーのtextフィールド
-        // このフィールドはJavaScriptによって完全に置き換えられます。
-        $this->text('email_rendered_placeholder', 'メール内容プレビュー')
-             ->attribute('id', 'email-rendered-placeholder') // JavaScriptで参照するためのID
-             ->disable(); // 編集不可にする
+        // プレビューリンクを表示
+        $previewUrl = route('admin.mail-preview', ['orderId' => $orderId]);
+        $this->text('preview_link', 'HTMLプレビューリンク')->default($previewUrl)->disable();
 
-        // JavaScriptでダミーフィールドをレンダリングされたHTMLに置き換える
-        Admin::script(
-<<<SCRIPT
-            // モーダルが開かれたときに実行されるように、Bootstrapのイベントリスナーを使用
-            $(document).on('shown.bs.modal', function () {
-                var rawHtmlTextarea = $('#email-raw-html-hidden'); // 隠しtextareaを取得
-                var placeholderElement = $('#email-rendered-placeholder').closest('.form-group'); // ダミーフィールドの親要素を取得
-
-                // 要素が存在することを確認してから操作
-                if (rawHtmlTextarea.length && placeholderElement.length) {
-                    var rawHtmlContent = rawHtmlTextarea.val(); // 生のHTMLコンテンツを取得
-
-                    // レンダリングされたHTMLを格納する新しいdiv要素を作成
-                    var renderedDiv = $('<div/>')
-                                        .attr('style', 'border: 1px solid #ddd; padding: 15px; background-color: #f9f9f9; min-height: 200px; overflow-y: auto;')
-                                        .html(rawHtmlContent);
-
-                    // ダミーフィールドのform-group全体を新しいdivで置き換える
-                    placeholderElement.replaceWith(renderedDiv);
-                } else {
-                    console.warn('Email preview elements not found or script executed too early.');
-                }
+        // カスタムJavaScriptでプレビューボタンを追加（モーダル対応版）
+        Admin::script("
+            $(document).ready(function() {
+                // モーダルが開かれた時に実行
+                $(document).on('shown.bs.modal', '.modal', function() {
+                    var modal = $(this);
+                    // このモーダル内にプレビューボタンがあるかチェック
+                    if (modal.find('.preview-btn').length === 0) {
+                        modal.find('.modal-footer .btn-primary').before('<button type=\"button\" class=\"btn btn-info preview-btn\" style=\"margin-right: 10px;\">HTMLプレビューを開く</button>');
+                        
+                        modal.find('.preview-btn').click(function() {
+                            // 現在のモーダル内のorder_idを取得
+                            var orderId = modal.find('input[name=\"order_id\"]').val();
+                            console.log('Preview button clicked, Modal Order ID:', orderId);
+                            
+                            // order_idが取得できない場合の代替手段
+                            if (!orderId) {
+                                // データ属性から取得を試す
+                                orderId = modal.find('input[data-order-id]').attr('data-order-id');
+                                console.log('Fallback: trying data-order-id:', orderId);
+                            }
+                            
+                            if (orderId) {
+                                var previewUrl = '/admin/mail-preview/' + orderId;
+                                console.log('Opening preview URL:', previewUrl);
+                                window.open(previewUrl, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+                            } else {
+                                console.error('Order ID not found in modal');
+                                console.log('Available inputs:', modal.find('input').map(function() { return this.name + '=' + this.value; }).get());
+                                alert('注文IDが取得できません');
+                            }
+                        });
+                    }
+                });
             });
-SCRIPT
-        );
-
-        // 送信用の件名を隠しフィールドで渡します。
-        $this->hidden('email_subject')
-             ->default($subject);
-
-        // 送信用の本文を隠しフィールドで渡します。
-        $this->hidden('email_body')
-             ->default($body);
+        ");
     }
 
     /**
-     * アクションが実行された際にメール送信処理を行います。
-     * このメソッドは、プレビューフォームが送信された後に呼び出されます。
-     *
-     * @param Model $order 現在のモデルインスタンス（注文情報）
-     * @param Request $request フォームからのリクエストデータ
-     * @return \Encore\Admin\Actions\Response
+     * メール送信処理
      */
-    public function handle(Model $order, Request $request)
+    public function handle(Model $model, Request $request)
     {
-        // メール送信前の最終バリデーションを行います。
+        // デバッグ: リクエストの全内容をログ出力
+        \Log::info('SendShippingMail handle() - All request data: ' . json_encode($request->all()));
+
+        $orderId = $request->input('order_id');
+
+        // デバッグ用ログ
+        \Log::info('SendShippingMail handle() - Received Order ID: ' . $orderId);
+        \Log::info('SendShippingMail handle() - Model passed: ' . ($model ? get_class($model) . ' ID:' . $model->getKey() : 'null'));
+
+        // リクエストにorder_idがない場合は、渡されたmodelを使用
+        if (!$orderId && $model) {
+            $orderId = $model->getKey();
+            \Log::info('SendShippingMail handle() - Using model ID instead: ' . $orderId);
+        }
+
+        if (!$orderId) {
+            $debugData = [
+                'request_data' => $request->all(),
+                'model_exists' => $model ? 'Yes' : 'No',
+                'model_class' => $model ? get_class($model) : 'null',
+                'model_id' => $model ? $model->getKey() : 'null'
+            ];
+            return $this->response()->error('注文IDが取得できませんでした。デバッグ: ' . json_encode($debugData, JSON_UNESCAPED_UNICODE))->refresh();
+        }
+
+        // 確実にデータを再取得
+        $order = Order::with(['customer', 'delivery', 'orderItems'])->find($orderId);
+
+        if (!$order) {
+            return $this->response()->error('注文情報が見つかりません（ID: ' . $orderId . '）')->refresh();
+        }
+
+        // デバッグ用ログ
+        \Log::info('SendShippingMail handle() - Found order: ' . $order->order_number);
+
+        // バリデーション
         if (empty($order->tracking_number)) {
             return $this->response()->error('配送伝票番号が入力されていません')->refresh();
         }
@@ -200,24 +196,36 @@ SCRIPT
             return $this->response()->error('発送日が未入力です')->refresh();
         }
 
-        // 関連する顧客情報を取得します。
         $customer = $order->customer;
+        if (!$customer) {
+            return $this->response()->error('顧客情報が見つかりません')->refresh();
+        }
 
-        // フォームから送信された件名と本文を取得します。
         $subject = $request->input('email_subject');
         $body = $request->input('email_body');
 
-        // メール送信処理を実行します。
+        // メール本文が空の場合は再生成
+        if (empty($body)) {
+            try {
+                $body = view('emails.thank_you', ['order' => $order])->render();
+                \Log::info('SendShippingMail handle() - Regenerated email body');
+            } catch (\Exception $e) {
+                \Log::error('SendShippingMail handle() - View rendering error: ' . $e->getMessage());
+                return $this->response()->error('メールテンプレートの生成に失敗しました: ' . $e->getMessage())->refresh();
+            }
+        }
+
+        // メール送信
         try {
             Mail::send([], [], function ($message) use ($customer, $subject, $body) {
-                $message->to($customer->email) // 顧客のメールアドレス宛に送信
-                    ->subject($subject) // 件名を設定
-                    ->setBody($body, 'text/html'); // HTMLメールとして本文を設定
+                $message->to($customer->email)
+                    ->subject($subject)
+                    ->setBody($body, 'text/html');
             });
 
-            // 送信成功メッセージを返します。
-            return $this->response()->success('発送メールを送信しました')->refresh();
+            return $this->response()->success('発送メールを送信しました（注文: ' . $order->order_number . '）')->refresh();
         } catch (\Exception $e) {
+            \Log::error('Mail sending error: ' . $e->getMessage());
             return $this->response()->error('送信エラー: ' . $e->getMessage())->refresh();
         }
     }

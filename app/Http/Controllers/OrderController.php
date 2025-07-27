@@ -118,8 +118,9 @@ class OrderController extends Controller
             }
 
 
-            // 3. 注文番号生成
-            $orderNumber = $this->generateOrderNumber();
+            // 3. 注文番号生成(モデルから)
+            //$orderNumber = $this->generateOrderNumber();
+            $orderNumber = Order::generateOrderNumber();
 
 
             // 4. 注文作成
@@ -168,7 +169,8 @@ class OrderController extends Controller
             return back()->with('error', 'エラーが発生しました: ' . $e->getMessage());
         }
     }
-    // 注文番号の生成（例: ORD202505300001）
+    // 注文番号の生成（例: ORD202505300001） モデルに移行
+    /*
     private function generateOrderNumber()
     {
         $date = now()->format('Ymd');
@@ -176,6 +178,10 @@ class OrderController extends Controller
         $number = $latestOrder ? ((int)substr($latestOrder->order_number, -4)) + 1 : 1;
         return 'ORD' . $date . str_pad($number, 4, '0', STR_PAD_LEFT);
     }
+    */
+
+
+
 
 
     public function complete()

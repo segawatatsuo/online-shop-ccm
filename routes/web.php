@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Session;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 
+use App\Admin\Controllers\MailPreviewController;
 
 use Square\Environments;
 
@@ -264,4 +265,14 @@ Route::get('/square-api-test', function () {
                '詳細ログ:<pre>' . htmlspecialchars($verboseLog) . '</pre>' .
                '（注意: 認証エラーは正常な接続を示します。通信自体が成功しているかを確認してください。）';
     }
+});
+
+
+
+// Admin画面での商品発送メールのプレビュー
+// ルートをAdmin認証が必要なグループ内に配置
+Route::middleware(['admin.auth'])->group(function () {
+    Route::get('admin/mail-preview/{orderId}', [MailPreviewController::class, 'preview'])
+        ->name('admin.mail-preview')
+        ->where('orderId', '[0-9]+'); // 数字のみ許可
 });

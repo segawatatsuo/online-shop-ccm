@@ -66,4 +66,40 @@ class Order extends Model
     }
 
 
+        /**
+     * 新しい注文番号を生成します。
+     * 重複が発生した場合は自動的にリトライします。
+     *
+     * @return string
+     * @throws \RuntimeException ユニークな注文番号の生成に失敗した場合
+     */
+    public static function generateOrderNumber(): string
+    {
+        $maxAttempts = 5; // 最大リトライ回数
+        $attempt = 0;
+
+        while ($attempt < $maxAttempts) {
+            $date = now()->format('Ymd');
+            $latestOrder = self::whereDate('created_at', now()->toDateString())
+                               ->latest('id')
+                               ->first();
+
+            $number = $latestOrder ? ((int)substr($latestOrder->order_number, -4)) + 1 : 1;
+            $orderNumber = 'ORD' . $date . str_pad($number, 4, '0', STR_PAD_LEFT);
+
+            // 生成された注文番号が既に存在しないか確認
+            if (!self::where('order_number', $orderNumber)->exists()) {
+                return $orderNumber; // 重複がなければこの番号を採用
+            }
+
+            $attempt++;
+            usleep(100000); // 100ミリ秒待機 (マイクロ秒単位)
+        }
+
+        // 最大リトライ回数を超えてもユニークな番号が生成できなかった場合
+        \Log::error('Failed to generate a unique order number after ' . $maxAttempts . ' attempts.');
+        throw new \RuntimeException('Unable to generate a unique order number.');
+    }
+
+
 }
