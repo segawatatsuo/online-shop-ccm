@@ -42,7 +42,7 @@ class OrderController extends AdminController
 
         //ユーザーが「作成日時」のヘッダーをクリックして昇順・降順を切り替え可能に
         $grid->column('created_at', __('作成日時'))->sortable();
-        
+
 
         // ✅ 月別絞り込み機能の追加
         if (request()->has('month')) {
@@ -154,18 +154,13 @@ class OrderController extends AdminController
         /*表示（編集不可画面）*/
 
         // EagerローディングでcustomerとorderItemsリレーションを取得
-        $order = Order::with(['customer', 'orderItems'])->findOrFail($id);
+        $order = Order::with(['customer', 'orderItems', 'delivery'])->findOrFail($id);
         $show = new Show($order);
 
         $show->field('order_number', __('注文番号'));
 
         // 方法1: リレーション経由でアクセサを呼び出す
         $show->field('customer.full_name', '氏名');
-
-        $show->field('customer.zip', __('郵便番号'));
-        $show->field('customer.full_address', __('住所'));
-        $show->field('customer.phone', __('電話番号'));
-        $show->field('customer.email', __('メールアドレス'));
 
         $show->field('delivery_date', __('配達希望日'));
         $show->field('delivery_time', __('配達希望時間'));
@@ -174,6 +169,18 @@ class OrderController extends AdminController
         $show->field('shipping_date', __('発送日'));
         $show->field('tracking_number', __('配送伝票番号'));
         $show->field('shipping_company', __('運送会社名'));
+
+        $show->field('customer.zip', __('注文者郵便番号'));
+        $show->field('customer.full_address', __('注文者住所'));
+        $show->field('customer.phone', __('注文者電話番号'));
+        $show->field('customer.email', __('注文者メールアドレス'));
+
+        $show->field('delivery.zip', __('送付先郵便番号'));
+        $show->field('delivery.full_address', __('送付先住所'));
+        $show->field('delivery.phone', __('送付先電話番号'));
+        $show->field('delivery.email', __('送付先メールアドレス'));
+
+
 
         // 注文商品をテーブル形式で表示
         $show->field('orderItems', __('注文商品'))->as(function ($orderItems) use ($order) {
@@ -246,13 +253,7 @@ class OrderController extends AdminController
             }
         })->ajax('/admin/api/customers');
 
-        // 配送先情報
-        $form->text('customer.zip', __('郵便番号'));
-        $form->text('customer.input_add01', __('住所1'));
-        $form->text('customer.input_add02', __('住所2'));
-        $form->text('customer.input_add03', __('住所3'));
-        $form->text('customer.phone', __('電話番号'));
-        $form->text('customer.email', __('メールアドレス'));
+
 
         // 配達情報
         $form->date('delivery_date', __('配達希望日'));
@@ -263,6 +264,22 @@ class OrderController extends AdminController
         $form->text('shipping_date', __('発送日'));
         $form->text('tracking_number', __('配送伝票番号'));
         $form->text('shipping_company', __('運送会社名'));
+
+        // 注文者情報
+        $form->text('customer.zip', __('注文者郵便番号'));
+        $form->text('customer.input_add01', __('注文者住所1'));
+        $form->text('customer.input_add02', __('注文者住所2'));
+        $form->text('customer.input_add03', __('注文者住所3'));
+        $form->text('customer.phone', __('注文者電話番号'));
+        $form->text('customer.email', __('注文者メールアドレス'));
+
+        // 配送先情報
+        $form->text('delivery.zip', __('配送先郵便番号'));
+        $form->text('delivery.input_add01', __('配送先住所1'));
+        $form->text('delivery.input_add02', __('配送先住所2'));
+        $form->text('delivery.input_add03', __('配送先住所3'));
+        $form->text('delivery.phone', __('配送先電話番号'));
+        $form->text('delivery.email', __('配送先メールアドレス'));
 
 
         // --- ここから商品明細部分 ---
