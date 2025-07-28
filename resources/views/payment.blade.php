@@ -12,6 +12,13 @@
         <button type="submit">支払う</button>
     </form>
 
+<!--セッションからアドレスと合計金額を取得 -->
+<script>
+    const address = @json(session('address'));
+    const totalAmount = @json(session('total'));
+</script>
+
+
     <script>
         const appId = "{{ env('SQUARE_APP_ID') }}";
         const locationId = "{{ env('SQUARE_LOCATION_ID') }}";
@@ -31,17 +38,17 @@
                     // PHP側ではJPYを使用しているので、ここもJPYに合わせるのが適切です。
                     const tokenResult = await card.tokenize({
                         amount: "100", // この金額はテスト用です。実際は動的に設定してください。
-                        currencyCode: "USD", // PHP側がJPYなので、ここもJPYに合わせるのが適切です。
+                        currencyCode: "JPY", // PHP側がJPYなので、ここもJPYに合わせるのが適切です。
                         intent: "CHARGE",
                         billingContact: {
-                            familyName: "Yamada",
-                            givenName: "Taro",
-                            email: "taro@example.com",
-                            country: "US",
-                            city: "New York",
-                            addressLines: ["123 Main St"],
-                            postalCode: "94103",
-                            phone: "1234567890"
+                            familyName: address.order_sei,
+                            givenName: address.order_mei,
+                            email: address.order_email,
+                            country: "JP",
+                            city: address.order_add01,
+                            addressLines:  [address.order_add02, address.order_add03].filter(Boolean),
+                            postalCode: address.order_zip,
+                            phone: address.order_phone
                         }
                     });
 
@@ -58,6 +65,7 @@
                                 token: tokenResult.token,
                                 // ここに決済金額も渡すように修正してください。
                                 // 例: amount: 100 // 実際の金額を動的に取得
+                                amount: totalAmount
                             })
                         });
 

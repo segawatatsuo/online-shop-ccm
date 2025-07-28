@@ -9,8 +9,6 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Form\Field\Summernote;
 
-
-
 class EmailTemplateController extends AdminController
 {
     /**
@@ -36,14 +34,6 @@ class EmailTemplateController extends AdminController
         $grid->column('created_at', __('作成日時'));
         $grid->column('updated_at', __('更新日時'));
 
-        /*
-        $grid->disableCreateButton(); // スラッグを固定したいので新規作成は不可に
-        $grid->actions(function ($actions) {
-            $actions->disableDelete(); // 削除も不可に
-        });
-        $grid->disableRowSelector();
-        $grid->disableColumnSelector();
-        */
         return $grid;
     }
 
@@ -60,16 +50,10 @@ class EmailTemplateController extends AdminController
         $show->field('id', __('Id'));
         $show->field('slug', __('スラッグ'));
         $show->field('subject', __('件名'));
-        /*
+
         $show->field('body', __('本文'))->unescape()->as(function ($body) {
-            return nl2br(e($body));
+            return $body; // e()やnl2br()を使わず、HTMLとして表示
         });
-        */
-
-
-$show->field('body', __('本文'))->unescape()->as(function ($body) {
-    return $body; // e()やnl2br()を使わず、HTMLとして表示
-});
 
         $show->field('description', __('説明'));
         $show->field('created_at', __('作成日時'));
@@ -90,14 +74,11 @@ $show->field('body', __('本文'))->unescape()->as(function ($body) {
         $form->display('id', __('Id'));
         $form->text('slug', __('スラッグ'))->readonly(); // スラッグは編集不可
         $form->text('subject', __('件名'))->required();
-        //$form->textarea('body', __('本文'))->rows(20)->required()->help('差し込み項目: {{name}}, {{order_number}}, {{shipping_date}}, {{shipping_company}}, {{tracking_number}}, {{customer_name}}, {{customer_zip}}, {{customer_address}}, {{customer_phone}}, {{delivery_name}}, {{delivery_zip}}, {{delivery_address}}, {{delivery_phone}}, {{order_items}}, {{shipping}}, {{total_amount}}, {{footer}}');
         $form->summernote('body', __('本文'))->required()->help(
-    '差し込み項目: {{name}}, {{order_number}}, {{shipping_date}}, {{shipping_company}}, {{tracking_number}}, {{customer_name}}, {{customer_zip}}, {{customer_address}}, {{customer_phone}}, {{delivery_name}}, {{delivery_zip}}, {{delivery_address}}, {{delivery_phone}}, {{order_items}}, {{shipping}}, {{total_amount}}, {{footer}}'
-);
-        
-        
-        $form->textarea('description', __('説明'));
+            '差し込み項目: {{name}}, {{order_number}}, {{shipping_date}}, {{shipping_company}}, {{tracking_number}}, {{customer_name}}, {{customer_zip}}, {{customer_address}}, {{customer_phone}}, {{delivery_name}}, {{delivery_zip}}, {{delivery_address}}, {{delivery_phone}}, {{order_items}}, {{shipping}}, {{total_amount}}, {{footer}}'
+        );
 
+        $form->textarea('description', __('説明'));
 
         return $form;
     }

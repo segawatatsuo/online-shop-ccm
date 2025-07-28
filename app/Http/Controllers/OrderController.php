@@ -48,7 +48,7 @@ class OrderController extends Controller
         $user = auth()->user();
         if ($user && $user->user_type === 'corporate') {
             // 法人ユーザーの場合ここで合計金額の表示が必要なので取得
-            $total = session('total');
+            $total = session('total');//CartService.phpで合計金額をセッションに保存している
             return view('order.corporate_confirm', compact('cart', 'user', 'total', 'deliveryTimes'));
         }
         // 一般ユーザー用：新規お届け先登録画面へ
