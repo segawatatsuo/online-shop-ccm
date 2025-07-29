@@ -27,7 +27,7 @@ class EmailTemplateController extends AdminController
     {
         $grid = new Grid(new EmailTemplate());
 
-        $grid->column('id', __('Id'));
+        //$grid->column('id', __('Id'));
         $grid->column('slug', __('スラッグ'))->width(150);
         $grid->column('subject', __('件名'));
         $grid->column('description', __('説明'));
@@ -47,8 +47,8 @@ class EmailTemplateController extends AdminController
     {
         $show = new Show(EmailTemplate::findOrFail($id));
 
-        $show->field('id', __('Id'));
-        $show->field('slug', __('スラッグ'));
+        //$show->field('id', __('Id'));
+        $show->field('slug', __('スラッグ'))->readonly();
         $show->field('subject', __('件名'));
 
         $show->field('body', __('本文'))->unescape()->as(function ($body) {
@@ -71,7 +71,7 @@ class EmailTemplateController extends AdminController
     {
         $form = new Form(new EmailTemplate());
 
-        $form->display('id', __('Id'));
+        //$form->display('id', __('Id'));
         $form->text('slug', __('スラッグ'))->readonly(); // スラッグは編集不可
         $form->text('subject', __('件名'))->required();
         $form->summernote('body', __('本文'))->required()->help(

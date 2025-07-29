@@ -6,6 +6,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\DB;
+use App\Models\CompanyInfo;
+use Illuminate\Support\Facades\Cache;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,5 +41,13 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        //フッターのデータを表示
+        View::composer('partials.footer', function ($view) {
+            $footerData = Cache::remember('company_footer_data', 3600, function () {
+                return CompanyInfo::getFooterData();
+            });
+
+            $view->with('footerData', $footerData);
+        });
     }
 }

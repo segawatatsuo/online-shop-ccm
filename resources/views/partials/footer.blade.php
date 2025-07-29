@@ -16,15 +16,27 @@
         </div>
 
         <div class="footer-address">
-            〒150-0043 東京都渋谷区道玄坂1-12-1 渋谷マークシティ W22階
+            @if($footerData['footer-address'])
+                {{ $footerData['footer-address'] }}
+            @else
+                <p>住所情報なし</p>
+            @endif
         </div>
 
         <div class="footer-contact">
-            TEL：03-6897-4086／FAX：03-6735-4829
+            @if($footerData['footer-contact'])
+                {{ $footerData['footer-contact'] }}
+            @else
+                <p>連絡先情報なし</p>
+            @endif
         </div>
 
         <div class="footer-copyright">
-            Copyright C.C.Medico Co.,Ltd　All Rights Reserved.
+            @if($footerData['footer-copyright'])
+                {{ $footerData['footer-copyright'] }}
+            @else
+                <p>© {{ date('Y') }} Company Name</p>
+            @endif
         </div>
     </div>
 </footer>

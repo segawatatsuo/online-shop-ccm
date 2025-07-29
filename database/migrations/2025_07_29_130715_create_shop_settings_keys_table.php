@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCompanyInfosTable extends Migration
+class CreateShopSettingsKeysTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateCompanyInfosTable extends Migration
      */
     public function up()
     {
-        Schema::create('company_infos', function (Blueprint $table) {
+        Schema::create('shop_settings_keys', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->nullable()->comment('例: cc_mail_address');
-            $table->text('value')->nullable()->comment('CC用メールアドレス');
-            $table->text('explanation')->nullable()->comment('説明');
+            $table->string('key');
+            $table->string('explanation')->nullable();
+            $table->string('value')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class CreateCompanyInfosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('company_infos');
+        Schema::dropIfExists('shop_settings_keys');
     }
 }

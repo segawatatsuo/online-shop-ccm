@@ -89,3 +89,14 @@
         font-size: 14px;
     }
 }
+
+
+
+/* public/css/custom_admin.css */
+.form-group.my-short-field .col-sm-8 { /* フィールド値が入る部分のクラス */
+    width: 50% !important; /* または他の任意の幅 */
+}
+
+.form-group.my-short-field .col-sm-2 { /* ラベル部分のクラス */
+    width: 15% !important; /* ラベルの幅も調整するなら */
+}

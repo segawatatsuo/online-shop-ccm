@@ -254,16 +254,24 @@ class OrderController extends AdminController
         })->ajax('/admin/api/customers');
 
 
-
         // 配達情報
         $form->date('delivery_date', __('配達希望日'));
         $form->time('delivery_time', __('配達希望時間'));
         $form->textarea('your_request', __('ご要望'));
 
 
-        $form->text('shipping_date', __('発送日'));
-        $form->text('tracking_number', __('配送伝票番号'));
+$form->html('<div style="border-bottom:1px solid #ddd; margin:20px 0;"></div>');
+
+
+        $form->date('shipping_date', __('発送日'));
+        $form->text('tracking_number', __('配送伝票番号')); 
         $form->text('shipping_company', __('運送会社名'));
+
+
+$form->html('<div style="border-bottom:1px solid #ddd; margin:20px 0;"></div>');
+
+
+
 
         // 注文者情報
         $form->text('customer.zip', __('注文者郵便番号'));
@@ -272,6 +280,10 @@ class OrderController extends AdminController
         $form->text('customer.input_add03', __('注文者住所3'));
         $form->text('customer.phone', __('注文者電話番号'));
         $form->text('customer.email', __('注文者メールアドレス'));
+
+
+$form->html('<div style="border-bottom:1px solid #ddd; margin:20px 0;"></div>');
+
 
         // 配送先情報
         $form->text('delivery.zip', __('配送先郵便番号'));

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactMail;
-
+use App\Models\CompanyInfo;
 
 class ContactController extends Controller
 {
@@ -22,8 +22,13 @@ class ContactController extends Controller
             'message' => 'required|string|max:1000',
         ]);
 
+        // CompanyInfoモデルを使ってメールアドレス取得
+        $toEmail = CompanyInfo::where('key', 'contact-mail')->value('value');
+
         // メール送信
-        Mail::to('your@email.com')->send(new ContactMail($request->all()));
+        if ($toEmail) {
+            Mail::to($toEmail)->send(new ContactMail($request->all()));
+        }
 
         return redirect()->route('contact.complete');
     }

@@ -17,8 +17,10 @@ class CompanyInfoController extends AdminController
     {
         $grid = new Grid(new CompanyInfo());
         $grid->column('id', __('Id'));
-        $grid->column('key', __('設定キー'));
+        //$grid->column('key', __('設定キー'));
+        $grid->column('explanation', __('説明'));
         $grid->column('value', __('設定値'));
+
         /*
         $grid->disableCreateButton();
         $grid->actions(function ($actions) {
@@ -34,9 +36,10 @@ class CompanyInfoController extends AdminController
         $form = new Form(new CompanyInfo());
 
         $form->display('id', __('Id'));
-        $form->display('key', __('設定キー'));
+        $form->display('explanation', __('説明'));
 
-        $form->textarea('value', __('設定値'))->rows(10)->help('CC用メールアドレスなど');
+        $form->textarea('value', __('設定値'))->rows(10);
+        //$form->textarea('value', __('設定値'))->rows(10)->help('CC用メールアドレスなど');
         return $form;
     }
 }
