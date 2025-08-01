@@ -260,15 +260,15 @@ class OrderController extends AdminController
         $form->textarea('your_request', __('ご要望'));
 
 
-$form->html('<div style="border-bottom:1px solid #ddd; margin:20px 0;"></div>');
+        $form->html('<div style="border-bottom:1px solid #ddd; margin:20px 0;"></div>');
 
 
         $form->date('shipping_date', __('発送日'));
-        $form->text('tracking_number', __('配送伝票番号')); 
+        $form->text('tracking_number', __('配送伝票番号'));
         $form->text('shipping_company', __('運送会社名'));
 
 
-$form->html('<div style="border-bottom:1px solid #ddd; margin:20px 0;"></div>');
+        $form->html('<div style="border-bottom:1px solid #ddd; margin:20px 0;"></div>');
 
 
 
@@ -282,7 +282,7 @@ $form->html('<div style="border-bottom:1px solid #ddd; margin:20px 0;"></div>');
         $form->text('customer.email', __('注文者メールアドレス'));
 
 
-$form->html('<div style="border-bottom:1px solid #ddd; margin:20px 0;"></div>');
+        $form->html('<div style="border-bottom:1px solid #ddd; margin:20px 0;"></div>');
 
 
         // 配送先情報

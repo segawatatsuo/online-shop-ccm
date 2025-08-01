@@ -48,7 +48,7 @@ class OrderController extends Controller
         $user = auth()->user();
         if ($user && $user->user_type === 'corporate') {
             // 法人ユーザーの場合ここで合計金額の表示が必要なので取得
-            $total = session('total');//CartService.phpで合計金額をセッションに保存している
+            $total = session('total'); //CartService.phpで合計金額をセッションに保存している
             return view('order.corporate_confirm', compact('cart', 'user', 'total', 'deliveryTimes'));
         }
         // 一般ユーザー用：新規お届け先登録画面へ
@@ -76,7 +76,6 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
-
             // 1. 顧客情報の保存
             $customer = Customer::create([
                 'sei'     => $address['order_sei'],
@@ -91,7 +90,6 @@ class OrderController extends Controller
 
             // 2. 配送先の保存
             if ($address['same_as_orderer'] == '1') {
-                // 注文者と同じ場合、配送先をコピー
                 $delivery = Delivery::create([
                     'sei'     => $customer->sei,
                     'mei'     => $customer->mei,
@@ -102,9 +100,7 @@ class OrderController extends Controller
                     'input_add02' => $customer->input_add02,
                     'input_add03' => $customer->input_add03,
                 ]);
-                //dd($delivery);
             } else {
-                // 配送先が異なる場合
                 $delivery = Delivery::create([
                     'sei'     => $address['delivery_sei'],
                     'mei'     => $address['delivery_mei'],
@@ -117,15 +113,11 @@ class OrderController extends Controller
                 ]);
             }
 
-
-            // 3. 注文番号生成(モデルから)
-            //$orderNumber = $this->generateOrderNumber();
+            // 3. 注文番号生成
             $orderNumber = Order::generateOrderNumber();
-
 
             // 4. 注文作成
             $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
-
 
             $order = Order::create([
                 'order_number' => $orderNumber,
@@ -150,24 +142,55 @@ class OrderController extends Controller
                 ]);
             }
 
+            // DBコミット - ここまでで注文データの保存完了
             DB::commit();
-            // ...（注文保存後）
-            Mail::to($customer->email)->send(new OrderConfirmed($order, $customer, $delivery));
 
-            Mail::to('shop@example.com')->send(new OrderNotification($order, $customer, $delivery));
-
-            Session::forget(['cart', 'address']);
-            //GET
-            //return redirect()->route('order.complete')->with('success', '注文が完了しました。');
-            return redirect()->route('order.complete');
+            \Log::info('注文データ保存完了', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number
+            ]);
         } catch (\Exception $e) {
-
             DB::rollBack();
-
-            \Log::error('OrderController::hoge - Error during order save: ' . $e->getMessage(), ['exception' => $e, 'address_session' => Session::get('address'), 'cart_session' => Session::get('cart')]);
-
+            \Log::error('OrderController::hoge - 注文データ保存エラー', [
+                'error' => $e->getMessage(),
+                'exception' => $e,
+                'address_session' => Session::get('address'),
+                'cart_session' => Session::get('cart')
+            ]);
             return back()->with('error', 'エラーが発生しました: ' . $e->getMessage());
         }
+
+        // 注文保存成功後、メール送信を試行（失敗してもユーザーは完了画面へ）
+        try {
+            Mail::to($customer->email)->send(new OrderConfirmed($order, $customer, $delivery));
+            \Log::info('顧客向け注文確認メール送信完了', ['order_id' => $order->id]);
+        } catch (\Exception $e) {
+            \Log::error('顧客向け注文確認メール送信失敗', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+                'customer_email' => $customer->email
+            ]);
+            // メール送信失敗でもユーザーには成功画面を表示
+            // 管理者に別途通知するなどの対応を検討
+        }
+
+        try {
+            $shopEmail = 'segawa82@nifty.com';
+            Mail::to($shopEmail)->send(new OrderNotification($order, $customer, $delivery));
+            \Log::info('ショップ向け注文通知メール送信完了', ['order_id' => $order->id]);
+        } catch (\Exception $e) {
+            \Log::error('ショップ向け注文通知メール送信失敗', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+                'shop_email' => $shopEmail
+            ]);
+        }
+
+        // セッションクリア
+        Session::forget(['cart', 'address']);
+
+        // 注文完了画面にリダイレクト
+        return redirect()->route('order.complete')->with('success', '注文が完了しました。');
     }
     // 注文番号の生成（例: ORD202505300001） モデルに移行
     /*
