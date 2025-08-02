@@ -46,6 +46,11 @@ Route::group([
     //社内のお知らせ
      $router->resource('admin-notices', 'AdminNoticeController');
 
+
+     //社内のお知らせ
+     $router->resource('shipping_fees', 'ShippingFeeController');
+
+
     // ✅ 複製用のPOSTルートをここに追加！
     Route::post('product/duplicate', [ProductJaController::class, 'duplicate']);
 

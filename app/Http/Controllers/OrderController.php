@@ -19,10 +19,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
-
 use App\Mail\OrderConfirmed;
 use App\Mail\OrderNotification;
 use App\Models\DeliveryTime; // 追加
+use App\Models\ShippingFee;
 
 class OrderController extends Controller
 {
@@ -55,6 +55,9 @@ class OrderController extends Controller
         return view('order.create', compact('cart', 'deliveryTimes'));
     }
 
+
+
+    //確認
     //確認
     public function confirm(OrderCustomerRequest $request) //リクエストクラスを使う
     {
