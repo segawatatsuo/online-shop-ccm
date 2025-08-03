@@ -91,10 +91,19 @@ class CartController extends Controller
 
     public function squarePayment(Request $request)
     {
-        // Orderコントローラーのconfirmアクションによってセッションに保存された値を取得
-        $prefecture = session('address')['delivery_add01'] ?? null;
+        // Orderコントローラーのconfirmアクションによってセッションに保存された値を取得(一般会員用)
+        $prefecture = session('address')['delivery_add01'] ?? null;//
         $cart = $this->cartService->getCartItems(null, $prefecture);
         $totalAmount = $cart['total']; 
+ 
+        //法人顧客
+        $user = auth()->user();
+        if ($user && $user->user_type === 'corporate') {
+            $prefecture = $user->corporateCustomer->delivery_add01;
+            $cart = $this->cartService->getCartItems($user, $prefecture);
+            $totalAmount = $cart['total'];
+        }
+
 
         return view('cart.square-payment', [
             'totalAmount' => $totalAmount,

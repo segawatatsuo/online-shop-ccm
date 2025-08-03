@@ -7,9 +7,26 @@ body {
     color: #333;
 }
 
+
+    /* メインコンテンツ */
+    .main {
+        /*padding: 40px 0; /* paddingを調整して、上下の余白を設ける */
+        margin-top: 0; /* bodyのpadding-topがあるのでmainには不要 */
+        /*padding-top: 70px;*/
+        padding-top: 40px; /* ここに上部の余白を追加 */
+        padding-bottom: 40px;
+    }
+
+    .container {
+        max-width: 960px; /* 最大幅 */
+        margin: 0 auto; /* 中央寄せ */
+        padding: 0 15px; /* 左右の余白 */
+    }
+
+
 /* コンテナ */
 .order-container {
-    max-width: 1000px;
+    max-width: 960px;
     margin: 20px auto;
     padding: 20px; /* ここで内側の余白を確保 */
     background-color: #fff;
@@ -249,3 +266,83 @@ body {
     }
 }
 
+    /* ボタンのデザイン */
+    .button-area {
+        text-align: center;
+        margin-top: 50px;
+        margin-bottom: 40px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 15px 35px; /* パディングを調整 */
+        font-size: 1.15em; /* フォントサイズを少し大きく */
+        font-weight: 600; /* 太さを調整 */
+        text-decoration: none;
+        border-radius: 8px; /* 角丸を調整 */
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* 影のトランジションも追加 */
+        border: none;
+    }
+
+    .btn-primary {
+        /*background: linear-gradient(135deg, #6c7b8b 0%, #4a546e 100%);*/ /* シックなグラデーションに統一 */
+        background: linear-gradient(135deg, #ffce12 0%, #f8bd19 100%);
+        /*color: #fff;*/
+        color: #0f1111;
+        margin-left: 20px;
+        box-shadow: 0 5px 15px rgba(74, 84, 110, 0.2); /* 影を追加 */
+    }
+
+    .btn-primary:hover {
+        /*background: linear-gradient(135deg, #5a6675 0%, #3a425a 100%);*/ /* ホバー時のグラデーション */
+        background: linear-gradient(135deg, #ffce12 0%, #f8bd19 100%);
+        transform: translateY(-3px); /* わずかに浮き上がる効果を強調 */
+        box-shadow: 0 8px 20px rgba(74, 84, 110, 0.3); /* ホバー時の影を強調 */
+    }
+
+    .btn-secondary {
+        background-color: #abb6bf; /* 落ち着いたライトグレー */
+        color: #fff;
+        box-shadow: 0 3px 10px rgba(171, 182, 191, 0.2); /* 影を追加 */
+    }
+
+    .btn-secondary:hover {
+        background-color: #929da6; /* ホバー時の色 */
+        /*
+        transform: translateY(-3px); /* わずかに浮き上がる効果
+        box-shadow: 0 6px 15px rgba(171, 182, 191, 0.3); /* ホバー時の影を強調 */
+    }
+
+    .a-button {
+        display: block; /* ブロック要素にして中央揃えしやすく */
+        width: fit-content; /* 内容に合わせて幅を調整 */
+        margin: 30px auto 0; /* 上部のマージンと中央揃え */
+        padding: 18px 40px; /* ボタンのパディングを調整 */
+        font-size: 1.2rem; /* フォントサイズを調整 */
+        font-weight: 600;
+        border-radius: 12px;
+        /*background: linear-gradient(135deg, #5e6d8a 0%, #4a546e 100%); /* シックなグラデーション */
+        background-color: #FFD814;
+        /*color: white;*/
+        color: #0f1111;
+        cursor: pointer;
+        /*transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(94, 109, 138, 0.2); */
+    }
+
+    .a-button:hover {
+        /*
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(94, 109, 138, 0.3);
+        */
+        background-color: #F7CA00;
+    }
+
+    .d-inline-block {
+        /*
+        display: inline-block;
+        vertical-align: middle;
+        */
+        background-color: #F7CA00;
+    }

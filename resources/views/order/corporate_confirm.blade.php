@@ -1,11 +1,15 @@
 @extends('layouts.app')
 
+@section('title', 'トップページ')
+
 @push('styles')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <link rel="stylesheet" href="{{ asset('css/corporate_confirm.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/_responsive.css') }}">
 @endpush
 
 @section('content')
+
     <main class="main">
         <div class="order-container">
             <h1 class="order-title">ご注文情報確認</h1>
@@ -145,10 +149,23 @@
             </div>
 
             <div class="order-total-card">
-                <p>配送料：&yen;{{ number_format($shipping_fee) }}</p>
+                <h3>配送料：&yen;{{ number_format($shipping_fee) }}</h3>
                 <h2 class="order-total-title">合計金額</h2>
                 <div class="order-total-amount">&yen;{{ number_format($total ?? 0) }}</div>
             </div>
+
+
+            <div class="button-area">
+
+                <a href="{{ route('cart.index') }}" class="btn btn-secondary">戻る</a>
+
+                <form action="{{ route('cart.square-payment') }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="a-button" style="border: none">お支払い</button>
+                </form>
+
+            </div>
+
 
         </div>
     </main>
