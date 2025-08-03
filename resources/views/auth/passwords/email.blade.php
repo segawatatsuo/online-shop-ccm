@@ -1,7 +1,14 @@
 @extends('layouts.app')
+
+@section('title', 'トップページ')
+
 @push('styles')
+    {{-- _responsive.cssは本当は共通CSSだがtop-page.cssの後に読み込まないと崩れるため --}}
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/kakunin-page.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/_responsive.css') }}">
 @endpush
+
 @section('content')
 <main class="main">
     <div class="login-container">
@@ -30,7 +37,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="a-button">
+                    <button type="submit" class="a-button" style="border: none; font-weight:400;">
                         {{ __('リセットリンクを送信') }}
                     </button>
                     <div>パスワードリセットリンクを送信します</div>

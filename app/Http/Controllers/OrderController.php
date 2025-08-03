@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderThanksMail;
 use App\Services\CartService;
+use App\Services\ShippingFeeService;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -24,16 +25,20 @@ use App\Mail\OrderNotification;
 use App\Models\DeliveryTime; // 追加
 use App\Models\ShippingFee;
 
+
 class OrderController extends Controller
 {
 
     protected $cartService;
-    public function __construct(CartService $cartService)
+    protected $shippingFeeService;
+
+    public function __construct(CartService $cartService, ShippingFeeService $shippingFeeService)
     {
         $this->cartService = $cartService;
+        $this->shippingFeeService = $shippingFeeService;
     }
 
-    public function create()
+    public function create(Request $request, CartService $cartService)
     {
         // 🔽 セッションからカート(セッションデータのキー名が「cart」の情報を配列で取得。無ければ空の配列を返す）
         $cart = session()->get('cart', []);
@@ -44,27 +49,117 @@ class OrderController extends Controller
 
         $deliveryTimes = DeliveryTime::pluck('time'); // 配送時間帯のtimeカラムの値のみを取得
 
+
+
         // 認証済みユーザーが法人かどうかをチェック
+        /*
         $user = auth()->user();
         if ($user && $user->user_type === 'corporate') {
             // 法人ユーザーの場合ここで合計金額の表示が必要なので取得
+            //法人は都道府県がすでに登録済なので送料を計算できるcorporate_customersテーブルを使う
+            $prefecture = $user->corporateCustomer->delivery_add01;
+            $shippingFee = $this->shippingFeeService->getFeeByPrefecture($prefecture);
+            
             $total = session('total'); //CartService.phpで合計金額をセッションに保存している
             return view('order.corporate_confirm', compact('cart', 'user', 'total', 'deliveryTimes'));
         }
         // 一般ユーザー用：新規お届け先登録画面へ
         return view('order.create', compact('cart', 'deliveryTimes'));
+        */
+        $user = auth()->user();
+
+        if ($user && $user->user_type === 'corporate') {
+            $prefecture = $user->corporateCustomer->delivery_add01;
+            // CartService は $this->cartService を使う（__construct で注入済）
+            $cart = $this->cartService->getCartItems($user, $prefecture);
+            return view('order.corporate_confirm', [
+                'user' => $user,
+                'cart' => $cart['items'],
+                'subtotal' => $cart['subtotal'],
+                'shipping_fee' => $cart['shipping_fee'],
+                'total' => $cart['total'],
+                'deliveryTimes' => $deliveryTimes,
+            ]);
+        }
+
+        $prefecture = null;
+        $cart = $this->cartService->getCartItems($user, $prefecture);
+        return view('order.create', [
+            'items' => $cart['items'],
+            'subtotal' => $cart['subtotal'],
+            'shipping_fee' => $cart['shipping_fee'],
+            'total' => $cart['total'],
+            'deliveryTimes' => $deliveryTimes, // ← これを追加！
+        ]);
     }
 
-
-
-    //確認
-    //確認
-    public function confirm(OrderCustomerRequest $request) //リクエストクラスを使う
+    //バリデーションのリクエストクラスでバリデーションを行い、それをビューに送る
+    public function confirm(OrderCustomerRequest $request) //バリデーションのリクエストクラス(OrderCustomerRequest)を依存注入する
     {
-        $validatedData = $request->validated(); // 全てのバリデーション済みデータを配列で取得
-        // セッションに保存（戻るときに使用）
+        // 1. 依存注入されたことによりFormRequest（OrderCustomerRequest）の rules() が自動で適用され
+        // 2. バリデーションに通ると
+        // 3. validated() で「検証済みの値」だけを取得
+        $validatedData = $request->validated(); // 4.全てのバリデーション済みの住所データを配列で取得
+/*
+        $validatedData = 
+        array:20 [▼
+  "order_sei" => "瀬川"
+  "order_mei" => "達男"
+  "order_zip" => "206-0823"
+  "order_email" => "segawa@lookingfor.jp"
+  "order_phone" => "09091496802"
+  "order_add01" => "東京都"
+  "order_add02" => "稲城市平尾"
+  "order_add03" => null
+  "delivery_date" => null
+  "delivery_time" => "なし"
+  "your_request" => null
+  "same_as_orderer" => "1"
+  "delivery_sei" => "瀬川"
+  "delivery_mei" => "達男"
+  "delivery_zip" => "206-0823"
+  "delivery_email" => "segawa@lookingfor.jp"
+  "delivery_phone" => "09091496802"
+  "delivery_add01" => "東京都"
+  "delivery_add02" => "稲城市平尾"
+  "delivery_add03" => null
+]
+*/    
+
+        // 送料計算(コンストラクタでShippingFeeServiceを依存注入しているので、直接呼び出せる)
+        //$shippingFee = $this->shippingFeeService->getFeeByPrefecture($validatedData["delivery_add01"]);
+$getCartItems = $this->cartService->getCartItems(null, $validatedData["delivery_add01"]);
+/* $cart=
+array:4 [▼
+  "items" => array:2 [▼
+    0 => array:6 [▼
+      "product_id" => 4
+      "product_code" => "PS04"
+      "name" => "エアーストッキングプレミアムシルク 120G ブロンズ"
+      "quantity" => 1
+      "price" => 3300
+      "subtotal" => 3300
+    ]
+    1 => array:6 [▼
+      "product_id" => 10
+      "product_code" => "DL05"
+      "name" => "エアーストッキングダイアモンドレッグス 120G ダンス"
+      "quantity" => 1
+      "price" => 4400
+      "subtotal" => 4400
+    ]
+  ]
+  "subtotal" => 7700
+  "shipping_fee" => 1500
+  "total" => 9200
+]
+*/
+
+        // セッションに住所を保存（戻るときに使用）
         session(['address' => $validatedData]);
-        return view('order.confirm', ['address' => $validatedData]);
+
+        return view('order.confirm',compact('getCartItems', 'validatedData'));
+
     }
 
     public function hoge(Request $request)
@@ -205,9 +300,6 @@ class OrderController extends Controller
         return 'ORD' . $date . str_pad($number, 4, '0', STR_PAD_LEFT);
     }
     */
-
-
-
 
 
     public function complete()

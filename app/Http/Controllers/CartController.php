@@ -8,16 +8,21 @@ use App\Services\CartService;
 use App\Services\AmazonPayService;
 
 use Illuminate\Support\Facades\Session;
+use App\Services\ShippingFeeService;
 
 class CartController extends Controller
 {
     /*serviceを使う*/
     protected $cartService;
+    protected $shippingFeeService;
 
-    public function __construct(CartService $cartService)
+    public function __construct(CartService $cartService, ShippingFeeService $shippingFeeService)
     {
         $this->cartService = $cartService;
+        $this->shippingFeeService = $shippingFeeService;
     }
+
+
 
     public function index()
     {
@@ -86,18 +91,11 @@ class CartController extends Controller
 
     public function squarePayment(Request $request)
     {
-        // セッションからカート情報を取得
-        $cart = $request->session()->get('cart', []);
+        // Orderコントローラーのconfirmアクションによってセッションに保存された値を取得
+        $prefecture = session('address')['delivery_add01'] ?? null;
+        $cart = $this->cartService->getCartItems(null, $prefecture);
+        $totalAmount = $cart['total']; 
 
-        $totalAmount = 0;
-        foreach ($cart as $item) {
-            // quantityとpriceが存在することを確認
-            if (isset($item['quantity']) && isset($item['price'])) {
-                $totalAmount += $item['quantity'] * $item['price'];
-            }
-        }
-
-        // 計算した合計金額をビューに渡す
         return view('cart.square-payment', [
             'totalAmount' => $totalAmount,
         ]);

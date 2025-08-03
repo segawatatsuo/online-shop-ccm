@@ -5,24 +5,32 @@ namespace App\Services;
 
 use App\Models\ProductJa;
 use Illuminate\Support\Facades\Session;
+use App\Services\ShippingFeeService;
 
 class CartService
 {
-    public function getCartItems($user = null)
+    protected $shippingFeeService;
+
+    public function __construct(ShippingFeeService $shippingFeeService)
+    {
+        $this->shippingFeeService = $shippingFeeService;
+    }
+
+
+    public function getCartItems($user = null, string $prefecture = null)
     {
         $cart = session()->get('cart', []);
         $items = [];
         $total = 0;
-        
+
         foreach ($cart as $productId => $item) {
             $product = ProductJa::find($productId);
             if (!$product) {
                 continue;
             }
-            //$price = $item['price'] ?? ($user ? $product->member_price : $product->price);
             $price = $item['price'];
             $subtotal = $price * $item['quantity'];
-   
+
 
             $items[] = [
                 'product_id' => $productId,
@@ -35,13 +43,24 @@ class CartService
 
             $total += $subtotal;
         }
-        //合計金額をセッションに保存
-        session(['total' => $total]);
 
-        
+        // 都道府県に基づく送料取得
+        $shippingFee = $prefecture
+            ? $this->shippingFeeService->getFeeByPrefecture($prefecture)
+            : 0;
+
+        $grandTotal = $total + $shippingFee;
+
+        session([
+            'total' => $grandTotal,
+            'shipping_fee' => $shippingFee
+        ]);
+
         return [
             'items' => $items,
-            'total' => $total,
+            'subtotal' => $total,
+            'shipping_fee' => $shippingFee,
+            'total' => $grandTotal,
         ];
     }
 
@@ -62,8 +81,8 @@ class CartService
                 'price' => $price,
             ];
         }
-          session()->put('cart', $cart);
-          //dd(session('cart'));
+        session()->put('cart', $cart);
+        //dd(session('cart'));
     }
 
     public function updateQuantity($productId, $quantity)

@@ -107,7 +107,8 @@ class PaymentController extends Controller
 
                 // ここでOrderControllerのhogeメソッドを呼び出す
                 Log::debug('PaymentController: OrderController::hoge呼び出し前');
-                $orderController = new OrderController(app(\App\Services\CartService::class));
+                //$orderController = new OrderController(app(\App\Services\CartService::class));
+                $orderController = app(OrderController::class);
                 $orderSaveResult = $orderController->hoge(new Request());
                 Log::debug('PaymentController: OrderController::hoge呼び出し後', ['result' => $orderSaveResult->getStatusCode()]);
 

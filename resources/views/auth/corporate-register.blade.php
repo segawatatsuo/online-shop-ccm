@@ -1,7 +1,11 @@
 @extends('layouts.app')
 
+@section('title', 'トップページ')
+
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/address_input.css') }}">
+    {{-- _responsive.cssは本当は共通CSSだがtop-page.cssの後に読み込まないと崩れるため --}}
+    <link rel="stylesheet" href="{{ asset('css/address-page.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/_responsive.css') }}">
 @endpush
 
 
@@ -54,6 +58,8 @@
 @endpush
 
 @section('content')
+
+    <main class="container">
     {{-- <form method="POST" action="{{ route('register.confirm') }}" class="post-content"> --}}
     <form method="POST" action="{{ route('corporate.register.confirm') }}" class="post-content" id="my-form">
         @csrf
@@ -248,4 +254,5 @@
 
         </main>
     </form>
+    </main>
 @endsection

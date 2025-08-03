@@ -9,7 +9,7 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ $product->name }}</h5>
                         @if ($user)
-                            <p class="card-text">価格: ¥{{ number_format($product->member_price) }}</p><!--会員価格-->
+                            <p class="card-text">会員価格: ¥{{ number_format($product->member_price) }}</p><!--会員価格-->
                         @else
                             <p class="card-text">価格: ¥{{ number_format($product->price) }}</p><!--ログインしてない場合価格-->
                         @endif

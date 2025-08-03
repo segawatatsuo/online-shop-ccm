@@ -109,9 +109,6 @@ class OrderCustomerRequest extends FormRequest
             // delivery_add03（任意入力の場合）
             'delivery_add03.string' => 'お届け先の番地・建物名は文字列で入力してください。',
             'delivery_add03.max'    => 'お届け先の番地・建物名は :max 文字以内で入力してください。',
-
-
-
         ];
     }
 }

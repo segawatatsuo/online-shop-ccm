@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
-@section('content')
+@section('title', 'トップページ')
+
+@push('styles')
+    {{-- _responsive.cssは本当は共通CSSだがtop-page.cssの後に読み込まないと崩れるため --}}
+
+    <link rel="stylesheet" href="{{ asset('css/kakunin-page.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/_responsive.css') }}">
+@endpush
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">

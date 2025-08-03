@@ -6,6 +6,20 @@
     {{-- _responsive.cssは本当は共通CSSだがtop-page.cssの後に読み込まないと崩れるため --}}
     <link rel="stylesheet" href="{{ asset('css/kakunin-page.css') }}">
     <link rel="stylesheet" href="{{ asset('css/_responsive.css') }}">
+
+<style>
+    .order-table tfoot tr th,
+.order-table tfoot tr td {
+    border-top: 1px solid #ccc; /* 合計金額セクションの上に線を入れる */
+}
+
+/* 合計金額の行が複数ある場合、最後の行だけ下線を消すことも検討 */
+.order-table tfoot tr:last-child th,
+.order-table tfoot tr:last-child td {
+    border-bottom: none;
+}
+</style>
+
 @endpush
 
 @section('content')
@@ -98,13 +112,34 @@
 
 
 
-
+                            <!--
                             <tfoot>
                                 <tr>
                                     <th colspan="2" class="text-right">合計金額</th>
                                     <th class="text-right">&yen;{{ number_format($total) }}</th>
                                 </tr>
                             </tfoot>
+                        -->
+
+<tfoot>
+    <tr>
+        <th colspan="2" class="text-right">小計</th>
+        <th class="text-right">&yen;{{ $getCartItems['subtotal'] }}</th>
+    </tr>
+    <tr>
+        <th colspan="2" class="text-right">配送料</th>
+        <th class="text-right">
+        &yen;{{ $getCartItems['shipping_fee'] }}    
+        </th> 
+    </tr>
+    <tr>
+        <th colspan="2" class="text-right">合計金額</th>
+        {{-- 小計と配送料を合算した最終合計金額を表示 --}}
+        <th class="text-right">&yen;{{ $getCartItems['subtotal'] + $getCartItems['shipping_fee'] }}</th>
+    </tr>
+</tfoot>
+
+
                         </table>
                     </div>
                 </div>
@@ -118,7 +153,6 @@
                     @csrf
                     <button type="submit" class="a-button" style="border: none">お支払い</button>
                 </form>
-
 
             </div>
         </div>

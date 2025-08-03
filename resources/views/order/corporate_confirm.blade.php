@@ -130,9 +130,9 @@
                                     <td class="order-table-data" data-label="商品番号">{{ $item['product_code'] }}</td>
                                     <td class="order-table-data" data-label="商品名">{{ $item['name'] }}</td>
                                     <td class="order-table-data" data-label="数量">{{ $item['quantity'] }}</td>
-                                    <td class="order-table-data" data-label="単価">{{ number_format($item['price']) }}</td>
+                                    <td class="order-table-data" data-label="単価">&yen;{{ number_format($item['price']) }}</td>
                                     <td class="order-table-data" data-label="小計">
-                                        {{ number_format($item['price'] * $item['quantity']) }}</td>
+                                        &yen;{{ number_format($item['price'] * $item['quantity']) }}</td>
                                 </tr>
                             @endforeach
                         @else
@@ -145,8 +145,9 @@
             </div>
 
             <div class="order-total-card">
+                <p>配送料：&yen;{{ number_format($shipping_fee) }}</p>
                 <h2 class="order-total-title">合計金額</h2>
-                <div class="order-total-amount">￥{{ number_format($total ?? 0) }}</div>
+                <div class="order-total-amount">&yen;{{ number_format($total ?? 0) }}</div>
             </div>
 
         </div>
