@@ -1,5 +1,5 @@
 @extends('layouts.app') {{-- 必要に応じて調整 --}}
-
+@section('title', 'お問い合わせ')
 @section('head')
 <style>
 main.main {

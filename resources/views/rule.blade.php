@@ -12,17 +12,15 @@
 </style>
 @section('content')
     <main class="main">
-        <h1>個人情報保護について</h1>
+        <h1>利用規約</h1>
         <img src="{{ asset('images/junbi_icon.png') }}" alt="">
     </main>
 @endsection
 --}}
 
-{{-- resources/views/privacy-policy.blade.php --}}
-
 @extends('layouts.app')
 
-@section('title', '個人情報保護方針')
+@section('title', '利用規約')
 
 @push('styles')
     {{-- _responsive.cssは本当は共通CSSだがtop-page.cssの後に読み込まないと崩れるため --}}
@@ -33,9 +31,9 @@
 
 @section('content')
     <div class="container py-4">
-        <h1 class="mb-4">個人情報保護方針</h1>
+        <h1 class="mb-4">利用規約</h1>
         <div>
-            {!! nl2br(e($privacyContent)) !!}
+            {!! nl2br(e($ruleContent)) !!}
         </div>
     </div>
 @endsection

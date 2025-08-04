@@ -16,8 +16,8 @@ class SettingController extends AdminController
     {
         $grid = new Grid(new Setting());
         $grid->column('id', __('Id'));
-        $grid->column('key', __('設定キー'));
-        $grid->column('value', __('設定値'));
+        $grid->column('name', __('名称'));
+        $grid->column('value', __('内容'));
         /*
         $grid->disableCreateButton();
         $grid->actions(function ($actions) {
@@ -33,9 +33,20 @@ class SettingController extends AdminController
         $form = new Form(new Setting());
 
         $form->text('id', __('Id'));
-        $form->text('key', __('設定キー'));
+        $form->text('name', __('名称'));
 
-        $form->textarea('value', __('設定値'))->rows(10)->help('メールフッターなどの共通設定を編集します。');
+        $form->textarea('value', __('内容'))->rows(10)->help('共通設定を編集します。');
         return $form;
     }
+
+
+    protected function detail($id)
+    {
+        $show = new Show(Setting::findOrFail($id));
+        $show->field('id', __('Id'));
+        $show->field('name', __('名称'));
+        $show->field('value', __('内容'));
+        return $show;
+    }
+
 }

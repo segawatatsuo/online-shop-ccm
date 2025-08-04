@@ -13,6 +13,14 @@ class Setting extends Model
 
     protected $fillable = [
         'key',
+        'name',
         'value',
     ];
+
+
+    public static function getValue(string $key, $default = null)
+    {
+        return static::where('key', $key)->value('value') ?? $default;
+    }
+
 }

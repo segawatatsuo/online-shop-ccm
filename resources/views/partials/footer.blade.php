@@ -9,10 +9,10 @@
 
         <div class="footer-links">
             <a href="{{ asset('contact') }}">お問い合わせ</a>
-            <a href="{{ asset('kiyaku') }}">利用規約</a>
+            <a href="{{ asset('rule') }}">利用規約</a>
             <a href="{{ asset('privacy-policy') }}">個人情報保護について</a>
             <a href="{{ asset('/admin/login') }}">CCM法人取引専用サイト</a>
-            <a href="{{ asset('tokutei') }}">特定商取引法に基づく表示</a>
+            <a href="{{ asset('legal') }}">特定商取引法に基づく表示</a>
         </div>
 
         <div class="footer-address">

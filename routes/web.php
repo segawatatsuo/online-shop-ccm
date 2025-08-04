@@ -29,6 +29,7 @@ use Illuminate\Auth\Events\Registered;
 use App\Admin\Controllers\MailPreviewController;
 
 use Square\Environments;
+use App\Http\Controllers\PageController;
 
 // ホーム → 商品一覧にリダイレクト
 //Route::get('/', fn() => redirect('/products'));
@@ -200,6 +201,31 @@ Route::post('/corporate/resend-verification', function () {
 Route::get('/top', function () {
     return view('top');
 });
+
+
+//プライバシーポリシー
+Route::get('/privacy-policy', [PageController::class, 'privacyPolicy'])->name('privacy.policy');
+//利用規約
+Route::get('/rule', [PageController::class, 'rule'])->name('rule');
+//特定商取引法に基づく表示
+Route::get('/legal', [PageController::class, 'legal'])->name('legal');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Route::get('/ssl-test', function () {
     try {

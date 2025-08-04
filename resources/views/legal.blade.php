@@ -1,4 +1,4 @@
-{{--
+{{--}}
 @extends('layouts.app')
 <style>
 .main {
@@ -12,17 +12,15 @@
 </style>
 @section('content')
     <main class="main">
-        <h1>個人情報保護について</h1>
+        <h1>特定商取引法に基づく表示</h1>
         <img src="{{ asset('images/junbi_icon.png') }}" alt="">
     </main>
 @endsection
 --}}
 
-{{-- resources/views/privacy-policy.blade.php --}}
-
 @extends('layouts.app')
 
-@section('title', '個人情報保護方針')
+@section('title', '特定商取引法に基づく表示')
 
 @push('styles')
     {{-- _responsive.cssは本当は共通CSSだがtop-page.cssの後に読み込まないと崩れるため --}}
@@ -33,9 +31,9 @@
 
 @section('content')
     <div class="container py-4">
-        <h1 class="mb-4">個人情報保護方針</h1>
+        <h1 class="mb-4">特定商取引法に基づく表示</h1>
         <div>
-            {!! nl2br(e($privacyContent)) !!}
+            {!! nl2br(e($legalContent)) !!}
         </div>
     </div>
 @endsection
