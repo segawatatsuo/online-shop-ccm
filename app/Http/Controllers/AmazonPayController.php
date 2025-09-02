@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Amazon\Pay\API\Client;
 use App\Services\AmazonPayService;
+use Illuminate\Support\Facades\Log; // ← これを追加
+
+
 
 class AmazonPayController extends Controller
 {
