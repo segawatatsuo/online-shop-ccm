@@ -255,9 +255,7 @@ Route::prefix('amazon-pay')->name('amazon-pay.')->group(function () {
 });
 
 
-// routes/web.php
-Route::post('/amazon-pay/webhook', [AmazonPayController::class, 'webhook'])
-    ->name('amazon-pay.webhook');
+
 
 
 
