@@ -28,16 +28,6 @@ class AmazonPayController extends Controller
      */
     public function createSession(Request $request)
     {
-        /*
-        $request->validate([
-            'amount' => 'required|numeric|min:1|max:1000000',
-        ], [
-            'amount.required' => '金額を入力してください。',
-            'amount.numeric' => '金額は数値で入力してください。',
-            'amount.min' => '金額は1円以上で入力してください。',
-            'amount.max' => '金額は1,000,000円以下で入力してください。',
-        ]);
-        */
         try {
             $amount = $request->input('amount');
             $paymentData = $this->amazonPayService->createSession($amount);
@@ -92,4 +82,26 @@ class AmazonPayController extends Controller
     {
         return view('amazonpay.error');
     }
+
+
+// AmazonPayController.php
+public function webhook(Request $request)
+{
+    // 生のリクエストボディを取得
+    $payload = $request->getContent();
+    $headers = $request->headers->all();
+
+    // ログに出力（payloadはJSON、headersは配列）
+    \Log::info('AmazonPay Webhook 受信: headers', $headers);
+    \Log::info('AmazonPay Webhook 受信: payload', [
+        'raw' => $payload,
+        'decoded' => json_decode($payload, true),
+    ]);
+
+    // いったんOK返す（Amazonに「受信しました」と返さないと再送され続けます）
+    return response()->json(['status' => 'ok']);
+}
+
+
+
 }

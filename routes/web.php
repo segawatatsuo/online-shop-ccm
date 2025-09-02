@@ -247,8 +247,6 @@ Route::prefix('amazon-pay')->name('amazon-pay.')->group(function () {
     Route::post('/create-session', [AmazonPayController::class, 'createSession'])->name('create-session');
     //Amazon が checkoutSessionId を持った状態で ここにリダイレクトします。
     Route::get('/complete', [AmazonPayController::class, 'complete'])->name('complete');
-    Route::get('/complete_test', [AmazonPayController::class, 'complete_test']);
-
 
     Route::get('/cancel', [AmazonPayController::class, 'cancelPayment'])->name('cancel');
     Route::get('/error', [AmazonPayController::class, 'errorPayment'])->name('error');
@@ -257,7 +255,9 @@ Route::prefix('amazon-pay')->name('amazon-pay.')->group(function () {
 });
 
 
-
+// routes/web.php
+Route::post('/amazon-pay/webhook', [AmazonPayController::class, 'webhook'])
+    ->name('amazon-pay.webhook');
 
 
 
