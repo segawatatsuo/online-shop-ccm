@@ -1,86 +1,114 @@
 <?php
-// app/Services/AmazonPayService.php
+
 namespace App\Services;
 
 use Amazon\Pay\API\Client;
-use Exception;
-use Illuminate\Support\Str;
-use Log;
+use Amazon\Pay\API\Constants\Environment;
 
 class AmazonPayService
 {
-    protected Client $client;
+    protected $client;
+    protected $config;
 
     public function __construct()
     {
-        $config = config('amazonpay');
-
-        $this->client = new Client([
-            'public_key_id' => $config['public_key_id'],
-            'private_key' => file_get_contents($config['private_key']),
-            'region' => $config['region'],
-            'sandbox' => $config['sandbox'],
-            'store_id' => $config['store_id'],
-        ]);
+        $this->config = [
+            'public_key_id' => config('amazonpay.public_key_id'),
+            'private_key' => config('amazonpay.private_key_path'),
+            'region' => config('amazonpay.region'),
+            'sandbox' => config('amazonpay.sandbox'),
+        ];
+        
+           $this->client = new Client($this->config);
     }
 
-    public function createCheckoutSession(string $webCheckoutUrl): array
+    /**
+     * 決済セッションを作成
+     */
+    public function createSession($amount, $merchantReferenceId = null)
     {
+        $merchantReferenceId = $merchantReferenceId ?: 'Order_' . time();
+        
+        // セッションに金額を保存（セキュリティのため）
+        session(['payment_amount' => $amount]);
+        
         $payload = [
             'webCheckoutDetails' => [
-                'checkoutReviewReturnUrl' => $webCheckoutUrl, //購入者がAmazon Payのレビュー画面を完了した後に戻ってくるべきURL
-                'checkoutResultReturnUrl' => $webCheckoutUrl, //購入者が決済結果画面（成功・失敗など）を見た後に戻ってくるべきURL
+                'checkoutResultReturnUrl' => route('amazon-pay.complete'),
+                'checkoutCancelUrl' => route('amazon-pay.cancel'),
+                'checkoutMode' => 'ProcessOrder',
             ],
-            'storeId' => config('amazonpay.store_id'), //Laravelのヘルパー関数で、config/amazonpay.phpから 'store_id' の値を取得
+            'storeId' => config('amazonpay.store_id'),
+            'chargePermissionType' => 'OneTime',
+            'merchantMetadata' => [
+                'merchantReferenceId' => $merchantReferenceId,
+                'merchantStoreName' => config('amazonpay.store_name'),
+                'noteToBuyer' => '料金のお支払いです',
+            ],
             'paymentDetails' => [
-                'paymentIntent' => 'Authorize', // 決済の種類.標準的な認証のみの 'Authorize' を指定
+                'paymentIntent' => 'AuthorizeWithCapture',
                 'chargeAmount' => [
-                    'amount' => '100',
-                    'currencyCode' => 'JPY'
+                    'amount' => (string)$amount,
+                    'currencyCode' => 'JPY',
                 ],
             ],
-            'merchantMetadata' => [
-                'merchantReferenceId' => uniqid('order_'),
-                'merchantStoreName' => 'テストストア',
-            ],
+            'scopes' => ['name', 'email'],
         ];
 
-        $idempotencyKey = (string) Str::uuid(); // 一意のID生成
-        $headers = [
-            'x-amz-pay-idempotency-key' => $idempotencyKey,
+        $payloadJson = json_encode($payload, JSON_UNESCAPED_UNICODE);
+        $signature = $this->client->generateButtonSignature($payloadJson);
+
+        return [
+            'payloadJson' => $payloadJson,
+            'signature' => $signature,
+            'publicKeyId' => config('amazonpay.public_key_id'),
+            'merchantId' => config('amazonpay.merchant_id'),
+            'sandbox' => config('amazonpay.sandbox'),
         ];
+    }
 
-        // Checkout セッションを作成
-        $response = $this->client->createCheckoutSession($payload, $headers);
-        dd($response);
-        $data = json_decode($response['response'], true);
+    /**
+     * 決済を完了
+     */
+    public function completePayment($amazonCheckoutSessionId, $amount)
+    {
+        // 注文情報を取得
+        $result = $this->client->getCheckoutSession($amazonCheckoutSessionId);
 
-        // API応答が成功しているか、checkoutSessionId が存在するかを確認
-        if (!isset($data['checkoutSessionId'])) {
-            // checkoutSessionId が存在しない場合はエラー処理を行う
-            // 応答全体やエラーメッセージをログに出力するなど
-            \Log::error('Amazon Pay createCheckoutSession API error', [
-                'response_status' => $response['status'] ?? 'N/A',
-                'response_body' => $data, // エラーの詳細が含まれている可能性がある
-                'payload' => $payload,
-            ]);
+        $response = json_decode($result['response'], true);
 
-            // 例外をスローするか、エラーを示す値を返す
-            // 今回は例外をスローする例
-            throw new Exception('Failed to create Amazon Pay checkout session. Error: ' . json_encode($data));
+        // 購入者のemailアドレスを確認
+        $email = $response['buyer']['email'] ?? null;
+        if (empty($email)) {
+            throw new \Exception('購入者のメールアドレスが取得できませんでした。');
         }
 
-        // チェックアウトセッションIDの取得
-        $sessionId = $data['checkoutSessionId'];
+        // 売上請求処理
+        $payload = [
+            'chargeAmount' => [
+                'amount' => (string)$amount,
+                'currencyCode' => 'JPY',
+            ],
+        ];
+        
+        $checkoutResponse = $this->client->completeCheckoutSession($amazonCheckoutSessionId, $payload);
 
-        // セッション詳細を取得
-        $detailsResponse = $this->client->getCheckoutSession($sessionId);
-        $details = json_decode($detailsResponse['response'], true);
+        if ($checkoutResponse['status'] !== 200) {
+            throw new \Exception('決済の完了処理に失敗しました。');
+        }
 
-        // 詳細の確認
-        dd($details); // 全ての詳細を表示して、'amazonPayRedirectUrl' を確認
+        return [
+            'email' => $email,
+            'checkoutSessionId' => $amazonCheckoutSessionId,
+            'response' => $response,
+        ];
+    }
 
-        // 取得した情報を返却
-        return $details;
+    /**
+     * 決済をキャンセル
+     */
+    public function cancelPayment($amazonCheckoutSessionId)
+    {
+        return $this->client->cancelCheckoutSession($amazonCheckoutSessionId);
     }
 }

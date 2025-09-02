@@ -19,7 +19,9 @@ class Order extends Model
         'delivery_date', 
         'delivery_time', 
         'your_request', 
-        'status'
+        'status',
+        'amazon_checkout_session_id',
+        'square_payment_id'
     ];
 
     public function customer()

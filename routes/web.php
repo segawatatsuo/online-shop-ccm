@@ -65,6 +65,8 @@ Route::prefix('cart')->name('cart.')->group(function () {
     
     //Squareのカード入力画面
     Route::post('square-payment', [CartController::class, 'squarePayment'])->name('square-payment');
+
+    Route::get('which-payment', [CartController::class, 'whichPayment'])->name('which-payment');
 });
 
 // 注文
@@ -212,8 +214,47 @@ Route::get('/legal', [PageController::class, 'legal'])->name('legal');
 
 
 
+/*
+|--------------------------------------------------------------------------
+| Amazon Pay Routes
+|--------------------------------------------------------------------------
+*/
+/*
+Route::prefix('amazon-pay')->name('amazon-pay.')->group(function () {
+
+    Route::post('/payment', [AmazonPayController::class, 'payment'])
+    ->name('payment');  // amazon-pay.payment
+   
+    // 決済セッション作成（金額確定後）
+    Route::post('/create-session', [AmazonPayController::class, 'createPaymentSession'])->name('create-session');
+    
+    // 決済完了
+    Route::get('/return', [AmazonPayController::class, 'completePayment'])->name('complete');
+    
+    // 決済キャンセル
+    Route::get('/cancel', [AmazonPayController::class, 'cancelPayment'])->name('cancel');
+    
+    // エラーページ
+    Route::get('/error', [AmazonPayController::class, 'errorPayment'])->name('error');
+
+    // Webhook
+    Route::post('/webhook', [AmazonPayController::class, 'webhook']);
+
+});
+*/
+Route::prefix('amazon-pay')->name('amazon-pay.')->group(function () {
+    Route::get('/payment', [AmazonPayController::class, 'showPayment'])->name('payment');
+    Route::post('/create-session', [AmazonPayController::class, 'createSession'])->name('create-session');
+    //Amazon が checkoutSessionId を持った状態で ここにリダイレクトします。
+    Route::get('/complete', [AmazonPayController::class, 'complete'])->name('complete');
+    Route::get('/complete_test', [AmazonPayController::class, 'complete_test']);
 
 
+    Route::get('/cancel', [AmazonPayController::class, 'cancelPayment'])->name('cancel');
+    Route::get('/error', [AmazonPayController::class, 'errorPayment'])->name('error');
+    Route::get('/return', [AmazonPayController::class, 'amazonPayReturn'])->name('return');
+    Route::post('/webhook', [AmazonPayController::class, 'webhook'])->name('webhook');
+});
 
 
 

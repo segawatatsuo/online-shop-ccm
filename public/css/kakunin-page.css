@@ -519,6 +519,71 @@
         border: none;
     }
 
+
+/* PC用：横並び */
+.button-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+a.btn_return,
+.btn_payment {
+    all: unset;
+    box-sizing: border-box;
+    display: block;
+    text-align: center;
+    vertical-align: middle;
+    text-decoration: none;
+    min-width: 180px;       /* PC用の幅 */
+    padding: 0.5rem 1.5rem;
+    font-weight: bold;
+    border-radius: 12px;
+    transition: 0.5s;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+a.btn_return{
+    border: 2px solid #27acd9;
+    color: #27acd9;
+}
+.btn_payment{
+    background-color: #FFD814;
+    border: 2px solid #FFD814;
+    color: #0f1111;
+}
+
+a.btn_return:hover {
+    color: #fff;
+    background: #27acd9;
+}
+
+.btn_payment:hover {
+    color: #0f1111;
+    background: #F7CA00;
+    border: 2px solid #F7CA00;
+}
+
+/* スマホ用：縦並び・幅固定 */
+@media (max-width: 600px) {
+    .button-area {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    a.btn_return,
+    .btn_payment {
+        width: 280px; /* 全部同じ幅に固定 */
+    }
+}
+
+
+
+
+
     .btn-primary {
         /*background: linear-gradient(135deg, #6c7b8b 0%, #4a546e 100%);*/ /* シックなグラデーションに統一 */
         background: linear-gradient(135deg, #ffce12 0%, #f8bd19 100%);
@@ -581,267 +646,3 @@
         background-color: #F7CA00;
     }
 
-    /* フッター
-    .footer {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-        color: white;
-        padding: 60px 0 40px;
-        text-align: center;
-    }
-
-    .footer-content {
-        max-width: 1280px;
-        margin: 0 auto;
-        padding: 0 20px;
-    }
-
-    .social-icons {
-        display: flex;
-        justify-content: center;
-        gap: 30px;
-        margin-bottom: 40px;
-    }
-
-    .social-icon {
-        width: 50px;
-        height: 50px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        color: white;
-        transition: all 0.3s ease;
-    }
-
-    .social-icon:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-5px);
-    }
-
-    .footer-links {
-        display: flex;
-        justify-content: center;
-        gap: 40px;
-        margin-bottom: 30px;
-        flex-wrap: wrap;
-    }
-
-    .footer-links a {
-        color: white;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    .footer-links a:hover {
-        color: #5e6d8a; 
-    }
-
-    .footer-address {
-        font-size: 0.8rem;
-        color: rgba(255, 255, 255, 0.7);
-        margin-bottom: 10px;
-    }
-
-    .footer-contact {
-        font-size: 0.8rem;
-        color: rgba(255, 255, 255, 0.7);
-        margin-bottom: 40px;
-    }
-
-    .footer-copyright {
-        font-size: 0.7rem;
-        color: rgba(255, 255, 255, 0.5);
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        padding-top: 20px;
-    }
-
-    /* レスポンシブデザイン
-    @media (max-width: 768px) {
-        .hamburger {
-            display: flex;
-        }
-
-        .nav-menu {
-            position: fixed;
-            top: 70px;
-            left: -100%;
-            width: 100%;
-            height: calc(100vh - 70px);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            padding: 50px 0;
-            transition: left 0.3s ease;
-        }
-
-        .nav-menu.active {
-            left: 0;
-        }
-
-        .cart-header h2 {
-            font-size: 2rem;
-        }
-
-        .cart-table {
-            overflow-x: auto;
-        }
-
-        .cart-table table {
-            min-width: 600px;
-        }
-
-        .cart-actions {
-            flex-direction: column;
-        }
-
-        .quantity-controls {
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .footer-links {
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .social-icons {
-            gap: 20px;
-        }
-
-        .grid-layout {
-            grid-template-columns: 1fr;
-        }
-
-        .info-card {
-            margin-bottom: 20px;
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            font-size: 1em;
-            margin-left: 0;
-            margin-bottom: 15px;
-            display: block;
-            width: 90%; /* 幅を調整 
-            max-width: 300px; /* 最大幅を設定 
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .btn-primary {
-            margin-top: 15px;
-        }
-
-        /* フォームのレスポンシブ対応 
-        .post-content {
-            padding: 20px;
-        }
-
-        .post-content h1 {
-            font-size: 1.8rem;
-            margin-bottom: 25px;
-        }
-
-        .post-table {
-            flex-direction: column; /* 縦並びに変更
-            align-items: flex-start; /* 左寄せ
-            padding: 10px 0;
-        }
-
-        .post-table dt {
-            flex: none; /* 幅固定を解除 
-            width: 100%; /* フル幅に 
-            text-align: left; /* 左寄せ 
-            margin-bottom: 5px; /* 上下の間隔
-            padding-right: 0;
-        }
-
-        .post-table dd {
-            width: 100%; /* フル幅に
-            flex-wrap: wrap; /* 要素が収まらない場合に折り返す
-        }
-
-        .input-half {
-            width: 100%; /* フル幅に
-            max-width: 180px; /* 最大幅を設定して、大きくなりすぎないように
-        }
-
-        .form-select {
-            width: 100%;
-        }
-
-        .btn-01.small {
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .same-address-block dt {
-            text-align: left !important;
-        }
-
-        .same-address-block dd {
-            justify-content: flex-start; /* チェックボックスの配置を左寄せ
-        }
-
-        .a-button {
-            width: 90%; /* ボタン幅を調整
-            max-width: 300px;
-            padding: 15px 20px;
-            font-size: 1rem;
-            margin-bottom: 15px; /* ボタン間のマージン調整
-        }
-    }
-
-    @media (max-width: 480px) {
-        .cart-header h2 {
-            font-size: 1.8rem; /* さらに小さく
-        }
-
-        .section-title {
-            font-size: 1.8em; /* さらに小さく
-        }
-
-        .cart-table th,
-        .cart-table td {
-            padding: 12px 10px; /* パディングを小さく
-            font-size: 0.85rem; /* フォントサイズを小さく
-        }
-
-        .total-amount {
-            font-size: 1.6rem; /* さらに小さく
-        }
-
-        .post-content h1 {
-            font-size: 1.6rem; /* さらに小さく
-        }
-
-        .post-table dt,
-        .post-table dd label {
-            font-size: 0.85rem !important; /* さらに小さく
-        }
-
-        .form-control,
-        .form-select {
-            padding: 8px 10px; /* パディングを小さく
-            font-size: 0.85rem; /* フォントサイズを小さく
-        }
-
-        .btn-01.small {
-            font-size: 0.75rem; /* さらに小さく
-            padding: 5px 8px; /* パディングを小さく
-        }
-
-        .btn {
-            font-size: 1em; /* ボタンのフォントサイズを調整 
-        }
-    }
-
-*/

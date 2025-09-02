@@ -1,0 +1,75 @@
+/* メイン部分の余白を確保（上下のヘッダー・フッターと干渉しないように） */
+.main {
+  max-width: 600px;          /* PC時の横幅制限 */
+  margin: 80px auto 100px;   /* 上下に余白、左右中央寄せ */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* 見出し調整 */
+.main h1 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.main h2 {
+  font-size: 1.4rem;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* 金額表示 */
+.amount-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.amount-text {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #222;
+}
+
+/* 説明文 */
+.main p {
+  font-size: 1rem;
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 15px;
+  color: #444;
+}
+
+/* Amazon Pay ボタンを中央寄せ */
+#AmazonPayButton {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+/* ===== スマホ対応 ===== */
+@media (max-width: 600px) {
+  .main {
+    margin: 60px 15px 80px;  /* 左右に少し余白を追加 */
+    padding: 15px;
+  }
+
+  .main h1 {
+    font-size: 1.5rem;
+  }
+
+  .main h2 {
+    font-size: 1.2rem;
+  }
+
+  .amount-text {
+    font-size: 1.8rem;
+  }
+
+  .main p {
+    font-size: 0.8rem;
+  }
+}

@@ -109,4 +109,9 @@ class CartController extends Controller
             'totalAmount' => $totalAmount,
         ]);
     }
+
+    public function whichPayment()
+    {
+        return view('cart.which-payment-service');
+    }
 }

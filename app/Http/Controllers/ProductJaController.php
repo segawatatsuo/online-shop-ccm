@@ -25,10 +25,6 @@ class ProductJaController extends Controller
 
 
 
-
-
-
-
     public function category($category)
     {
         $premiumSilk = collect();

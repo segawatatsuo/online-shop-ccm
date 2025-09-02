@@ -6,7 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
-        "amzn/amazon-pay-api-sdk-php": "^2.6",
+        "amzn/amazon-pay-api-sdk-php": "^2.7",
         "amzn/amazon-pay-sdk-php": "^3.7",
         "doctrine/dbal": "^3.9",
         "encore/laravel-admin": "^1.8",
