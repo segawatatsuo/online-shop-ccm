@@ -85,6 +85,7 @@ class AmazonPayController extends Controller
 
 
 // AmazonPayController.php
+/*
 public function webhook(Request $request)
 {
     // 生のリクエストボディを取得
@@ -101,7 +102,15 @@ public function webhook(Request $request)
     // いったんOK返す（Amazonに「受信しました」と返さないと再送され続けます）
     return response()->json(['status' => 'ok']);
 }
+*/    
+public function webhook(Request $request)
+    {
+        // 受け取った内容をログに出す
+        Log::info('Amazon Pay Webhook 受信', $request->all());
 
+        // Amazon に 200 を返さないと「通知失敗」になる
+        return response()->json(['status' => 'ok']);
+    }
 
 
 }
