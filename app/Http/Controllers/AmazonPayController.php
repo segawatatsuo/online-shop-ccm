@@ -144,14 +144,27 @@ public function webhook(Request $request)
     }
 */
 
-public function webhook(Request $request)
-{
-    $payload = $request->all();
+    public function webhook(Request $request)
+    {
+        $payload = $request->all();
 
-    // 強制的にJSON化して出力
-    Log::info('Amazon Pay Webhook 受信データ: ' . json_encode($payload, JSON_UNESCAPED_UNICODE));
+        // 強制的にJSON化して出力public function webhook(Request $request)
+        {
+            // 生のリクエストボディを取得
+            $rawBody = $request->getContent();
 
-    return response()->json(['status' => 'ok']);
-}
+            // JSONとしてdecode
+            $payload = json_decode($rawBody, true);
 
+            // ログに出力
+            Log::info('Amazon Pay Webhook 受信 Raw: ' . $rawBody);
+            Log::info('Amazon Pay Webhook 受信 Decode: ' . json_encode($payload, JSON_UNESCAPED_UNICODE));
+
+            return response()->json(['status' => 'ok']);
+        }
+
+        Log::info('Amazon Pay Webhook 受信データ: ' . json_encode($payload, JSON_UNESCAPED_UNICODE));
+
+        return response()->json(['status' => 'ok']);
+    }
 }
