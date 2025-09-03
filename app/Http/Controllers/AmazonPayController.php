@@ -114,7 +114,7 @@ public function webhook(Request $request)
         // Amazon に 200 を返さないと「通知失敗」になる
         return response()->json(['status' => 'ok']);
     }
-*/
+
 
     public function webhook(Request $request)
     {
@@ -142,4 +142,15 @@ public function webhook(Request $request)
 
         return response()->json(['status' => 'ok']);
     }
+*/
+public function webhook(Request $request)
+{
+    $payload = $request->all();
+
+    // 受け取ったJSONをそのままログ出力
+    Log::info('Amazon Pay Webhook 受信データ', $payload);
+
+    return response()->json(['status' => 'ok']);
+}
+
 }
