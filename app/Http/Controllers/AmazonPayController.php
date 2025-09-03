@@ -57,7 +57,6 @@ class AmazonPayController extends Controller
         try {
             // セッションから金額を取得（セキュリティのため）
             $amount = session('payment_amount', '100');
-            $amount = 100;//とりあえず100円に
             $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
 
             return view('amazonpay.complete', [
