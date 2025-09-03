@@ -49,7 +49,7 @@ class AmazonPayController extends Controller
     public function complete(Request $request)
     {
         $amazonCheckoutSessionId = $request->get('amazonCheckoutSessionId');
-        
+
         if (empty($amazonCheckoutSessionId)) {
             return redirect()->route('payment.error')->with('error', 'セッションIDが無効です。');
         }
@@ -58,7 +58,7 @@ class AmazonPayController extends Controller
             // セッションから金額を取得（セキュリティのため）
             $amount = session('payment_amount', '100');
             $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
-            
+
             return view('amazonpay.complete', [
                 'email' => $result['email'],
                 'amount' => $amount,
@@ -87,8 +87,8 @@ class AmazonPayController extends Controller
     }
 
 
-// AmazonPayController.php
-/*
+    // AmazonPayController.php
+    /*
 public function webhook(Request $request)
 {
     // 生のリクエストボディを取得
@@ -105,8 +105,8 @@ public function webhook(Request $request)
     // いったんOK返す（Amazonに「受信しました」と返さないと再送され続けます）
     return response()->json(['status' => 'ok']);
 }
-*/    
-public function webhook(Request $request)
+
+    public function webhook(Request $request)
     {
         // 受け取った内容をログに出す
         Log::info('Amazon Pay Webhook 受信', $request->all());
@@ -114,6 +114,32 @@ public function webhook(Request $request)
         // Amazon に 200 を返さないと「通知失敗」になる
         return response()->json(['status' => 'ok']);
     }
+*/
 
+    public function webhook(Request $request)
+    {
+        $data = $request->all();
+        \Log::info('Amazon Pay Webhook 受信', $data);
 
+        $type = $data['notificationType'] ?? null;
+
+        switch ($type) {
+            case 'ChargePermissionStateChange':
+                // 与信許可・キャンセル時の処理
+                break;
+
+            case 'ChargeStateChange':
+                // 与信確定 / 売上確定の処理
+                break;
+
+            case 'RefundStateChange':
+                // 返金処理
+                break;
+
+            default:
+                \Log::warning('未知のWebhook通知', $data);
+        }
+
+        return response()->json(['status' => 'ok']);
+    }
 }
