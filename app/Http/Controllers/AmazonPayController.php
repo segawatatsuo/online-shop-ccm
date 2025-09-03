@@ -57,6 +57,7 @@ class AmazonPayController extends Controller
         try {
             // セッションから金額を取得（セキュリティのため）
             $amount = session('payment_amount', '100');
+            $amount = 100;//とりあえず100円に
             $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
 
             return view('amazonpay.complete', [
@@ -143,12 +144,13 @@ public function webhook(Request $request)
         return response()->json(['status' => 'ok']);
     }
 */
+
 public function webhook(Request $request)
 {
     $payload = $request->all();
 
-    // 受け取ったJSONをそのままログ出力
-    Log::info('Amazon Pay Webhook 受信データ', $payload);
+    // 強制的にJSON化して出力
+    Log::info('Amazon Pay Webhook 受信データ: ' . json_encode($payload, JSON_UNESCAPED_UNICODE));
 
     return response()->json(['status' => 'ok']);
 }
