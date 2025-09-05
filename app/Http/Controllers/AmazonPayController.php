@@ -67,79 +67,76 @@ public function createPaymentSession(Request $request)
     /**
      * チェックアウト完了（与信）処理
      */
-    public function complete(Request $request)
-    {
-        $amazonCheckoutSessionId = $request->get('amazonCheckoutSessionId');
-        Log::info('AmazonPay complete() 開始', ['amazonCheckoutSessionId' => $amazonCheckoutSessionId]);
+public function complete(Request $request)
+{
+    \Log::info('AmazonPay complete() 開始', ['amazonCheckoutSessionId' => $request->get('amazonCheckoutSessionId')]);
 
-        if (empty($amazonCheckoutSessionId)) {
-            return redirect()->route('payment.error')
-                ->with('error', 'セッションIDが無効です。');
-        }
-
-        try {
-            // セッションから金額取得
-            $amountSession = session('payment_amount', 0);
-
-            // Amazon Pay 完了処理（与信）
-            $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amountSession);
-            Log::info('AmazonPay completePayment() 結果', $result);
-
-            $amountFromAmazon = $result['amount'] ?? $amountSession;
-
-            // 金額差異チェック
-            if ($amountFromAmazon != $amountSession) {
-                Log::warning('決済金額差異', [
-                    'session' => $amountSession,
-                    'amazon'  => $amountFromAmazon
-                ]);
-                return redirect()->route('payment.error')
-                    ->with('error', '決済金額が一致しません。');
-            }
-
-            // =========================
-            // Customer作成（ゲスト対応）
-            // =========================
-            if (auth()->check()) {
-                $customer = auth()->user()->customer;
-            } else {
-                $buyer = $result['buyer'] ?? [];
-                $customer = Customer::create([
-                    'sei'         => $buyer['name']['lastName'] ?? 'ゲスト',
-                    'mei'         => $buyer['name']['firstName'] ?? '',
-                    'email'       => $buyer['email'] ?? null,
-                    'phone'       => $buyer['phone'] ?? null,
-                    'zip'         => $buyer['address']['postalCode'] ?? null,
-                    'input_add01' => $buyer['address']['addressLine1'] ?? null,
-                    'input_add02' => $buyer['address']['addressLine2'] ?? null,
-                    'input_add03' => $buyer['address']['city'] ?? null,
-                ]);
-            }
-
-            // =========================
-            // Order作成
-            // =========================
-            $order = new Order();
-            $order->amazon_checkout_session_id = $amazonCheckoutSessionId;
-            $order->amazon_charge_id           = $result['chargeId'] ?? null;
-            $order->order_number               = uniqid('order_');
-            $order->customer_id                = $customer->id;
-            $order->total_price                = $amountSession;
-            $order->status                     = Order::STATUS_AUTH; // 与信済
-            $order->save();
-
-            return view('amazonpay.complete', [
-                'email'     => $result['email'] ?? null,
-                'amount'    => $amountSession,
-                'orderData' => $result,
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('AmazonPay決済エラー: ' . $e->getMessage());
-            return redirect()->route('amazon-pay.error')
-                ->with('error', '決済処理中にエラーが発生しました。');
-        }
+    $amazonCheckoutSessionId = $request->get('amazonCheckoutSessionId');
+    if (empty($amazonCheckoutSessionId)) {
+        return redirect()->route('payment.error')
+            ->with('error', 'セッションIDが無効です。');
     }
+
+    try {
+        // 支払金額をセッションから取得（デフォルト100円）
+        $amount = session('payment_amount', 100);
+
+        // Amazon Pay 完了処理
+        $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
+        \Log::info('AmazonPay completePayment() 結果', $result);
+
+        // 顧客情報取得（ゲスト購入対応）
+        $buyer = $result['buyer'] ?? [];
+
+        $lastName  = $buyer['name']['lastName'] ?? 'ゲスト';
+        $firstName = $buyer['name']['firstName'] ?? '';
+        $email     = $buyer['email'] ?? null;
+
+        // NOT NULL 制約に対応するため、メールがなければダミーを作成
+        if (empty($email)) {
+            $email = 'guest_' . uniqid() . '@example.com';
+        }
+
+        $phone = $buyer['phone'] ?? '';
+        $zip   = $buyer['postalCode'] ?? '';
+        $add1  = $buyer['address']['addressLine1'] ?? '';
+        $add2  = $buyer['address']['addressLine2'] ?? '';
+        $city  = $buyer['address']['city'] ?? '';
+
+        // 顧客を作成
+        $customer = Customer::create([
+            'sei'         => $lastName,
+            'mei'         => $firstName,
+            'email'       => $email,
+            'phone'       => $phone,
+            'zip'         => $zip,
+            'input_add01' => $add1,
+            'input_add02' => $add2,
+            'input_add03' => $city,
+        ]);
+
+        // 注文を作成
+        $order = Order::create([
+            'customer_id'               => $customer->id,
+            'amazon_checkout_session_id'=> $amazonCheckoutSessionId,
+            'amazon_charge_id'          => $result['chargeId'] ?? null,
+            'order_number'              => uniqid('order_'),
+            'total_price'               => $amount,
+            'status'                    => Order::STATUS_AUTH, // 与信済み
+        ]);
+
+        return view('amazonpay.complete', [
+            'email'     => $customer->email,
+            'amount'    => $amount,
+            'orderData' => $result,
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('AmazonPay決済エラー: ' . $e->getMessage());
+        return redirect()->route('amazon-pay.error')
+            ->with('error', '決済処理中にエラーが発生しました。');
+    }
+}
+
 
 
     /**
