@@ -70,38 +70,53 @@ public function createPaymentSession(Request $request)
 
 public function complete(Request $request)
 {
+    \Log::info('AmazonPay complete() 開始', $request->all());
+
     $amazonCheckoutSessionId = $request->get('amazonCheckoutSessionId');
 
     if (empty($amazonCheckoutSessionId)) {
+        \Log::warning('AmazonPay complete() セッションIDが空');
         return redirect()->route('payment.error')
             ->with('error', 'セッションIDが無効です。');
     }
 
     try {
-        $amount = session('payment_amount', 100); // ← 金額はセッションから
-        $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
+        $amount = session('payment_amount', 100);
+        \Log::info('AmazonPay complete() セッション取得成功', [
+            'sessionId' => $amazonCheckoutSessionId,
+            'amount'    => $amount,
+        ]);
 
-        // ✅ 注文レコードを作成
+        $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
+        \Log::info('AmazonPay completePayment() 結果', $result);
+
+        // 注文作成
         $order = new \App\Models\Order();
         $order->amazon_checkout_session_id = $amazonCheckoutSessionId;
-        $order->amazon_charge_id           = $result['chargeId'];  // 与信ID
-        $order->order_number               = uniqid('order_');     // 適宜
-        $order->customer_id                = auth()->id();         // ログインユーザーなら
+        $order->amazon_charge_id           = $result['chargeId'] ?? null;
+        $order->order_number               = uniqid('order_');
+        $order->customer_id                = auth()->id();
         $order->total_price                = $amount;
-        $order->status                     = \App\Models\Order::STATUS_AUTH; // 与信済
+        $order->status                     = \App\Models\Order::STATUS_AUTH;
+
+        \Log::info('注文保存前', $order->toArray());
         $order->save();
+        \Log::info('注文保存成功', ['id' => $order->id]);
 
         return view('amazonpay.complete', [
-            'email'     => $result['email'],
+            'email'     => $result['email'] ?? null,
             'amount'    => $amount,
             'orderData' => $result,
         ]);
     } catch (\Exception $e) {
-        \Log::error('AmazonPay決済エラー: ' . $e->getMessage());
+        \Log::error('AmazonPay決済エラー: ' . $e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
+        ]);
         return redirect()->route('amazon-pay.error')
             ->with('error', '決済処理中にエラーが発生しました。');
     }
 }
+
 
 
 
