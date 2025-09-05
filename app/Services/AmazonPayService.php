@@ -167,51 +167,55 @@ class AmazonPayService
     }
     */
 
-    public function completePayment(string $checkoutSessionId, int $amount): array
-    {
-        // CheckoutSession を Complete
-        $response = $this->client->completeCheckoutSession(
-            $checkoutSessionId,
-            [
-                'chargeAmount' => [
-                    'amount'       => $amount,
-                    'currencyCode' => 'JPY',
-                ],
-            ]
-        );
-
-        $data = json_decode($response['response']['body'], true);
-
-        // CheckoutSession から chargePermissionId を取得
-        $chargePermissionId = $data['chargePermissionId'] ?? null;
-
-        if (!$chargePermissionId) {
-            throw new \Exception('chargePermissionId が取得できませんでした');
-        }
-
-        // 与信リクエスト
-        $authResponse = $this->client->authorizeCharge(
-            $chargePermissionId,
-            [
-                'authorizationReferenceId' => uniqid('auth_'),
-                'chargeAmount' => [
-                    'amount'       => $amount,
-                    'currencyCode' => 'JPY',
-                ],
-                'captureNow' => false, // 与信だけ
+public function completePayment(string $checkoutSessionId, int $amount): array
+{
+    // CheckoutSession を Complete
+    $response = $this->client->completeCheckoutSession(
+        $checkoutSessionId,
+        [
+            'chargeAmount' => [
+                'amount'       => $amount,
+                'currencyCode' => 'JPY',
             ],
-            []
-        );
+        ]
+    );
 
-        $authData = json_decode($authResponse['response']['body'], true);
+    // レスポンスの JSON を decode
+    $data = json_decode($response['response'], true);
 
-        return [
-            'email'      => $data['buyer']['email'] ?? null,
-            'chargeId'   => $authData['chargeId'] ?? null,
-            'status'     => $authData['statusDetails']['state'] ?? null,
-            'raw'        => $authData,
-        ];
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new \Exception('Amazon Pay API response が JSON として不正です: ' . json_last_error_msg());
     }
+
+    // CheckoutSession から chargePermissionId を取得
+    $chargePermissionId = $data['chargePermissionId'] ?? null;
+
+    if (!$chargePermissionId) {
+        throw new \Exception('chargePermissionId が取得できませんでした');
+    }
+
+    // 与信リクエスト
+$authResponse = $this->client->createCharge([
+    'chargePermissionId' => $chargePermissionId,
+    'chargeAmount' => [
+        'amount'       => $amount,
+        'currencyCode' => 'JPY',
+    ],
+    'captureNow' => false, // 与信だけ
+    'softDescriptor' => 'CCM Shop',
+], []);
+
+
+    $authData = json_decode($authResponse['response'], true);
+
+    return [
+        'email'      => $data['buyer']['email'] ?? null,
+        'chargeId'   => $authData['chargeId'] ?? null,
+        'status'     => $authData['statusDetails']['state'] ?? null,
+        'raw'        => $authData,
+    ];
+}
+
 
 
 
