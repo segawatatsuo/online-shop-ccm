@@ -121,12 +121,17 @@
         });
 
         // カートボタンのクリック効果
-        document.querySelector('.add-to-cart').addEventListener('click', function() {
+document.addEventListener('DOMContentLoaded', () => {
+    const addToCartBtn = document.querySelector('.add-to-cart');
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', function() {
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
                 this.style.transform = 'translateY(-3px)';
             }, 100);
         });
+    }
+});
 
 
 
