@@ -8,7 +8,7 @@
         "php": "^7.3|^8.0",
         "amzn/amazon-pay-api-sdk-php": "^2.7",
         "amzn/amazon-pay-sdk-php": "^3.7",
-        "doctrine/dbal": "^3.9",
+        "doctrine/dbal": "^3.10",
         "encore/laravel-admin": "^1.8",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",

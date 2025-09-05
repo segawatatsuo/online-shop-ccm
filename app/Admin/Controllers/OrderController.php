@@ -14,6 +14,7 @@ use Encore\Admin\Show;
 use App\Admin\Actions\SendShippingMail;
 use App\Admin\Actions\CheckShippingMail; // 修正: CheckShippingMailAction から CheckShippingMail へ
 use Carbon\Carbon;
+use App\Admin\Actions\Order\CaptureCharge;
 
 class OrderController extends AdminController
 {
@@ -105,10 +106,23 @@ class OrderController extends AdminController
         $grid->column('shipping_company', __('運送会社名'));
         $grid->column('created_at', __('作成日時'));
 
-        // 行アクション（発送メール）
-        $grid->actions(function ($actions) {
-            $actions->add(new SendShippingMail());
-        });
+        // 行アクション（発送メール, Capture）
+$grid->actions(function ($actions) {
+    $order = $actions->row;
+
+    // 発送メールは常に表示
+    $actions->add(new SendShippingMail());
+
+    // 与信状態のときだけ「売上確定」と「キャンセル」を表示
+    if ($order->status === \App\Models\Order::STATUS_AUTH) {
+        $actions->add(new \App\Admin\Actions\Order\CaptureCharge());
+        $actions->add(new \App\Admin\Actions\Order\CancelCharge());
+    }
+});
+
+
+
+
 
         // フッターにCSS（省略可）
         $grid->footer(function () {

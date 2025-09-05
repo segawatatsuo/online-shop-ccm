@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Amazon\Pay\API\Client;
 use App\Services\AmazonPayService;
 use Illuminate\Support\Facades\Log; // ← これを追加
-
+use App\Models\Order;
 
 
 class AmazonPayController extends Controller
@@ -43,32 +43,70 @@ class AmazonPayController extends Controller
     }
 
 
+    // CheckoutSession 作成時（仮注文保存）
+public function createPaymentSession(Request $request)
+{
+    $amount = $request->input('amount');
+    $orderNumber = 'ORD' . now()->format('YmdHis');
+
+    // CheckoutSession 作成
+    $result = $this->amazonPayService->createPaymentSession($amount, $orderNumber);
+
+    // 仮注文を作成
+    $order = Order::create([
+        'order_number' => $orderNumber,
+        'amount' => $amount,
+        'status' => 'pending', // 仮注文
+        'amazon_checkout_session_id' => $result['checkoutSessionId'],
+    ]);
+
+    return redirect($result['webCheckoutUrl']);
+}
+
+
     /**
      * 決済完了処理
      */
-    public function complete(Request $request)
-    {
-        $amazonCheckoutSessionId = $request->get('amazonCheckoutSessionId');
 
-        if (empty($amazonCheckoutSessionId)) {
-            return redirect()->route('payment.error')->with('error', 'セッションIDが無効です。');
-        }
+public function complete(Request $request)
+{
+    $amazonCheckoutSessionId = $request->get('amazonCheckoutSessionId');
 
-        try {
-            // セッションから金額を取得（セキュリティのため）
-            $amount = session('payment_amount', '100');
-            $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
-
-            return view('amazonpay.complete', [
-                'email' => $result['email'],
-                'amount' => $amount,
-                'orderData' => $result
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('AmazonPay決済エラー: ' . $e->getMessage());
-            return redirect()->route('amazon-pay.error')->with('error', '決済処理中にエラーが発生しました。');
-        }
+    if (empty($amazonCheckoutSessionId)) {
+        return redirect()->route('payment.error')->with('error', 'セッションIDが無効です。');
     }
+
+    try {
+        $amount = session('payment_amount', 100);
+
+        $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
+
+        // 仮注文取得 or 新規作成済みの Order を探す
+        $order = Order::where('amazon_checkout_session_id', $amazonCheckoutSessionId)->first();
+
+        if ($order) {
+            $order->amazon_charge_id = $result['chargeId'];
+            $order->status = Order::STATUS_AUTH; // 与信済みに更新
+            $order->save();
+        }
+
+        return view('amazonpay.complete', [
+            'email' => $result['email'],
+            'amount' => $amount,
+            'orderData' => $result,
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('AmazonPay決済エラー: ' . $e->getMessage());
+        return redirect()->route('amazon-pay.error')->with('error', '決済処理中にエラーが発生しました。');
+    }
+}
+
+
+
+
+
+
+
 
     /**
      * 決済キャンセル処理
@@ -143,23 +181,63 @@ public function webhook(Request $request)
         return response()->json(['status' => 'ok']);
     }
 */
+/*
+    public function webhook(Request $request)
+    {
+        $rawBody = $request->getContent();
+        $payload = json_decode($rawBody, true);
+
+        // ログ：外側のデータ
+        Log::info('Amazon Pay Webhook 外側: ' . json_encode($payload, JSON_UNESCAPED_UNICODE));
+
+        if (isset($payload['Message'])) {
+            $innerMessage = json_decode($payload['Message'], true);
+            Log::info('Amazon Pay Webhook 内側: ' . json_encode($innerMessage, JSON_UNESCAPED_UNICODE));
+        } else {
+            Log::warning('Amazon Pay Webhook: Message フィールドが見つかりません');
+        }
+
+        return response()->json(['status' => 'ok']);
+    }
+        */
+
+
 
 public function webhook(Request $request)
 {
-    $rawBody = $request->getContent();
-    $payload = json_decode($rawBody, true);
+    $data = json_decode($request->getContent(), true);
 
-    // ログ：外側のデータ
-    Log::info('Amazon Pay Webhook 外側: ' . json_encode($payload, JSON_UNESCAPED_UNICODE));
+    if (!isset($data['Message'])) {
+        Log::warning('Amazon Pay Webhook: Messageなし', $data);
+        return response()->json(['status' => 'ignored']);
+    }
 
-    if (isset($payload['Message'])) {
-        $innerMessage = json_decode($payload['Message'], true);
-        Log::info('Amazon Pay Webhook 内側: ' . json_encode($innerMessage, JSON_UNESCAPED_UNICODE));
-    } else {
-        Log::warning('Amazon Pay Webhook: Message フィールドが見つかりません');
+    $message = json_decode($data['Message'], true);
+
+    Log::info('Amazon Pay Webhook 内側', $message);
+
+    // CHARGE に関する通知だけ処理
+    if (($message['ObjectType'] ?? null) === 'CHARGE') {
+        $order = Order::where('amazon_charge_permission_id', $message['ChargePermissionId'])->first();
+
+        if ($order) {
+            $order->amazon_charge_id = $message['ObjectId'] ?? null;
+            $order->payment_status   = $message['NotificationType'] ?? 'Unknown';
+            $order->save();
+
+            Log::info("注文 {$order->id} を更新しました", [
+                'status' => $order->payment_status,
+            ]);
+        } else {
+            Log::warning('対応する注文が見つかりません', $message);
+        }
     }
 
     return response()->json(['status' => 'ok']);
 }
+
+
+
+
 
 }

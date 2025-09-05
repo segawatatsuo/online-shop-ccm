@@ -18,20 +18,74 @@ class AmazonPayService
             'region' => config('amazonpay.region'),
             'sandbox' => config('amazonpay.sandbox'),
         ];
-        
-           $this->client = new Client($this->config);
+
+        $this->client = new Client($this->config);
     }
 
+
+    /**
+     * 売上確定（Capture）
+     */
+    public function captureCharge(string $chargeId, int $amount): array
+    {
+        $response = $this->client->captureCharge(
+            $chargeId,
+            [
+                'captureAmount' => [
+                    'amount'       => $amount,
+                    'currencyCode' => 'JPY',
+                ],
+            ],
+            [] // options
+        );
+
+        return json_decode($response['response']['body'], true);
+    }
+
+    /*AmazonPayService で与信レスポンスから chargeId を取得*/
+    public function authorizeCharge(string $chargePermissionId, int $amount): array
+    {
+        $response = $this->client->authorizeCharge(
+            $chargePermissionId,
+            [
+                'authorizationReferenceId' => uniqid('auth_'),
+                'chargeAmount' => [
+                    'amount'       => $amount,
+                    'currencyCode' => 'JPY',
+                ],
+                'captureNow' => false, // ここで即売上にしない
+            ],
+            []
+        );
+
+        // レスポンスの JSON を decode
+        $data = json_decode($response['response']['body'], true);
+
+        // chargeId を返す
+        return [
+            'chargeId' => $data['chargeId'] ?? null,
+            'status'   => $data['statusDetails']['state'] ?? null,
+            'raw'      => $data,
+        ];
+    }
+
+
+
+
+    public function getCharge(string $chargeId): array
+    {
+        return $this->client->getCharge($chargeId);
+    }
     /**
      * 決済セッションを作成
      */
     public function createSession($amount, $merchantReferenceId = null)
     {
         $merchantReferenceId = $merchantReferenceId ?: 'Order_' . time();
-        
+
         // セッションに金額を保存（セキュリティのため）
         session(['payment_amount' => $amount]);
-        
+
         $payload = [
             'webCheckoutDetails' => [
                 'checkoutResultReturnUrl' => route('amazon-pay.complete'),
@@ -67,9 +121,17 @@ class AmazonPayService
         ];
     }
 
+
+
+
+
+
+
     /**
      * 決済を完了
      */
+
+    /*
     public function completePayment($amazonCheckoutSessionId, $amount)
     {
         // 注文情報を取得
@@ -103,6 +165,56 @@ class AmazonPayService
             'response' => $response,
         ];
     }
+    */
+
+    public function completePayment(string $checkoutSessionId, int $amount): array
+    {
+        // CheckoutSession を Complete
+        $response = $this->client->completeCheckoutSession(
+            $checkoutSessionId,
+            [
+                'chargeAmount' => [
+                    'amount'       => $amount,
+                    'currencyCode' => 'JPY',
+                ],
+            ]
+        );
+
+        $data = json_decode($response['response']['body'], true);
+
+        // CheckoutSession から chargePermissionId を取得
+        $chargePermissionId = $data['chargePermissionId'] ?? null;
+
+        if (!$chargePermissionId) {
+            throw new \Exception('chargePermissionId が取得できませんでした');
+        }
+
+        // 与信リクエスト
+        $authResponse = $this->client->authorizeCharge(
+            $chargePermissionId,
+            [
+                'authorizationReferenceId' => uniqid('auth_'),
+                'chargeAmount' => [
+                    'amount'       => $amount,
+                    'currencyCode' => 'JPY',
+                ],
+                'captureNow' => false, // 与信だけ
+            ],
+            []
+        );
+
+        $authData = json_decode($authResponse['response']['body'], true);
+
+        return [
+            'email'      => $data['buyer']['email'] ?? null,
+            'chargeId'   => $authData['chargeId'] ?? null,
+            'status'     => $authData['statusDetails']['state'] ?? null,
+            'raw'        => $authData,
+        ];
+    }
+
+
+
 
     /**
      * 決済をキャンセル
@@ -111,4 +223,18 @@ class AmazonPayService
     {
         return $this->client->cancelCheckoutSession($amazonCheckoutSessionId);
     }
+
+
+public function cancelCharge(string $chargeId): array
+{
+    $response = $this->client->cancelCharge(
+        $chargeId,
+        ['cancellationReason' => 'Order canceled by merchant'],
+        [] // options
+    );
+
+    return json_decode($response['response']['body'], true);
+}
+
+
 }

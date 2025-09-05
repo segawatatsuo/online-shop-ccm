@@ -24,6 +24,28 @@ class Order extends Model
         'square_payment_id'
     ];
 
+    // ステータス定数
+    const STATUS_PENDING   = 0; // 仮注文（CheckoutSession作成済み）
+    const STATUS_AUTH      = 1; // 与信済み（Authorized）
+    const STATUS_CAPTURED  = 2; // 売上確定（Captured）
+    const STATUS_CANCELED  = 9; // キャンセル済み
+
+    /**
+     * ステータス名を返すアクセサ
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            self::STATUS_PENDING  => '仮注文',
+            self::STATUS_AUTH     => '与信済み',
+            self::STATUS_CAPTURED => '売上確定',
+            self::STATUS_CANCELED => 'キャンセル',
+            default               => '不明',
+        };
+    }
+
+
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
