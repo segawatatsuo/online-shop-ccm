@@ -73,31 +73,33 @@ public function complete(Request $request)
     $amazonCheckoutSessionId = $request->get('amazonCheckoutSessionId');
 
     if (empty($amazonCheckoutSessionId)) {
-        return redirect()->route('payment.error')->with('error', 'セッションIDが無効です。');
+        return redirect()->route('payment.error')
+            ->with('error', 'セッションIDが無効です。');
     }
 
     try {
-        $amount = session('payment_amount', 100);
-
+        $amount = session('payment_amount', 100); // ← 金額はセッションから
         $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
 
-        // 仮注文取得 or 新規作成済みの Order を探す
-        $order = Order::where('amazon_checkout_session_id', $amazonCheckoutSessionId)->first();
-
-        if ($order) {
-            $order->amazon_charge_id = $result['chargeId'];
-            $order->status = Order::STATUS_AUTH; // 与信済みに更新
-            $order->save();
-        }
+        // ✅ 注文レコードを作成
+        $order = new \App\Models\Order();
+        $order->amazon_checkout_session_id = $amazonCheckoutSessionId;
+        $order->amazon_charge_id           = $result['chargeId'];  // 与信ID
+        $order->order_number               = uniqid('order_');     // 適宜
+        $order->customer_id                = auth()->id();         // ログインユーザーなら
+        $order->total_price                = $amount;
+        $order->status                     = \App\Models\Order::STATUS_AUTH; // 与信済
+        $order->save();
 
         return view('amazonpay.complete', [
-            'email' => $result['email'],
-            'amount' => $amount,
+            'email'     => $result['email'],
+            'amount'    => $amount,
             'orderData' => $result,
         ]);
     } catch (\Exception $e) {
         \Log::error('AmazonPay決済エラー: ' . $e->getMessage());
-        return redirect()->route('amazon-pay.error')->with('error', '決済処理中にエラーが発生しました。');
+        return redirect()->route('amazon-pay.error')
+            ->with('error', '決済処理中にエラーが発生しました。');
     }
 }
 
