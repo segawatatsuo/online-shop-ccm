@@ -26,12 +26,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @php $total = 0; @endphp {{-- Initialize total outside the loop, before the tbody, or even before the table if you prefer. --}}
                     @foreach ($cart as $item)
-                        @php
-                            $subtotal = $item['price'] * $item['quantity'];
-                            $total += $subtotal;
-                        @endphp
                         <tr>
                             <td class="product-name">{{ $item['name'] }}</td>
                             <td class="product-price">&yen;{{ number_format($item['price']) }}</td>
@@ -42,11 +37,13 @@
                                         <input type="hidden" name="product_id" value="{{ $item['product_id'] }}">
                                         <input type="number" name="quantity" class="quantity-input"
                                             value="{{ $item['quantity'] }}" min="1">
-                                        <button type="submit" class="update-btn" onclick="updateQuantity(this)">更新</button>
+                                        <button type="submit" class="update-btn">更新</button>
                                     </form>
                                 </div>
                             </td>
-                            <td class="subtotal">&yen;{{ number_format($subtotal) }}</td>
+                            <td class="subtotal" data-subtotal="{{ $item['subtotal'] }}">
+                                &yen;{{ number_format($item['subtotal']) }}
+                            </td>
                             <td>
                                 <form method="POST" action="{{ route('cart.remove') }}" class="remove-form">
                                     @csrf
@@ -55,20 +52,21 @@
                                 </form>
                             </td>
                         </tr>
-                    @endforeach {{-- This closes the @foreach loop --}}
+                    @endforeach
                 </tbody>
+
             </table>
         </div>
 
         <div class="cart-total">
             <h4>お買い物カゴの合計</h4>
-            {{-- Display the calculated total here --}}
             <div class="total-amount" id="totalAmount">&yen;{{ number_format($total) }}</div>
         </div>
 
         <div class="cart-actions">
-            <button class="continue-shopping" onclick="window.location.href='{{ asset('product/'.$category) }}'">買い物を続ける</button>
-             <button class="checkout-btn" onclick="window.location.href='{{ route('order.create') }}'">購入手続きに進む</button>
+            <button class="continue-shopping"
+                onclick="window.location.href='{{ asset('product/' . $category) }}'">買い物を続ける</button>
+            <button class="checkout-btn" onclick="window.location.href='{{ route('order.create') }}'">購入手続きに進む</button>
         </div>
     </main>
 

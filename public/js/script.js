@@ -61,17 +61,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /************** cart.html **************/
-    function updateTotal() {
-        const subtotalCells = document.querySelectorAll('.subtotal');
-        if (!subtotalCells.length) return;
-        let total = 0;
-        subtotalCells.forEach(cell => {
-            const amount = parseInt(cell.textContent.replace(/[\\,]/g, '')) || 0;
-            total += amount;
-        });
-        const totalAmount = document.getElementById('totalAmount');
-        if (totalAmount) totalAmount.textContent = `¥${total.toLocaleString()}`;
+function updateTotal() {
+    const subtotalCells = document.querySelectorAll('.subtotal');
+    if (!subtotalCells.length) return;
+
+    let total = 0;
+    subtotalCells.forEach(cell => {
+        const amount = parseInt(cell.dataset.subtotal) || 0;
+        total += amount;
+    });
+
+    const totalAmount = document.getElementById('totalAmount');
+    if (totalAmount) {
+        totalAmount.textContent = `¥${total.toLocaleString()}`;
     }
+}
 
     function updateQuantity(button) {
         if (!button) return;

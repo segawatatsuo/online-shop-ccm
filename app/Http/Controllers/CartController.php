@@ -27,17 +27,20 @@ class CartController extends Controller
     public function index()
     {
         $user = auth()->user();
-        //Serviceのメソッド
         $result = $this->cartService->getCartItems($user);
-        $cart = $result['items'];
-        $total = $result['total'];
+
+        $cart       = $result['items'];
+        $subtotal   = $result['subtotal'];
+        $shipping   = $result['shipping_fee'];
+        $total      = $result['total'];
 
         $category = session()->get('category');
-        return view('cart.index', compact('cart', 'total', 'category'));
+        return view('cart.index', compact('cart', 'subtotal', 'shipping', 'total', 'category'));
     }
 
     public function add(Request $request)
     {
+
         $product = ProductJa::findOrFail($request->product_id);
         $quantity = max((int) $request->input('quantity', 1), 1);
         $user = auth()->user();
@@ -92,10 +95,10 @@ class CartController extends Controller
     public function squarePayment(Request $request)
     {
         // Orderコントローラーのconfirmアクションによってセッションに保存された値を取得(一般会員用)
-        $prefecture = session('address')['delivery_add01'] ?? null;//
+        $prefecture = session('address')['delivery_add01'] ?? null; //
         $cart = $this->cartService->getCartItems(null, $prefecture);
-        $totalAmount = $cart['total']; 
- 
+        $totalAmount = $cart['total'];
+
         //法人顧客
         $user = auth()->user();
         if ($user && $user->user_type === 'corporate') {
