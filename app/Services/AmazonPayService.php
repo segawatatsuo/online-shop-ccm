@@ -192,6 +192,8 @@ public function completePayment(string $amazonCheckoutSessionId, float $amount):
         $buyer = $response['buyer'] ?? [];
 
         $email = $buyer['email'] ?? 'guest_' . uniqid() . '@example.com';
+\Log::info('email', $email);
+
         $firstName = $buyer['name']['firstName'] ?? '';
         $lastName = $buyer['name']['lastName'] ?? 'ゲスト';
         $phone = $buyer['phone'] ?? null;
