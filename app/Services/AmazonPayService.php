@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Amazon\Pay\API\Client;
 use Amazon\Pay\API\Constants\Environment;
+use Illuminate\Support\Facades\Log;
 
 class AmazonPayService
 {
@@ -167,54 +168,71 @@ class AmazonPayService
     }
     */
 
-public function completePayment(string $checkoutSessionId, int $amount): array
+public function completePayment(string $amazonCheckoutSessionId, float $amount): array
 {
-    // CheckoutSession を Complete
-    $response = $this->client->completeCheckoutSession(
-        $checkoutSessionId,
-        [
-            'chargeAmount' => [
-                'amount'       => $amount,
-                'currencyCode' => 'JPY',
-            ],
-        ]
-    );
+    \Log::info('AmazonPay completePayment() 開始', ['amazonCheckoutSessionId' => $amazonCheckoutSessionId]);
 
-    // レスポンスの JSON を decode
-    $data = json_decode($response['response'], true);
+    try {
+        // ✅ Idempotency Key を必ず設定
+        $idempotencyKey = uniqid('amazonpay_', true);
 
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new \Exception('Amazon Pay API response が JSON として不正です: ' . json_last_error_msg());
+        $response = $this->client->completeCheckoutSession(
+            $amazonCheckoutSessionId,
+            [
+                'headers' => [
+                    'x-amz-pay-idempotency-key' => $idempotencyKey,
+                ],
+            ]
+        );
+
+        \Log::info('AmazonPay completePayment() 結果', ['raw' => $response]);
+
+        // API から顧客情報を取得（存在しない場合は仮データ）
+        $buyer = $response['buyer'] ?? [];
+
+        $email = $buyer['email'] ?? 'guest_' . uniqid() . '@example.com';
+        $firstName = $buyer['name']['firstName'] ?? '';
+        $lastName = $buyer['name']['lastName'] ?? 'ゲスト';
+        $phone = $buyer['phone'] ?? null;
+        $zip = $buyer['address']['postalCode'] ?? null;
+        $add1 = $buyer['address']['addressLine1'] ?? null;
+        $add2 = $buyer['address']['addressLine2'] ?? null;
+        $city = $buyer['address']['city'] ?? null;
+
+        // ✅ Customer 作成（ゲスト対応）
+        $customer = Customer::create([
+            'sei'         => $lastName,
+            'mei'         => $firstName,
+            'email'       => $email,
+            'phone'       => $phone,
+            'zip'         => $zip,
+            'input_add01' => $add1,
+            'input_add02' => $add2,
+            'input_add03' => $city,
+        ]);
+
+        // ✅ Order 作成
+        $order = new \App\Models\Order();
+        $order->amazon_checkout_session_id = $amazonCheckoutSessionId;
+        $order->amazon_charge_id           = $response['chargeId'] ?? null;
+        $order->order_number               = uniqid('order_');
+        $order->customer_id                = $customer->id;
+        $order->total_price                = $amount;
+        $order->status                     = \App\Models\Order::STATUS_AUTH; // 与信済
+        $order->save();
+
+        return [
+            'email'    => $email,
+            'chargeId' => $response['chargeId'] ?? null,
+            'status'   => $response['status'] ?? null,
+        ];
+
+    } catch (\Exception $e) {
+        \Log::error('AmazonPay completePayment エラー: ' . $e->getMessage(), ['exception' => $e]);
+        throw $e;
     }
-
-    // CheckoutSession から chargePermissionId を取得
-    $chargePermissionId = $data['chargePermissionId'] ?? null;
-
-    if (!$chargePermissionId) {
-        throw new \Exception('chargePermissionId が取得できませんでした');
-    }
-
-    // 与信リクエスト
-$authResponse = $this->client->createCharge([
-    'chargePermissionId' => $chargePermissionId,
-    'chargeAmount' => [
-        'amount'       => $amount,
-        'currencyCode' => 'JPY',
-    ],
-    'captureNow' => false, // 与信だけ
-    'softDescriptor' => 'CCM Shop',
-], []);
-
-
-    $authData = json_decode($authResponse['response'], true);
-
-    return [
-        'email'      => $data['buyer']['email'] ?? null,
-        'chargeId'   => $authData['chargeId'] ?? null,
-        'status'     => $authData['statusDetails']['state'] ?? null,
-        'raw'        => $authData,
-    ];
 }
+
 
 
 
