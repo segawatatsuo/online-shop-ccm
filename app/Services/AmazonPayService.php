@@ -5,6 +5,7 @@ namespace App\Services;
 use Amazon\Pay\API\Client;
 use Amazon\Pay\API\Constants\Environment;
 use Illuminate\Support\Facades\Log;
+use App\Models\Customer;
 
 class AmazonPayService
 {
