@@ -16,7 +16,7 @@ use App\Mail\OrderConfirmed;
 use App\Mail\OrderNotification;
 use App\Models\DeliveryTime; // 追加
 use App\Models\ShippingFee;
-
+use Illuminate\Support\Facades\DB;
 
 
 class AmazonPayController extends Controller
@@ -94,7 +94,14 @@ public function complete(Request $request)
 
     try {
         // Amazon Pay 決済確定
-        $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId);
+        // ✅ Idempotency Key を生成
+        $idempotencyKey = uniqid('amazonpay_', true);
+
+        // サービス呼び出し（2引数）
+        $result = $this->amazonPayService->completePayment(
+            $amazonCheckoutSessionId,
+            $idempotencyKey
+        );
 
         if (empty($result['status']) || $result['status'] !== 'Completed') {
             throw new \Exception('Amazon Pay決済が完了していません: ' . json_encode($result));
