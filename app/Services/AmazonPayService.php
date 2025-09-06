@@ -169,9 +169,11 @@ class AmazonPayService
     }
     */
 
-public function completePayment(string $amazonCheckoutSessionId, float $amount): array
+public function completePayment(string $amazonCheckoutSessionId): array
 {
-    \Log::info('AmazonPay completePayment() 開始', ['amazonCheckoutSessionId' => $amazonCheckoutSessionId]);
+    \Log::info('AmazonPay completePayment() 開始', [
+        'amazonCheckoutSessionId' => $amazonCheckoutSessionId
+    ]);
 
     try {
         // ✅ Idempotency Key を必ず設定
@@ -188,19 +190,23 @@ public function completePayment(string $amazonCheckoutSessionId, float $amount):
 
         \Log::info('AmazonPay completePayment() 結果', ['raw' => $response]);
 
+        // ✅ 金額を Amazon Pay 側のレスポンスから取得
+        $amount = 0;
+        if (isset($response['chargeAmount']['amount'])) {
+            $amount = (float) $response['chargeAmount']['amount'];
+        }
+
         // API から顧客情報を取得（存在しない場合は仮データ）
         $buyer = $response['buyer'] ?? [];
 
-        $email = $buyer['email'] ?? 'guest_' . uniqid() . '@example.com';
-
-
+        $email     = $buyer['email'] ?? 'guest_' . uniqid() . '@example.com';
         $firstName = $buyer['name']['firstName'] ?? '';
-        $lastName = $buyer['name']['lastName'] ?? 'ゲスト';
-        $phone = $buyer['phone'] ?? null;
-        $zip = $buyer['address']['postalCode'] ?? null;
-        $add1 = $buyer['address']['addressLine1'] ?? null;
-        $add2 = $buyer['address']['addressLine2'] ?? null;
-        $city = $buyer['address']['city'] ?? null;
+        $lastName  = $buyer['name']['lastName'] ?? 'ゲスト';
+        $phone     = $buyer['phone'] ?? null;
+        $zip       = $buyer['address']['postalCode'] ?? null;
+        $add1      = $buyer['address']['addressLine1'] ?? null;
+        $add2      = $buyer['address']['addressLine2'] ?? null;
+        $city      = $buyer['address']['city'] ?? null;
 
         // ✅ Customer 作成（ゲスト対応）
         $customer = Customer::create([
@@ -228,6 +234,7 @@ public function completePayment(string $amazonCheckoutSessionId, float $amount):
             'email'    => $email,
             'chargeId' => $response['chargeId'] ?? null,
             'status'   => $response['status'] ?? null,
+            'amount'   => $amount,
         ];
 
     } catch (\Exception $e) {
@@ -235,6 +242,7 @@ public function completePayment(string $amazonCheckoutSessionId, float $amount):
         throw $e;
     }
 }
+
 
 
 

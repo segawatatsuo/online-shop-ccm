@@ -79,29 +79,23 @@ public function createPaymentSession(Request $request)
      */
 public function complete(Request $request)
 {
-    $amazonCheckoutSessionId = $request->get('amazonCheckoutSessionId');
+    $amazonCheckoutSessionId = $request->query('amazonCheckoutSessionId');
 
     \Log::info('AmazonPay complete() 開始', [
         'amazonCheckoutSessionId' => $amazonCheckoutSessionId
     ]);
 
-    $address = Session::get('address');
-    $cart = Session::get('cart');
-
-    if (!$address || !$cart) {
-        return redirect()->route('cart.index')->with('error', 'カートまたは住所情報が見つかりません。');
-    }
-
     try {
-        // Amazon Pay 決済確定
-        // ✅ Idempotency Key を生成
-        $idempotencyKey = uniqid('amazonpay_', true);
+        // ✅ amount は渡さない
+        $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId);
 
-        // サービス呼び出し（2引数）
-        $result = $this->amazonPayService->completePayment(
-            $amazonCheckoutSessionId,
-            $idempotencyKey
-        );
+        return view('amazonpay.complete', [
+            'email'    => $result['email'],
+            'chargeId' => $result['chargeId'],
+            'status'   => $result['status'],
+            'amount'   => $result['amount'],
+        ]);
+
 
         if (empty($result['status']) || $result['status'] !== 'Completed') {
             throw new \Exception('Amazon Pay決済が完了していません: ' . json_encode($result));
