@@ -6,6 +6,11 @@ use Amazon\Pay\API\Client;
 use Amazon\Pay\API\Constants\Environment;
 use Illuminate\Support\Facades\Log;
 use App\Models\Customer;
+use Illuminate\Support\Facades\DB;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Delivery;
+
 
 class AmazonPayService
 {
@@ -176,7 +181,6 @@ public function completePayment(string $amazonCheckoutSessionId): array
     ]);
 
     try {
-        // ✅ Idempotency Key を必ず設定
         $idempotencyKey = uniqid('amazonpay_', true);
 
         $response = $this->client->completeCheckoutSession(
@@ -190,58 +194,88 @@ public function completePayment(string $amazonCheckoutSessionId): array
 
         \Log::info('AmazonPay completePayment() 結果', ['raw' => $response]);
 
-        // ✅ 金額を Amazon Pay 側のレスポンスから取得
-        $amount = 0;
-        if (isset($response['chargeAmount']['amount'])) {
-            $amount = (float) $response['chargeAmount']['amount'];
+        $amount = (float)($response['chargeAmount']['amount'] ?? 0);
+
+        // === セッションからカート & 住所を取得 ===
+        $cart = session('cart', []);
+        $address = session('address', []);
+
+        if (empty($cart)) {
+            throw new \Exception('カート情報が空です。');
         }
 
-        // API から顧客情報を取得（存在しない場合は仮データ）
-        $buyer = $response['buyer'] ?? [];
+        DB::beginTransaction();
 
-        $email     = $buyer['email'] ?? 'guest_' . uniqid() . '@example.com';
-        $firstName = $buyer['name']['firstName'] ?? '';
-        $lastName  = $buyer['name']['lastName'] ?? 'ゲスト';
-        $phone     = $buyer['phone'] ?? null;
-        $zip       = $buyer['address']['postalCode'] ?? null;
-        $add1      = $buyer['address']['addressLine1'] ?? null;
-        $add2      = $buyer['address']['addressLine2'] ?? null;
-        $city      = $buyer['address']['city'] ?? null;
-
-        // ✅ Customer 作成（ゲスト対応）
+        // === 顧客作成 ===
         $customer = Customer::create([
-            'sei'         => $lastName,
-            'mei'         => $firstName,
-            'email'       => $email,
-            'phone'       => $phone,
-            'zip'         => $zip,
-            'input_add01' => $add1,
-            'input_add02' => $add2,
-            'input_add03' => $city,
+            'sei'        => $address['order_sei'] ?? 'ゲスト',
+            'mei'        => $address['order_mei'] ?? '',
+            'email'      => $address['order_email'] ?? ($response['buyer']['email'] ?? 'guest_' . uniqid() . '@example.com'),
+            'phone'      => $address['order_phone'] ?? ($response['buyer']['phone'] ?? null),
+            'zip'        => $address['order_zip'] ?? null,
+            'input_add01'=> $address['order_add01'] ?? null,
+            'input_add02'=> $address['order_add02'] ?? null,
+            'input_add03'=> $address['order_add03'] ?? null,
         ]);
 
-        // ✅ Order 作成
-        $order = new \App\Models\Order();
-        $order->amazon_checkout_session_id = $amazonCheckoutSessionId;
-        $order->amazon_charge_id           = $response['chargeId'] ?? null;
-        $order->order_number               = uniqid('order_');
-        $order->customer_id                = $customer->id;
-        $order->total_price                = $amount;
-        $order->status                     = \App\Models\Order::STATUS_AUTH; // 与信済
-        $order->save();
+        // === 配送先作成 ===
+        if (($address['same_as_orderer'] ?? '1') === '1') {
+            $delivery = Delivery::create($customer->toArray());
+        } else {
+            $delivery = Delivery::create([
+                'sei'        => $address['delivery_sei'] ?? '',
+                'mei'        => $address['delivery_mei'] ?? '',
+                'email'      => $address['delivery_email'] ?? '',
+                'phone'      => $address['delivery_phone'] ?? '',
+                'zip'        => $address['delivery_zip'] ?? '',
+                'input_add01'=> $address['delivery_add01'] ?? '',
+                'input_add02'=> $address['delivery_add02'] ?? '',
+                'input_add03'=> $address['delivery_add03'] ?? '',
+            ]);
+        }
+
+        // === 注文作成 ===
+        $order = Order::create([
+            'order_number'   => Order::generateOrderNumber(),
+            'customer_id'    => $customer->id,
+            'delivery_id'    => $delivery->id,
+            'total_price'    => $amount,
+            'delivery_time'  => $address['delivery_time'] ?? null,
+            'delivery_date'  => $address['delivery_date'] ?? null,
+            'your_request'   => $address['your_request'] ?? null,
+            'amazon_checkout_session_id' => $amazonCheckoutSessionId,
+            'amazon_charge_id' => $response['chargeId'] ?? null,
+            'status'         => Order::STATUS_AUTH, // 与信済
+        ]);
+
+        // === 注文明細作成 ===
+        foreach ($cart as $item) {
+            OrderItem::create([
+                'order_id'     => $order->id,
+                'product_id'   => $item['product_id'],
+                'product_code' => $item['product_code'],
+                'name'         => $item['name'],
+                'quantity'     => $item['quantity'],
+                'price'        => $item['price'],
+                'subtotal'     => $item['price'] * $item['quantity'],
+            ]);
+        }
+
+        DB::commit();
 
         return [
-            'email'    => $email,
-            'chargeId' => $response['chargeId'] ?? null,
-            'status'   => $response['status'] ?? null,
-            'amount'   => $amount,
+            'order'    => $order,
+            'customer' => $customer,
+            'delivery' => $delivery,
         ];
 
     } catch (\Exception $e) {
+        DB::rollBack();
         \Log::error('AmazonPay completePayment エラー: ' . $e->getMessage(), ['exception' => $e]);
         throw $e;
     }
 }
+
 
 
 

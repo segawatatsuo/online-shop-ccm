@@ -80,139 +80,43 @@ public function createPaymentSession(Request $request)
 public function complete(Request $request)
 {
     $amazonCheckoutSessionId = $request->query('amazonCheckoutSessionId');
-
     \Log::info('AmazonPay complete() 開始', [
         'amazonCheckoutSessionId' => $amazonCheckoutSessionId
     ]);
 
     try {
-        // ✅ amount は渡さない
         $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId);
 
-        return view('amazonpay.complete', [
-            'email'    => $result['email'],
-            'chargeId' => $result['chargeId'],
-            'status'   => $result['status'],
-            'amount'   => $result['amount'],
-        ]);
+        $order    = $result['order'];
+        $customer = $result['customer'];
+        $delivery = $result['delivery'];
 
-
-        if (empty($result['status']) || $result['status'] !== 'Completed') {
-            throw new \Exception('Amazon Pay決済が完了していません: ' . json_encode($result));
+        // === メール送信 ===
+        try {
+            Mail::to($customer->email)->send(new OrderConfirmed($order, $customer, $delivery));
+            \Log::info('顧客向け注文確認メール送信完了', ['order_id' => $order->id]);
+        } catch (\Exception $e) {
+            \Log::error('顧客向け注文確認メール送信失敗', ['order_id' => $order->id, 'error' => $e->getMessage()]);
         }
 
-        DB::beginTransaction();
-
-        // 1. 顧客保存
-        $customer = Customer::create([
-            'sei'        => $address['order_sei'],
-            'mei'        => $address['order_mei'],
-            'email'      => $address['order_email'],
-            'phone'      => $address['order_phone'],
-            'zip'        => $address['order_zip'],
-            'input_add01'=> $address['order_add01'],
-            'input_add02'=> $address['order_add02'],
-            'input_add03'=> $address['order_add03'],
-        ]);
-
-        // 2. 配送先保存
-        if ($address['same_as_orderer'] == '1') {
-            $delivery = Delivery::create([
-                'sei'        => $customer->sei,
-                'mei'        => $customer->mei,
-                'email'      => $customer->email,
-                'phone'      => $customer->phone,
-                'zip'        => $customer->zip,
-                'input_add01'=> $customer->input_add01,
-                'input_add02'=> $customer->input_add02,
-                'input_add03'=> $customer->input_add03,
-            ]);
-        } else {
-            $delivery = Delivery::create([
-                'sei'        => $address['delivery_sei'],
-                'mei'        => $address['delivery_mei'],
-                'email'      => $address['delivery_email'],
-                'phone'      => $address['delivery_phone'],
-                'zip'        => $address['delivery_zip'],
-                'input_add01'=> $address['delivery_add01'],
-                'input_add02'=> $address['delivery_add02'],
-                'input_add03'=> $address['delivery_add03'],
-            ]);
+        try {
+            Mail::to('segawa82@nifty.com')->send(new OrderNotification($order, $customer, $delivery));
+            \Log::info('ショップ向け注文通知メール送信完了', ['order_id' => $order->id]);
+        } catch (\Exception $e) {
+            \Log::error('ショップ向け注文通知メール送信失敗', ['order_id' => $order->id, 'error' => $e->getMessage()]);
         }
 
-        // 3. 注文番号生成
-        $orderNumber = Order::generateOrderNumber();
+        // === セッション削除 ===
+        Session::forget(['cart', 'address']);
 
-        // 4. 注文保存
-        $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+        return redirect()->route('order.complete')->with('success', '注文が完了しました。');
 
-        $order = Order::create([
-            'order_number'   => $orderNumber,
-            'customer_id'    => $customer->id,
-            'delivery_id'    => $delivery->id,
-            'total_price'    => $total,
-            'delivery_time'  => $address['delivery_time'] ?? null,
-            'delivery_date'  => $address['delivery_date'] ?? null,
-            'your_request'   => $address['your_request'] ?? null,
-            'amazon_checkout_session_id' => $amazonCheckoutSessionId,
-        ]);
-
-        // 5. 注文明細保存
-        foreach ($cart as $item) {
-            OrderItem::create([
-                'order_id'     => $order->id,
-                'product_id'   => $item['product_id'],
-                'product_code' => $item['product_code'],
-                'name'         => $item['name'],
-                'quantity'     => $item['quantity'],
-                'price'        => $item['price'],
-                'subtotal'     => $item['price'] * $item['quantity'],
-            ]);
-        }
-
-        DB::commit();
-
-        \Log::info('注文データ保存完了', [
-            'order_id' => $order->id,
-            'order_number' => $order->order_number
-        ]);
     } catch (\Exception $e) {
-        DB::rollBack();
-        \Log::error('AmazonPay complete() 注文処理エラー', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-        ]);
+        \Log::error('AmazonPay complete() 注文処理エラー', ['error' => $e->getMessage()]);
         return redirect()->route('cart.index')->with('error', '注文処理に失敗しました: ' . $e->getMessage());
     }
-
-    // 6. メール送信
-    try {
-        Mail::to($customer->email)->send(new OrderConfirmed($order, $customer, $delivery));
-        \Log::info('顧客向け注文確認メール送信完了', ['order_id' => $order->id]);
-    } catch (\Exception $e) {
-        \Log::error('顧客向け注文確認メール送信失敗', [
-            'order_id' => $order->id,
-            'error' => $e->getMessage()
-        ]);
-    }
-
-    try {
-        $shopEmail = 'segawa82@nifty.com';
-        Mail::to($shopEmail)->send(new OrderNotification($order, $customer, $delivery));
-        \Log::info('ショップ向け注文通知メール送信完了', ['order_id' => $order->id]);
-    } catch (\Exception $e) {
-        \Log::error('ショップ向け注文通知メール送信失敗', [
-            'order_id' => $order->id,
-            'error' => $e->getMessage()
-        ]);
-    }
-
-    // 7. セッション削除
-    Session::forget(['cart', 'address']);
-
-    // 8. 完了画面へ
-    return redirect()->route('order.complete')->with('success', '注文が完了しました。');
 }
+
 
 
 
