@@ -23,6 +23,7 @@ class CaptureCharge extends RowAction
 
             // ✅ captureCharge では authorization_id を渡す
             $response = $amazonPay->captureCharge($model->authorization_id, $model->total_price);
+            
 
             if (isset($response['statusDetails']['state']) && $response['statusDetails']['state'] === 'Captured') {
                 $model->status = \App\Models\Order::STATUS_CAPTURED; // 売上確定
