@@ -76,7 +76,7 @@ Route::prefix('order')->name('order.')->group(function () {
     Route::post('storeOrder', [OrderController::class, 'storeOrder'])->name('storeOrder'); //store
     Route::get('complete', [OrderController::class, 'complete'])->name('complete');
     Route::post('hoge', [OrderController::class, 'hoge'])->name('hoge');
-
+    
     Route::get('modify/{type}', [OrderController::class, 'modify'])->name('modify');
 });
 
