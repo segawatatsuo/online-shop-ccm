@@ -33,21 +33,22 @@ class AmazonPayService
     /**
      * 売上確定（Capture）
      */
-    public function captureCharge(string $chargeId, int $amount): array
-    {
-        $response = $this->client->captureCharge(
-            $chargeId,
-            [
-                'captureAmount' => [
-                    'amount'       => $amount,
-                    'currencyCode' => 'JPY',
-                ],
+public function captureCharge(string $authorizationId, int $amount): array
+{
+    $response = $this->client->captureCharge(
+        $authorizationId, // ✅ Authorization ID を渡す
+        [
+            'captureAmount' => [
+                'amount'       => $amount,
+                'currencyCode' => 'JPY',
             ],
-            [] // options
-        );
+        ],
+        [] // options
+    );
 
-        return json_decode($response['response']['body'], true);
-    }
+    return json_decode($response['response']['body'], true);
+}
+
 
     /*AmazonPayService で与信レスポンスから chargeId を取得*/
     public function authorizeCharge(string $chargePermissionId, int $amount): array
@@ -196,6 +197,9 @@ public function completePayment(string $amazonCheckoutSessionId): array
 
         $amount = (float)($response['chargeAmount']['amount'] ?? 0);
 
+        // ✅ AuthorizationId を取得
+        $authorizationId = $response['chargePermissionDetails']['authorizationDetails']['authorizationId'] ?? null;
+
         // === セッションからカート & 住所を取得 ===
         $cart = session('cart', []);
         $address = session('address', []);
@@ -245,6 +249,7 @@ public function completePayment(string $amazonCheckoutSessionId): array
             'your_request'   => $address['your_request'] ?? null,
             'amazon_checkout_session_id' => $amazonCheckoutSessionId,
             'amazon_charge_id' => $response['chargeId'] ?? null,
+            'authorization_id' => $response['authorizationId'] ?? null, // ✅ ここ
             'status'         => Order::STATUS_AUTH, // 与信済
         ]);
 

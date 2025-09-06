@@ -11,28 +11,29 @@ class CaptureCharge extends RowAction
 {
     public $name = '売上確定';
 
-public function handle(Model $model, Request $request)
-{
-    try {
-        $amazonPay = app(AmazonPayService::class);
+    public function handle(Model $model, Request $request)
+    {
+        try {
+            $amazonPay = app(AmazonPayService::class);
 
-        if (!$model->amazon_charge_id) {
-            return $this->response()->error('与信IDが存在しません。');
+            // ✅ authorization_id をチェック
+            if (!$model->authorization_id) {
+                return $this->response()->error('与信IDが存在しません。');
+            }
+
+            // ✅ captureCharge では authorization_id を渡す
+            $response = $amazonPay->captureCharge($model->authorization_id, $model->total_price);
+
+            if (isset($response['statusDetails']['state']) && $response['statusDetails']['state'] === 'Captured') {
+                $model->status = \App\Models\Order::STATUS_CAPTURED; // 売上確定
+                $model->save();
+
+                return $this->response()->success('売上を確定しました！')->refresh();
+            }
+
+            return $this->response()->error('売上確定に失敗しました。');
+        } catch (\Exception $e) {
+            return $this->response()->error('エラー: ' . $e->getMessage());
         }
-
-        $response = $amazonPay->captureCharge($model->amazon_charge_id, $model->total_price);
-
-        if (isset($response['statusDetails']['state']) && $response['statusDetails']['state'] === 'Captured') {
-            $model->status = \App\Models\Order::STATUS_CAPTURED; // 売上確定
-            $model->save();
-
-            return $this->response()->success('売上を確定しました！')->refresh();
-        }
-
-        return $this->response()->error('売上確定に失敗しました。');
-    } catch (\Exception $e) {
-        return $this->response()->error('エラー: ' . $e->getMessage());
     }
-}
-
 }
