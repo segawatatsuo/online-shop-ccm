@@ -257,7 +257,7 @@ class AmazonPayService
                 //'authorization_id' => $response['authorizationId'] ?? null, // ✅ ここ
                 // ✅ ここを追加
                 'authorization_id' => $response['authorizationId'] ?? null,
-                'charge_permission_id' => $response['chargePermissionId'] ?? null,
+                'amazon_charge_permission_id' => $response['chargePermissionId'] ?? null,
                 'status'         => Order::STATUS_AUTH, // 与信済
             ]);
 
