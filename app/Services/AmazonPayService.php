@@ -115,9 +115,17 @@ public function createSession($amount, $merchantReferenceId = null)
         ],
     ];
 
+    /*
     $headers = [
         'x-amz-pay-idempotency-key' => uniqid('amazonpay_', true),
     ];
+    */
+
+$headers = [
+    // uniqid() の代わりに bin2hex(random_bytes()) を使用
+    'x-amz-pay-idempotency-key' => 'amazonpay_' . bin2hex(random_bytes(8)),
+];
+
 
     // ✅ checkoutMode は削除！
     $response = $this->client->createCheckoutSession($payload, $headers);
