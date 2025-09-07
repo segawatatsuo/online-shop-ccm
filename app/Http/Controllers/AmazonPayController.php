@@ -37,7 +37,7 @@ class AmazonPayController extends Controller
         $orderNumber = 'ORD' . now()->format('YmdHis');
 
         // CheckoutSession 作成
-        $result = $this->amazonPayService->createPaymentSession($amount, $orderNumber);
+        $result = $this->amazonPayService->createSession($amount, $orderNumber);
 
         // 仮注文作成
         $order = Order::create([
