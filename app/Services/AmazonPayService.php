@@ -100,7 +100,7 @@ $payload = [
         'checkoutResultReturnUrl' => route('amazon-pay.complete') . '?amazonCheckoutSessionId={checkoutSessionId}',
         'checkoutCancelUrl'       => route('amazon-pay.cancel'),
     ],
-    'storeId'              => config('services.amazonpay.store_id'),
+    'storeId'              => config('amazonpay.store_id'),
     'chargePermissionType' => 'OneTime',
     'merchantMetadata'     => [
         'merchantReferenceId' => $orderId, // 例: 自社注文番号
