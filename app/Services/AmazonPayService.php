@@ -146,32 +146,63 @@ $headers = [
 
 
 
-    public function createPaymentSession(float $amount, ?string $merchantReferenceId = null): array
+public function createPaymentSession(float $amount, ?string $merchantReferenceId = null): array
 {
-    $merchantReferenceId = $merchantReferenceId ?: 'order_' . time();
+    // merchantReferenceId（自社注文番号）を用意
+    $merchantReferenceId = $merchantReferenceId ?: 'ORD' . now()->format('YmdHis');
+
+    // JPYなら小数は不要。整数文字列で渡す（Amazon API 想定）
+    $amountStr = (string) intval(round($amount));
 
     $payload = [
         'webCheckoutDetails' => [
-            'checkoutResultReturnUrl' => route('amazon-pay.complete'),
+            // Amazon が {checkoutSessionId} を置換する想定の URL
+            'checkoutResultReturnUrl' => route('amazon-pay.complete') . '?amazonCheckoutSessionId={checkoutSessionId}',
+            // 購入確認ページ（Amazon → 戻る先）を指定（要ルート or とりあえず complete にしても可）
+            'checkoutReviewReturnUrl' => route('amazon-pay.complete'),
+            'checkoutCancelUrl'       => route('amazon-pay.cancel'),
         ],
-        'storeId' => config('services.amazon_pay.store_id'),
+        // config のキー名はあなたの設定に合わせてください
+        'storeId' => config('amazonpay.store_id'), // 例: config('amazonpay.store_id')
+        'chargePermissionType' => 'OneTime',
+        'merchantMetadata' => [
+            'merchantReferenceId' => $merchantReferenceId,
+            'merchantStoreName'   => config('amazonpay.store_name') ?? 'SHOP_NAME',
+            'noteToBuyer'         => '料金のお支払いです',
+        ],
         'paymentDetails' => [
             'paymentIntent' => 'AuthorizeWithCapture',
-            'chargeAmount' => [
-                'amount' => number_format($amount, 2, '.', ''),
+            'chargeAmount'  => [
+                'amount'       => $amountStr,
                 'currencyCode' => 'JPY',
             ],
         ],
-        'merchantMetadata' => [
-            'merchantReferenceId' => $merchantReferenceId,
-            'customInformation' => 'Order created at ' . now(),
-        ],
     ];
 
-    $response = $this->client->createCheckoutSession($payload);
+    // idempotency key（許容文字だけを使う）
+    $headers = [
+        'x-amz-pay-idempotency-key' => 'amazonpay_' . bin2hex(random_bytes(8)), // <= 英数字のみ
+    ];
 
-    return $response;
+    // SDK のメソッドは (payload, headers)
+    $response = $this->client->createCheckoutSession($payload, $headers);
+
+    // SDK の返り値の構造に合わせて body を取り出す（ログで確認した形に基づく）
+    $body = json_decode($response['response'] ?? '{}', true);
+
+    if (empty($body['checkoutSessionId'])) {
+        // 詳細ログを残しつつ例外を投げます（デバッグ用）
+        throw new \Exception('Amazon Pay から checkoutSessionId が返ってきませんでした: ' . json_encode($body));
+    }
+
+    return [
+        'checkoutSessionId' => $body['checkoutSessionId'],
+        // Amazon のレスポンスに webCheckoutDetails.webCheckoutUrl が含まれる想定
+        'webCheckoutUrl'    => $body['webCheckoutDetails']['webCheckoutUrl'] ?? null,
+        'raw'               => $body,
+    ];
 }
+
 
 
 
