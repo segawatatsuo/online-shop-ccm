@@ -81,7 +81,7 @@ public function createPaymentSession(Request $request)
      */
 public function complete(Request $request)
 {
-    // 仮注文の最新のセッションを取得
+    // 🔹 仮注文（pending）の最新レコードを取得
     $order = Order::where('status', 'pending')
                   ->latest()
                   ->firstOrFail();
@@ -92,12 +92,14 @@ public function complete(Request $request)
     \Log::info('AmazonPay complete() 開始', [
         'order_id' => $order->id,
         'amazonCheckoutSessionId' => $amazonCheckoutSessionId,
+        'amount' => $amount,
     ]);
 
     try {
         // AmazonPayService で与信完了（Authorize）処理
         $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
 
+        // サービスから返却される order / customer / delivery
         $order    = $result['order'];
         $customer = $result['customer'];
         $delivery = $result['delivery'];
@@ -126,15 +128,19 @@ public function complete(Request $request)
         // セッション削除
         Session::forget(['cart', 'address']);
 
+        // 注文完了ページにリダイレクト
         return redirect()->route('order.complete')->with('success', '注文が完了しました。');
+
     } catch (\Exception $e) {
         \Log::error('AmazonPay complete() 注文処理エラー', [
             'order_id' => $order->id,
             'error' => $e->getMessage(),
         ]);
+
         return redirect()->route('cart.index')->with('error', '注文処理に失敗しました: ' . $e->getMessage());
     }
 }
+
 
 
 
