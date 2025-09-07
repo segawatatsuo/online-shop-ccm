@@ -80,12 +80,18 @@ class AmazonPayController extends Controller
     public function complete(Request $request)
     {
         $amazonCheckoutSessionId = $request->query('amazonCheckoutSessionId');
+
+        // 仮注文を検索
+        $order = Order::where('amazon_checkout_session_id', $amazonCheckoutSessionId)->firstOrFail();
+        $amount = $order->amount; // ✅ ここで取得
+
         \Log::info('AmazonPay complete() 開始', [
             'amazonCheckoutSessionId' => $amazonCheckoutSessionId
         ]);
 
         try {
-            $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId);
+            // 金額を渡す
+            $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
 
             $order    = $result['order'];
             $customer = $result['customer'];
