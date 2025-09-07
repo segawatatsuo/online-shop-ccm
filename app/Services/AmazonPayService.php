@@ -96,7 +96,8 @@ class AmazonPayService
 
         $payload = [
             'webCheckoutDetails' => [
-                'checkoutResultReturnUrl' => route('amazon-pay.complete'),
+                //'checkoutResultReturnUrl' => route('amazon-pay.complete'),
+                'checkoutResultReturnUrl' => route('amazon-pay.complete') . '?amazonCheckoutSessionId={checkoutSessionId}',
                 'checkoutCancelUrl' => route('amazon-pay.cancel'),
                 'checkoutMode' => 'ProcessOrder',
             ],
