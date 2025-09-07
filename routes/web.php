@@ -244,7 +244,7 @@ Route::prefix('amazon-pay')->name('amazon-pay.')->group(function () {
 */
 Route::prefix('amazon-pay')->name('amazon-pay.')->group(function () {
     Route::get('/payment', [AmazonPayController::class, 'showPayment'])->name('payment');
-    Route::post('/create-session', [AmazonPayController::class, 'createSession'])->name('create-session');
+    Route::post('/create-session', [AmazonPayController::class, 'createPaymentSession'])->name('create-session');
     //Amazon が checkoutSessionId を持った状態で ここにリダイレクトします。
     Route::get('/complete', [AmazonPayController::class, 'complete'])->name('complete');
 
