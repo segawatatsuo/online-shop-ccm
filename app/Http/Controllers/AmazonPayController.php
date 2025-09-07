@@ -116,4 +116,18 @@ class AmazonPayController extends Controller
     {
         return redirect()->route('cart.index')->with('error', 'Amazon Pay による支払いがキャンセルされました。');
     }
+
+
+public function review(Request $request)
+{
+    // Amazon から渡される checkoutSessionId を受け取って注文内容を確認
+    $amazonCheckoutSessionId = $request->query('amazonCheckoutSessionId');
+
+    // ここで API からセッション情報を取得して、確認画面を表示する
+    $session = $this->amazonPayService->getCheckoutSession($amazonCheckoutSessionId);
+
+    return view('amazon-pay.review', compact('session'));
+}
+
+
 }

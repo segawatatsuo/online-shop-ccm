@@ -252,6 +252,8 @@ Route::prefix('amazon-pay')->name('amazon-pay.')->group(function () {
     Route::get('/error', [AmazonPayController::class, 'errorPayment'])->name('error');
     Route::get('/return', [AmazonPayController::class, 'amazonPayReturn'])->name('return');
     Route::post('/webhook', [AmazonPayController::class, 'webhook'])->name('webhook');
+
+    Route::get('/review', [AmazonPayController::class, 'review'])->name('review');
 });
 
 

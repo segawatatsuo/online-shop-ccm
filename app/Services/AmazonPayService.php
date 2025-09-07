@@ -94,26 +94,27 @@ public function createSession($amount, $merchantReferenceId = null)
     // セッションに金額を保存（セキュリティのため）
     session(['payment_amount' => $amount]);
 
-    $payload = [
-        'webCheckoutDetails' => [
-            'checkoutResultReturnUrl' => route('amazon-pay.complete') . '?amazonCheckoutSessionId={checkoutSessionId}',
-            'checkoutCancelUrl'       => route('amazon-pay.cancel'),
+$payload = [
+    'webCheckoutDetails' => [
+        'checkoutReviewReturnUrl' => route('amazon-pay.review'), // ← 必須
+        'checkoutResultReturnUrl' => route('amazon-pay.complete') . '?amazonCheckoutSessionId={checkoutSessionId}',
+        'checkoutCancelUrl'       => route('amazon-pay.cancel'),
+    ],
+    'storeId'              => config('services.amazonpay.store_id'),
+    'chargePermissionType' => 'OneTime',
+    'merchantMetadata'     => [
+        'merchantReferenceId' => $orderId, // 例: 自社注文番号
+        'merchantStoreName'   => 'SHOP_NAME',
+        'noteToBuyer'         => '料金のお支払いです',
+    ],
+    'paymentDetails'       => [
+        'paymentIntent' => 'AuthorizeWithCapture', // 与信+売上確定
+        'chargeAmount'  => [
+            'amount'       => (string)$amount,
+            'currencyCode' => 'JPY',
         ],
-        'storeId'             => config('amazonpay.store_id'),
-        'chargePermissionType'=> 'OneTime',
-        'merchantMetadata'    => [
-            'merchantReferenceId' => $merchantReferenceId,
-            'merchantStoreName'   => config('amazonpay.store_name'),
-            'noteToBuyer'         => '料金のお支払いです',
-        ],
-        'paymentDetails'      => [
-            'paymentIntent' => 'AuthorizeWithCapture',
-            'chargeAmount'  => [
-                'amount'       => (string)$amount,
-                'currencyCode' => 'JPY',
-            ],
-        ],
-    ];
+    ],
+];
 
     /*
     $headers = [
@@ -270,4 +271,20 @@ public function completePayment(string $amazonCheckoutSessionId): array
 
         return json_decode($response['response']['body'], true);
     }
+
+// app/Services/AmazonPayService.php
+
+public function getCheckoutSession(string $checkoutSessionId): array
+{
+    $response = $this->client->getCheckoutSession($checkoutSessionId);
+
+    $body = $response['response'] ?? null;
+    if (!$body) {
+        throw new \Exception('Amazon Pay から CheckoutSession の情報を取得できませんでした。');
+    }
+
+    return json_decode($body, true);
+}
+
+
 }
