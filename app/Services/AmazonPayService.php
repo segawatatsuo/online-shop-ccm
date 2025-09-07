@@ -97,38 +97,44 @@ public function createSession($amount, $merchantReferenceId = null)
     $payload = [
         'webCheckoutDetails' => [
             'checkoutResultReturnUrl' => route('amazon-pay.complete') . '?amazonCheckoutSessionId={checkoutSessionId}',
-            'checkoutCancelUrl' => route('amazon-pay.cancel'),
-            'checkoutMode' => 'ProcessOrder',
+            'checkoutCancelUrl'       => route('amazon-pay.cancel'),
+            'checkoutMode'            => 'ProcessOrder',
         ],
-        'storeId' => config('amazonpay.store_id'),
-        'chargePermissionType' => 'OneTime',
-        'merchantMetadata' => [
+        'storeId'             => config('amazonpay.store_id'),
+        'chargePermissionType'=> 'OneTime',
+        'merchantMetadata'    => [
             'merchantReferenceId' => $merchantReferenceId,
-            'merchantStoreName' => config('amazonpay.store_name'),
-            'noteToBuyer' => '料金のお支払いです',
+            'merchantStoreName'   => config('amazonpay.store_name'),
+            'noteToBuyer'         => '料金のお支払いです',
         ],
-        'paymentDetails' => [
+        'paymentDetails'      => [
             'paymentIntent' => 'AuthorizeWithCapture',
-            'chargeAmount' => [
-                'amount' => (string)$amount,
+            'chargeAmount'  => [
+                'amount'       => (string)$amount,
                 'currencyCode' => 'JPY',
             ],
         ],
         'scopes' => ['name', 'email'],
     ];
 
-    // 実際に Amazon にリクエスト送信
-    $response = $this->client->createCheckoutSession($payload);
+    // Idempotencyキーを必ず付与（重複リクエスト防止）
+    $headers = [
+        'x-amz-pay-idempotency-key' => uniqid('amazonpay_', true),
+    ];
+
+    // ✅ 第2引数にヘッダーを渡す
+    $response = $this->client->createCheckoutSession($payload, $headers);
 
     if (!isset($response['checkoutSessionId'])) {
         throw new \Exception('Amazon Pay から checkoutSessionId が返ってきませんでした: ' . json_encode($response));
     }
 
     return [
-        'checkoutSessionId' => $response['checkoutSessionId'],
+        'checkoutSessionId'  => $response['checkoutSessionId'],
         'webCheckoutDetails' => $response['webCheckoutDetails'] ?? null,
     ];
 }
+
 
 
 
