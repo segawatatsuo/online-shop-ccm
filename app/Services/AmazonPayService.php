@@ -89,7 +89,7 @@ class AmazonPayService
      */
 public function createSession($amount, $merchantReferenceId = null)
 {
-    $merchantReferenceId = $merchantReferenceId ?: 'ORD' . date('YmdHis');
+    $orderId = $merchantReferenceId ?: 'ORD' . date('YmdHis');
 
     // セッションに金額を保存（セキュリティのため）
     session(['payment_amount' => $amount]);
