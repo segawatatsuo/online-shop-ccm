@@ -87,48 +87,78 @@ class AmazonPayService
     /**
      * 決済セッションを作成
      */
-    public function createSession($amount, $merchantReferenceId = null)
-    {
-        $merchantReferenceId = $merchantReferenceId ?: 'Order_' . time();
+public function createSession($amount, $merchantReferenceId = null)
+{
+    $merchantReferenceId = $merchantReferenceId ?: 'Order_' . time();
 
-        // セッションに金額を保存（セキュリティのため）
-        session(['payment_amount' => $amount]);
+    // セッションに金額を保存（セキュリティのため）
+    session(['payment_amount' => $amount]);
 
-        $payload = [
-            'webCheckoutDetails' => [
-                //'checkoutResultReturnUrl' => route('amazon-pay.complete'),
-                'checkoutResultReturnUrl' => route('amazon-pay.complete') . '?amazonCheckoutSessionId={checkoutSessionId}',
-                'checkoutCancelUrl' => route('amazon-pay.cancel'),
-                'checkoutMode' => 'ProcessOrder',
+    $payload = [
+        'webCheckoutDetails' => [
+            'checkoutResultReturnUrl' => route('amazon-pay.complete') . '?amazonCheckoutSessionId={checkoutSessionId}',
+            'checkoutCancelUrl' => route('amazon-pay.cancel'),
+            'checkoutMode' => 'ProcessOrder',
+        ],
+        'storeId' => config('amazonpay.store_id'),
+        'chargePermissionType' => 'OneTime',
+        'merchantMetadata' => [
+            'merchantReferenceId' => $merchantReferenceId,
+            'merchantStoreName' => config('amazonpay.store_name'),
+            'noteToBuyer' => '料金のお支払いです',
+        ],
+        'paymentDetails' => [
+            'paymentIntent' => 'AuthorizeWithCapture',
+            'chargeAmount' => [
+                'amount' => (string)$amount,
+                'currencyCode' => 'JPY',
             ],
-            'storeId' => config('amazonpay.store_id'),
-            'chargePermissionType' => 'OneTime',
-            'merchantMetadata' => [
-                'merchantReferenceId' => $merchantReferenceId,
-                'merchantStoreName' => config('amazonpay.store_name'),
-                'noteToBuyer' => '料金のお支払いです',
-            ],
-            'paymentDetails' => [
-                'paymentIntent' => 'AuthorizeWithCapture',
-                'chargeAmount' => [
-                    'amount' => (string)$amount,
-                    'currencyCode' => 'JPY',
-                ],
-            ],
-            'scopes' => ['name', 'email'],
-        ];
+        ],
+        'scopes' => ['name', 'email'],
+    ];
 
-        $payloadJson = json_encode($payload, JSON_UNESCAPED_UNICODE);
-        $signature = $this->client->generateButtonSignature($payloadJson);
+    // 実際に Amazon にリクエスト送信
+    $response = $this->client->createCheckoutSession($payload);
 
-        return [
-            'payloadJson' => $payloadJson,
-            'signature' => $signature,
-            'publicKeyId' => config('amazonpay.public_key_id'),
-            'merchantId' => config('amazonpay.merchant_id'),
-            'sandbox' => config('amazonpay.sandbox'),
-        ];
+    if (!isset($response['checkoutSessionId'])) {
+        throw new \Exception('Amazon Pay から checkoutSessionId が返ってきませんでした: ' . json_encode($response));
     }
+
+    return [
+        'checkoutSessionId' => $response['checkoutSessionId'],
+        'webCheckoutDetails' => $response['webCheckoutDetails'] ?? null,
+    ];
+}
+
+
+
+
+    public function createPaymentSession(float $amount, ?string $merchantReferenceId = null): array
+{
+    $merchantReferenceId = $merchantReferenceId ?: 'order_' . time();
+
+    $payload = [
+        'webCheckoutDetails' => [
+            'checkoutResultReturnUrl' => route('amazon-pay.complete'),
+        ],
+        'storeId' => config('services.amazon_pay.store_id'),
+        'paymentDetails' => [
+            'paymentIntent' => 'AuthorizeWithCapture',
+            'chargeAmount' => [
+                'amount' => number_format($amount, 2, '.', ''),
+                'currencyCode' => 'JPY',
+            ],
+        ],
+        'merchantMetadata' => [
+            'merchantReferenceId' => $merchantReferenceId,
+            'customInformation' => 'Order created at ' . now(),
+        ],
+    ];
+
+    $response = $this->client->createCheckoutSession($payload);
+
+    return $response;
+}
 
 
 
