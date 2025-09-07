@@ -89,7 +89,7 @@ class AmazonPayService
      */
 public function createSession($amount, $merchantReferenceId = null)
 {
-    $merchantReferenceId = $merchantReferenceId ?: 'Order_' . time();
+    $merchantReferenceId = $merchantReferenceId ?: 'ORD' . date('YmdHis');
 
     // セッションに金額を保存（セキュリティのため）
     session(['payment_amount' => $amount]);
@@ -98,7 +98,6 @@ public function createSession($amount, $merchantReferenceId = null)
         'webCheckoutDetails' => [
             'checkoutResultReturnUrl' => route('amazon-pay.complete') . '?amazonCheckoutSessionId={checkoutSessionId}',
             'checkoutCancelUrl'       => route('amazon-pay.cancel'),
-            'checkoutMode'            => 'ProcessOrder',
         ],
         'storeId'             => config('amazonpay.store_id'),
         'chargePermissionType'=> 'OneTime',
@@ -114,15 +113,13 @@ public function createSession($amount, $merchantReferenceId = null)
                 'currencyCode' => 'JPY',
             ],
         ],
-        'scopes' => ['name', 'email'],
     ];
 
-    // Idempotencyキーを必ず付与（重複リクエスト防止）
     $headers = [
         'x-amz-pay-idempotency-key' => uniqid('amazonpay_', true),
     ];
 
-    // ✅ 第2引数にヘッダーを渡す
+    // ✅ checkoutMode は削除！
     $response = $this->client->createCheckoutSession($payload, $headers);
 
     if (!isset($response['checkoutSessionId'])) {
@@ -134,6 +131,7 @@ public function createSession($amount, $merchantReferenceId = null)
         'webCheckoutDetails' => $response['webCheckoutDetails'] ?? null,
     ];
 }
+
 
 
 
