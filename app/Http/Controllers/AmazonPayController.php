@@ -54,24 +54,26 @@ class AmazonPayController extends Controller
 
 
     // CheckoutSession 作成時（仮注文保存）
-    public function createPaymentSession(Request $request)
-    {
-        $amount = $request->input('amount');
-        $orderNumber = 'ORD' . now()->format('YmdHis');
+public function createPaymentSession(Request $request)
+{
+    $amount = $request->input('amount');
+    $orderNumber = 'ORD' . now()->format('YmdHis');
 
-        // CheckoutSession 作成
-        $result = $this->amazonPayService->createPaymentSession($amount, $orderNumber);
+    // CheckoutSession 作成
+    $result = $this->amazonPayService->createPaymentSession($amount, $orderNumber);
 
-        // 仮注文を作成
-        $order = Order::create([
-            'order_number' => $orderNumber,
-            'amount' => $amount,
-            'status' => 'pending', // 仮注文
-            'amazon_checkout_session_id' => $result['checkoutSessionId'],
-        ]);
+    // 仮注文を作成（CheckoutSessionId を保存）
+    $order = Order::create([
+        'order_number' => $orderNumber,
+        'amount' => $amount,
+        'status' => 'pending', // 仮注文
+        'amazon_checkout_session_id' => $result['checkoutSessionId'],
+    ]);
 
-        return redirect($result['webCheckoutUrl']);
-    }
+    // Amazon Pay へリダイレクト
+    return redirect($result['webCheckoutUrl']);
+}
+
 
 
     /**
@@ -79,55 +81,61 @@ class AmazonPayController extends Controller
      */
 public function complete(Request $request)
 {
-    $amazonCheckoutSessionId = $request->query('amazonCheckoutSessionId');
+    // 仮注文の最新のセッションを取得
+    $order = Order::where('status', 'pending')
+                  ->latest()
+                  ->firstOrFail();
 
-    if (!$amazonCheckoutSessionId) {
-        \Log::error('AmazonPay complete() amazonCheckoutSessionId が取得できませんでした');
-        return redirect()->route('cart.index')->with('error', '決済情報が取得できませんでした。');
-    }
-
-    // 仮注文を検索
-    $order = Order::where('amazon_checkout_session_id', $amazonCheckoutSessionId)->firstOrFail();
+    $amazonCheckoutSessionId = $order->amazon_checkout_session_id;
     $amount = $order->amount;
 
     \Log::info('AmazonPay complete() 開始', [
-        'amazonCheckoutSessionId' => $amazonCheckoutSessionId,
         'order_id' => $order->id,
+        'amazonCheckoutSessionId' => $amazonCheckoutSessionId,
     ]);
 
     try {
+        // AmazonPayService で与信完了（Authorize）処理
         $result = $this->amazonPayService->completePayment($amazonCheckoutSessionId, $amount);
 
         $order    = $result['order'];
         $customer = $result['customer'];
         $delivery = $result['delivery'];
 
-        // === メール送信 ===
+        // メール送信
         try {
             Mail::to($customer->email)->send(new OrderConfirmed($order, $customer, $delivery));
             \Log::info('顧客向け注文確認メール送信完了', ['order_id' => $order->id]);
         } catch (\Exception $e) {
-            \Log::error('顧客向け注文確認メール送信失敗', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            \Log::error('顧客向け注文確認メール送信失敗', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         try {
             Mail::to('segawa82@nifty.com')->send(new OrderNotification($order, $customer, $delivery));
             \Log::info('ショップ向け注文通知メール送信完了', ['order_id' => $order->id]);
         } catch (\Exception $e) {
-            \Log::error('ショップ向け注文通知メール送信失敗', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            \Log::error('ショップ向け注文通知メール送信失敗', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
+        // セッション削除
         Session::forget(['cart', 'address']);
 
         return redirect()->route('order.complete')->with('success', '注文が完了しました。');
     } catch (\Exception $e) {
         \Log::error('AmazonPay complete() 注文処理エラー', [
             'order_id' => $order->id,
-            'error'    => $e->getMessage()
+            'error' => $e->getMessage(),
         ]);
         return redirect()->route('cart.index')->with('error', '注文処理に失敗しました: ' . $e->getMessage());
     }
 }
+
 
 
 
