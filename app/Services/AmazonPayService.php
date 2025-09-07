@@ -187,6 +187,8 @@ public function createPaymentSession(float $amount, ?string $merchantReferenceId
     // SDK のメソッドは (payload, headers)
     $response = $this->client->createCheckoutSession($payload, $headers);
 
+    dd($response);
+
     // SDK の返り値の構造に合わせて body を取り出す（ログで確認した形に基づく）
     $body = json_decode($response['response'] ?? '{}', true);
 
